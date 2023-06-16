@@ -1,0 +1,41 @@
+[package]
+name = "freedom-api"
+version = "1.0.0"
+edition = "2021"
+authors = ["Caleb Leinz <caleb.leinz@atlasspace.com>"]
+description = "Freedom API for Rustaceans"
+readme = "README.md"
+repository = "https://github.com/ATLAS-Space-Operations/rust-freedom-api"
+
+[dependencies]
+async-stream = { version = "0.3.5" }
+async-trait = { version = "0.1.77" }
+futures-core = { version = "0.3.30" }
+reqwest = { version = "0.12.4", features = ["json"]}
+serde = { version = "1.0.195", features = ["derive"] }
+serde_json = { version = "1.0.111" }
+thiserror = { version = "1.0.56" }
+time = { version = "0.3.36", features = ["macros", "parsing", "formatting"] }
+tracing = { version = "0.1.40" }
+url = { version = "2.5.0" }
+
+# Optional dependencies
+mockall = { version = "0.12.1", optional = true }
+moka = { version = "0.12.3", features = ["future"], optional = true }
+
+# ATLAS internal dependencies
+freedom-config = { git = "https://github.com/ATLAS-Space-Operations/rust-freedom-config", branch = "main", features = ["serde"] }
+freedom-models = { git = "https://github.com/ATLAS-Space-Operations/rust-freedom-models", branch = "main", features = ["serde"] }
+
+[dev-dependencies]
+dotenvy = { version = "0.15.7" }
+futures = { version = "0.3.30" }
+tokio = { version = "1.28.2", features = ["full"] }
+tracing-test = { version = "0.2.4" }
+
+[features]
+caching = ["dep:moka", "serde/rc"]
+mocking = ["dep:mockall"]
+
+[[example]]
+name = "fetch_token"
