@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .secret_from_env()?
         .build()?;
 
-    let mut atlas_client = Client::from_config(atlas_config);
+    let atlas_client = Client::from_config(atlas_config);
 
     // Query Freedom for a list of all Satellites, printing the names of the satellite which
     // passed deserialization
@@ -37,12 +37,42 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+## Chaining API returns
+
+Many of the data types exposed in this library can be navigated to through other
+resources, for instance a task request object holds links to the site object the
+task was scheduled at.
+
+Rather than making a call to fetch the request, then parse the site ID, then
+request the site from the ID, you can instead fetch the site directly from the
+return of the request call
+
+```rust, no_run
+use freedom_api::prelude::*;
+use freedom_config::Config;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let atlas_config = Config::from_env()?;
+    let atlas_client = Client::from_config(atlas_config);
+
+    let site_from_request: Site = atlas_client
+        .get_request_by_id(42)
+        .await?
+        .get_site(&atlas_client)
+        .await?;
+
+
+    Ok(())
+}
+```
+
 ## Api Return Type
 
 ### Async Trait
 
 When looking at the return type of the API methods, they may appear daunting. This is mostly
-resulting from async lifetimes brought about by useage of [`async_trait`](https://docs.rs/async-trait/latest/async_trait/).
+resulting from async lifetimes brought about by usage of [`async_trait`](https://docs.rs/async-trait/latest/async_trait/).
 Once the [async trait feature](https://blog.rust-lang.org/inside-rust/2023/05/03/stabilizing-async-fn-in-trait.html)
 is release in stable rust. This complexity will be alleviated.
 

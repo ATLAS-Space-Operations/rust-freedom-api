@@ -24,7 +24,7 @@ pub mod prelude {
         error::{BuilderError, Error, RuntimeError},
     };
     pub use freedom_models::{
-        account::*, satellite::*, satellite_configuration::*, task::*, user::*,
+        account::*, satellite::*, satellite_configuration::*, site::*, task::*, user::*,
     };
 }
 
