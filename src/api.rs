@@ -48,7 +48,7 @@ impl<'a, T: 'a + Send> PaginatedErr<'a, T> for Error {
 ///
 /// The Freedom API is generic over "containers". Each implementer of the [`FreedomApi`] trait must
 /// also define a container. This is useful since certain clients will return Arc'd values, i.e. the
-/// caching client. While others return the values wrapped in a simple [`Inner`] type which is just
+/// caching client. While others return the values wrapped in a simple `Inner` type which is just
 /// a stack value
 pub trait FreedomApiContainer<T>: Deref<Target = T> + FreedomApiValue {
     fn into_inner(self) -> T;
@@ -268,8 +268,7 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a single [`TaskRequest`](freedom_models::request::TaskRequest) matching the
-    /// provided ID.
+    /// Produces a single [`TaskRequest`] matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_request_by_task_id(
@@ -281,7 +280,7 @@ pub trait FreedomApi: Send {
         self.get(uri).await
     }
 
-    /// Produces a paginated stream of [`TaskRequest`](freedom_models::request::TaskRequest) objects.
+    /// Produces a paginated stream of [`TaskRequest`] objects.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
@@ -292,7 +291,7 @@ pub trait FreedomApi: Send {
         }
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
+    /// Produces a vector of [`TaskRequest`] items,
     /// representing all the task requests matching the account at the provided URI and whose
     /// target time overlaps with the provided time range.
     ///
@@ -319,7 +318,7 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a paginated stream of [`TaskRequest`](freedom_models::request::TaskRequest)
+    /// Produces a paginated stream of [`TaskRequest`]
     /// objects whose account name matches the provided name, and whose pass will occur today.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
@@ -332,7 +331,7 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a paginated stream of [`TaskRequest`](freedom_models::request::TaskRequest)
+    /// Produces a paginated stream of [`TaskRequest`]
     /// objects whose satellite configuration matches that of the configuration at the
     /// `configuration_uri` endpoint.
     ///
@@ -358,10 +357,9 @@ pub trait FreedomApi: Send {
         self.get_paginated::<TaskRequest>(uri)
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
-    /// representing all the task requests which match the provided configuration, whose satellite
-    /// name matches one of the names provided as part of `satellite_name`, and which overlaps the
-    /// provided time range.
+    /// Produces a vector of [`TaskRequest`] items, representing all the task requests which match
+    /// the provided configuration, whose satellite name matches one of the names provided as part
+    /// of `satellite_name`, and which overlaps the provided time range.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_by_configuration_and_satellite_names_and_target_date_between<T, I, S>(
@@ -395,9 +393,9 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
-    /// representing all the task requests matching the configuration at the provided URI and whose
-    /// target time overlaps with the provided time range.
+    /// Produces a vector of [`TaskRequest`] items, representing all the task requests matching the
+    /// configuration at the provided URI and whose target time overlaps with the provided time
+    /// range.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
@@ -425,7 +423,7 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
+    /// Produces a vector of [`TaskRequest`] items,
     /// representing all the task requests whose ID matches one of the IDs provided as part of
     /// `ids`.
     ///
@@ -449,8 +447,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a paginated stream of [`TaskRequest`](freedom_models::request::TaskRequest)
-    /// objects which are public, and which overlap with the provided time range.
+    /// Produces a paginated stream of [`TaskRequest`] objects which are public, and which overlap
+    /// with the provided time range.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
@@ -470,8 +468,8 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a paginated stream of [`TaskRequest`](freedom_models::request::TaskRequest)
-    /// objects whose satellite name matches one of the names provided as part of `satellite_name`.
+    /// Produces a paginated stream of [`TaskRequest`] objects whose satellite name matches one of
+    /// the names provided as part of `satellite_name`.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
@@ -489,9 +487,9 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
-    /// representing all the task requests whose satellite name matches the provided name and whose
-    /// target time overlaps with the provided time range.
+    /// Produces a vector of [`TaskRequest`] items, representing all the task requests whose
+    /// satellite name matches the provided name and whose target time overlaps with the provided
+    /// time range.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_by_satellite_name_and_target_date_between<T>(
@@ -519,8 +517,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a paginated stream of [`TaskRequest`](freedom_models::request::TaskRequest)
-    /// objects whose status matches the provided status.
+    /// Produces a paginated stream of [`TaskRequest`] objects whose status matches the provided
+    /// status.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
@@ -540,9 +538,8 @@ pub trait FreedomApi: Send {
         Ok(self.get_paginated(uri))
     }
 
-    /// Produces a paginated stream of [`TaskRequest`](freedom_models::request::TaskRequest),
-    /// representing all the task requests which match the provided status, account, and overlap
-    /// the provided time range.
+    /// Produces a paginated stream of [`TaskRequest`], representing all the task requests which
+    /// match the provided status, account, and overlap the provided time range.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
@@ -571,9 +568,8 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
-    /// representing all the tasks which match the provided type, overlap with the provided time
-    /// range.
+    /// Produces a vector of [`TaskRequest`] items, representing all the tasks which match the
+    /// provided type, overlap with the provided time range.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_by_type_and_target_date_between<T>(
@@ -602,8 +598,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
-    /// representing the list of tasks which have already occurred today.
+    /// Produces a vector of [`TaskRequest`] items, representing the list of tasks which have
+    /// already occurred today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_passed_today(
@@ -617,8 +613,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`TaskRequest`](freedom_models::request::TaskRequest) items,
-    /// representing the list of tasks which will occur later today.
+    /// Produces a vector of [`TaskRequest`] items, representing the list of tasks which will occur
+    /// later today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_upcoming_today(
@@ -632,7 +628,7 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a paginated stream of [`Satellite`](freedom_models::satellite::Satellite) objects.
+    /// Produces a paginated stream of [`Satellite`] objects.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
@@ -642,7 +638,7 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a single [`Task`](freedom_models::task::Task) matching the provided ID.
+    /// Produces a single [`Task`] matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_task_by_id(&mut self, task_id: i32) -> Result<Self::Container<Task>, Error> {
@@ -651,8 +647,8 @@ pub trait FreedomApi: Send {
         self.get(uri).await
     }
 
-    /// Produces a vector of [`Task`](freedom_models::task::Task) items, representing all the tasks
-    /// which match the provided account, and intersect with the provided time frame.
+    /// Produces a vector of [`Task`] items, representing all the tasks which match the provided
+    /// account, and intersect with the provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_by_account_and_pass_overlapping<T>(
@@ -679,9 +675,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`Task`](freedom_models::task::Task) items, representing all the tasks
-    /// which match the provided account, satellite, band, and intersect with the provided time
-    /// frame.
+    /// Produces a vector of [`Task`] items, representing all the tasks which match the provided
+    /// account, satellite, band, and intersect with the provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_by_account_and_satellite_and_band_and_pass_overlapping<T, U, V>(
@@ -715,9 +710,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`Task`](freedom_models::task::Task) items, representing all the tasks
-    /// which match the provided account, site configuration, band, and intersect with the provided
-    /// time frame.
+    /// Produces a vector of [`Task`] representing all the tasks which match the provided account,
+    /// site configuration, band, and intersect with the provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_by_account_and_site_configuration_and_band_and_pass_overlapping<T, U, V>(
@@ -751,8 +745,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`Task`](freedom_models::task::Task) items, representing all the tasks
-    /// contained within the provided time frame.
+    /// Produces a vector of [`Task`] items, representing all the tasks contained within the
+    /// provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     ///
@@ -779,8 +773,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a paginated stream of [`Task`](freedom_models::task::Task) items, representing all
-    /// the tasks which overlap the provided time frame.
+    /// Produces a paginated stream of [`Task`] items, representing all the tasks which overlap the
+    /// provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     ///
@@ -810,8 +804,8 @@ pub trait FreedomApi: Send {
         self.get_paginated(uri)
     }
 
-    /// Produces a vector of [`Task`](freedom_models::task::Task) items, representing the list of
-    /// tasks which have already occurred today.
+    /// Produces a vector of [`Task`] items, representing the list of tasks which have already
+    /// occurred today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_passed_today(&mut self) -> Result<Self::Container<Vec<Task>>, Error> {
@@ -823,8 +817,8 @@ pub trait FreedomApi: Send {
             .items)
     }
 
-    /// Produces a vector of [`Task`](freedom_models::task::Task) items, representing the list of
-    /// tasks which will occur later today.
+    /// Produces a vector of [`Task`] items, representing the list of tasks which will occur later
+    /// today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_upcoming_today(&mut self) -> Result<Self::Container<Vec<Task>>, Error> {
@@ -889,7 +883,7 @@ pub trait FreedomApi: Send {
         self.get_token(&payload).await
     }
 
-    /// Produces a paginated stream of [`User`](freedom_models::user::User) objects.
+    /// Produces a paginated stream of [`User`] objects.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type

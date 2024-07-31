@@ -48,16 +48,18 @@ is release in stable rust. This complexity will be alleviated.
 
 ### Container
 
-There is however another complexity that exists in the return types of API methods. You will
-note that what is returned by a given method call is of type `Self::Container<T>` rather than
-simply type `T`. This complexity is required since there are multiple API clients, most notably
-the default [`Client`] and the [`CachingClient`](crate::caching_client::CachingClient)
-(available via the `caching` feature flag). The caching client is backed by a concurrent caching
-system, and in order to avoid unnecessarily cloning all responses from the caching client to the
-call site, the cached values are stored as `Arc<T>` so they can be cheaply cloned from the
-cache. This complexity will be mostly transparent to the caller, since the container is required
-to implement [`Deref<T>`](std::ops::Deref). If however you need to mutate the data after
-receiving it, simply clone the value out of its container and mutate the cloned value.
+There is however another complexity that exists in the return types of API
+methods. You will note that what is returned by a given method call is of type
+`Self::Container<T>` rather than simply type `T`. This complexity is required
+since there are multiple API clients, most notably the default [`Client`] and
+the `CachingClient` (available via the `caching` feature flag). The caching
+client is backed by a concurrent caching system, and in order to avoid
+unnecessarily cloning all responses from the caching client to the call site,
+the cached values are stored as `Arc<T>` so they can be cheaply cloned from the
+cache. This complexity will be mostly transparent to the caller, since the
+container is required to implement [`Deref<T>`](std::ops::Deref). If however you
+need to mutate the data after receiving it, simply clone the value out of its
+container and mutate the cloned value.
 
 ```rust
 # use std::sync::Arc;
