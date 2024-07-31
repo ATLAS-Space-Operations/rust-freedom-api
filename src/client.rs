@@ -137,8 +137,7 @@ impl FreedomApi for Client {
             .basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .json(&msg)
             .send()
-            .await
-            .inspect_err(|error| println!("{:?}", error))?;
+            .await?;
 
         resp.json::<T>().await.map_err(From::from)
     }

@@ -12,6 +12,7 @@ use async_trait::async_trait;
 use freedom_config::Config;
 use freedom_models::{
     account::Account,
+    band::Band,
     pagination::Paginated,
     satellite::Satellite,
     task::{Task, TaskRequest, TaskStatusType, TaskType},
@@ -75,60 +76,6 @@ pub trait FreedomApi: Send {
     where
         T: FreedomApiValue;
 
-    fn config(&self) -> &Config;
-
-    fn config_mut(&mut self) -> &mut Config;
-
-    /// Fetch the URL from the given path
-    ///
-    /// # Panics
-    ///
-    /// Panics in the event the URL cannot be constructed from the provided path
-    fn path_to_url(&self, path: impl AsRef<str>) -> Url {
-        let url = self.config().environment().freedom_entrypoint();
-        url.join(path.as_ref()).expect("Invalid URL construction")
-    }
-
-    async fn post<S, T>(&self, url: Url, msg: S) -> Result<T, Error>
-    where
-        S: serde::Serialize + Send + Sync,
-        T: FreedomApiValue;
-
-    /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
-    ///
-    /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_account_by_id(
-        &mut self,
-        account_id: i32,
-    ) -> Result<Self::Container<Account>, Error> {
-        let uri = self.path_to_url(format!("accounts/{account_id}"));
-        self.get(uri).await
-    }
-
-    /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
-    ///
-    /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_account_by_name(
-        &mut self,
-        account_name: &str,
-    ) -> Result<Self::Container<Account>, Error> {
-        let mut uri = self.path_to_url("accounts/search/findOneByName");
-        uri.set_query(Some(&format!("name={account_name}")));
-        println!("{:?}", uri);
-        self.get(uri).await
-    }
-
-    /// Produces a paginated stream of [`Account`](freedom_models::account::Account) objects.
-    ///
-    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
-    /// and return type
-    fn get_accounts(
-        &mut self,
-    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Account>, Error>> + '_>> {
-        let uri = self.path_to_url("accounts");
-        self.get_paginated(uri)
-    }
-
     /// Creates a stream of items from a paginated endpoint.
     ///
     /// The stream is produced as a collection of `Result<T>`. This is so that if any one item fails
@@ -172,6 +119,107 @@ pub trait FreedomApi: Send {
                 }
             }
         })
+    }
+
+    fn config(&self) -> &Config;
+
+    fn config_mut(&mut self) -> &mut Config;
+
+    /// Fetch the URL from the given path
+    ///
+    /// # Panics
+    ///
+    /// Panics in the event the URL cannot be constructed from the provided path
+    fn path_to_url(&self, path: impl AsRef<str>) -> Url {
+        let url = self.config().environment().freedom_entrypoint();
+        url.join(path.as_ref()).expect("Invalid URL construction")
+    }
+
+    async fn post<S, T>(&self, url: Url, msg: S) -> Result<T, Error>
+    where
+        S: serde::Serialize + Send + Sync,
+        T: FreedomApiValue;
+
+    /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    async fn get_account_by_name(
+        &mut self,
+        account_name: &str,
+    ) -> Result<Self::Container<Account>, Error> {
+        let mut uri = self.path_to_url("accounts/search/findOneByName");
+        uri.set_query(Some(&format!("name={account_name}")));
+        self.get(uri).await
+    }
+
+    /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    async fn get_account_by_id(
+        &mut self,
+        account_id: i32,
+    ) -> Result<Self::Container<Account>, Error> {
+        let uri = self.path_to_url(format!("accounts/{account_id}"));
+        self.get(uri).await
+    }
+
+    /// Produces a paginated stream of [`Account`](freedom_models::account::Account) objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_accounts(
+        &mut self,
+    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Account>, Error>> + '_>> {
+        let uri = self.path_to_url("accounts");
+        self.get_paginated(uri)
+    }
+
+    /// Produces a paginated stream of [`Band`] objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_satellite_bands(
+        &mut self,
+    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Band>, Error>> + '_>> {
+        let uri = self.path_to_url("satellite_bands/search/findAll");
+        self.get_paginated(uri)
+    }
+
+    /// Produces a single [`Band`] matching the provided ID.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    async fn get_satellite_band_by_id(
+        &mut self,
+        satellite_band_id: i32,
+    ) -> Result<Self::Container<Band>, Error> {
+        let uri = self.path_to_url(format!("satellite_bands/{satellite_band_id}"));
+        self.get(uri).await
+    }
+
+    /// Produces a single [`Band`] matching the provided name.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    async fn get_satellite_band_by_name(
+        &mut self,
+        satellite_band_name: &str,
+    ) -> Result<Self::Container<Band>, Error> {
+        let mut uri = self.path_to_url("satellite_bands/search/findOneByName");
+        uri.set_query(Some(&format!("name={satellite_band_name}")));
+        self.get(uri).await
+    }
+
+    /// Produces a paginated stream of [`Band`] objects matching the provided account name.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_satellite_bands_by_account_name(
+        &mut self,
+        account_name: &str,
+    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Band>, Error>> + '_>> {
+        let mut uri = self.path_to_url("satellite_bands/search/findAllByAccountName");
+        uri.set_query(Some(&format!("accountName={account_name}")));
+
+        self.get_paginated(uri)
     }
 
     /// Produces a single [`TaskRequest`](freedom_models::request::TaskRequest) matching the
