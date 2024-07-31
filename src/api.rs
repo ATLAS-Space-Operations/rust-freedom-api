@@ -268,11 +268,11 @@ pub trait FreedomApi: Send + Sync {
     /// Produces a single [`TaskRequest`] matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_request_by_task_id(
+    async fn get_request_by_id(
         &self,
-        task_id: i32,
+        task_request_id: i32,
     ) -> Result<Self::Container<TaskRequest>, Error> {
-        let uri = self.path_to_url(format!("requests/{task_id}"));
+        let uri = self.path_to_url(format!("requests/{task_request_id}"));
 
         self.get(uri).await
     }
