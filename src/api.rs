@@ -15,6 +15,7 @@ use freedom_models::{
     band::Band,
     pagination::Paginated,
     satellite::Satellite,
+    satellite_configuration::SatelliteConfiguration,
     task::{Task, TaskRequest, TaskStatusType, TaskType},
     user::User,
     utils::Embedded,
@@ -218,6 +219,51 @@ pub trait FreedomApi: Send {
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Band>, Error>> + '_>> {
         let mut uri = self.path_to_url("satellite_bands/search/findAllByAccountName");
         uri.set_query(Some(&format!("accountName={account_name}")));
+
+        self.get_paginated(uri)
+    }
+
+    /// Produces a paginated stream of [`SatelliteConfiguration`] objects matching the provided
+    /// account name.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_satellite_configurations_by_account_name(
+        &mut self,
+        account_name: &str,
+    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
+    {
+        let mut uri = self.path_to_url("satellite_configurations/search/findAllByAccountName");
+        uri.set_query(Some(&format!("accountName={account_name}")));
+
+        self.get_paginated(uri)
+    }
+
+    /// Produces a paginated stream of [`SatelliteConfiguration`] objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_satellite_configurations(
+        &mut self,
+    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
+    {
+        let uri = self.path_to_url("satellite_configurations/search/findAll");
+
+        self.get_paginated(uri)
+    }
+
+    /// Produces a paginated stream of [`SatelliteConfiguration`] objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_satellite_configurations_by_id(
+        &mut self,
+        satellite_configuration_id: i32,
+    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
+    {
+        let uri = self.path_to_url(format!(
+            "satellite_configurations/{satellite_configuration_id}"
+        ));
 
         self.get_paginated(uri)
     }
