@@ -5,8 +5,19 @@ to use and idiomatic way. The API is entirely asynchronous, support for a blocki
 be added sometime in the future, but for now an executor is required for usage, we recommend
 [tokio](https://tokio.rs/).
 
-To get started with this library, simply import the crate's prelude, build a client and make a
-query.
+## Installation 
+
+To incorporate the Freedom API into an existing cargo project simply invoke the
+following from the project's root directory:
+
+```console
+$ cargo add --git https://github.com/ATLAS-Space-Operations/rust-freedom-api
+```
+
+## Getting Started
+
+Once added, simply import the crate's prelude, build a client and make a
+query:
 
 ```rust, no_run
 use freedom_api::prelude::*;
@@ -18,8 +29,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Build the client, grabbing the API keys from environment variables
     let atlas_config = Config::builder()
         .environment(Test)
-        .key_from_env()?
-        .secret_from_env()?
+        .key_from_env()?    // Sources the key from ATLAS_KEY
+        .secret_from_env()? // Sources the secret from ATLAS_SECRET
         .build()?;
 
     let atlas_client = Client::from_config(atlas_config);
@@ -37,7 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Chaining API returns
+## Chaining API Returns
 
 Many of the data types exposed in this library can be navigated to through other
 resources, for instance a task request object holds links to the site object the
@@ -45,7 +56,7 @@ task was scheduled at.
 
 Rather than making a call to fetch the request, then parse the site ID, then
 request the site from the ID, you can instead fetch the site directly from the
-return of the request call
+return of the request call:
 
 ```rust, no_run
 use freedom_api::prelude::*;
@@ -67,7 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Api Return Type
+## API Return Type
 
 ### Async Trait
 
@@ -92,7 +103,8 @@ need to mutate the data after receiving it, simply clone the value out of its
 container and mutate the cloned value.
 
 ```rust
-# use std::sync::Arc;
+use std::sync::Arc;
+
 let arc_value = Arc::new(String::from("Hello "));
 let mut mutable_value = (*arc_value).clone();
 mutable_value.push_str("World!");
