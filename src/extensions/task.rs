@@ -12,21 +12,21 @@ pub trait TaskExt {
 
     async fn get_task_request<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<TaskRequest>, crate::Error>
     where
         C: FreedomApi + Send;
 
     async fn get_config<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<SiteConfiguration>, crate::Error>
     where
         C: FreedomApi + Send;
 
     async fn get_azel<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<AzEl>, crate::Error>
     where
         C: FreedomApi + Send;
@@ -40,30 +40,30 @@ impl TaskExt for Task {
 
     async fn get_task_request<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<TaskRequest>, crate::Error>
     where
-        C: FreedomApi + Send,
+        C: FreedomApi,
     {
         super::get_item("taskRequest", &self.links, client).await
     }
 
     async fn get_config<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<SiteConfiguration>, crate::Error>
     where
-        C: FreedomApi + Send,
+        C: FreedomApi + Send + Sync,
     {
         super::get_item("config", &self.links, client).await
     }
 
     async fn get_azel<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<AzEl>, crate::Error>
     where
-        C: FreedomApi + Send,
+        C: FreedomApi + Send + Sync,
     {
         super::get_item("azel", &self.links, client).await
     }

@@ -5,7 +5,7 @@ use futures::StreamExt;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Config::from_env()?;
-    let mut client = Client::from_config(config);
+    let client = Client::from_config(config);
     let satellite_configurations = client
         .get_satellite_configurations_by_account_name("ATLAS")
         .filter_map(|result| async move { result.ok() })

@@ -61,7 +61,7 @@ pub type PaginatedStream<'a, T> = Pin<Box<dyn Stream<Item = Result<T, Error>> + 
 
 /// The primary trait for interfacing with Freedom
 #[async_trait]
-pub trait FreedomApi: Send {
+pub trait FreedomApi: Send + Sync {
     /// The [`FreedomApi`] supports implementors with different so-called "container" types.
     ///
     /// Certain [`FreedomApi`] clients return an `Arc<T>` for each call, others return an `Inner<T>`
@@ -73,7 +73,7 @@ pub trait FreedomApi: Send {
     ///
     /// The JSON response is then deserialized into the required type, erroring if the
     /// deserialization fails, and providing the object if it does not.
-    async fn get<T>(&mut self, url: Url) -> Result<T, Error>
+    async fn get<T>(&self, url: Url) -> Result<T, Error>
     where
         T: FreedomApiValue;
 
@@ -91,7 +91,7 @@ pub trait FreedomApi: Send {
     /// penalty (it requires an allocation), however this will be negligible given the latency of
     /// the responses. For more information on pinning in rust refer to the [pinning chapter](https://rust-lang.github.io/async-book/04_pinning/01_chapter.html)
     /// of the async book.
-    fn get_paginated<T>(&mut self, head_url: Url) -> PaginatedStream<'_, Self::Container<T>>
+    fn get_paginated<T>(&self, head_url: Url) -> PaginatedStream<'_, Self::Container<T>>
     where
         T: 'static + FreedomApiValue,
     {
@@ -145,7 +145,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_account_by_name(
-        &mut self,
+        &self,
         account_name: &str,
     ) -> Result<Self::Container<Account>, Error> {
         let mut uri = self.path_to_url("accounts/search/findOneByName");
@@ -156,10 +156,7 @@ pub trait FreedomApi: Send {
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_account_by_id(
-        &mut self,
-        account_id: i32,
-    ) -> Result<Self::Container<Account>, Error> {
+    async fn get_account_by_id(&self, account_id: i32) -> Result<Self::Container<Account>, Error> {
         let uri = self.path_to_url(format!("accounts/{account_id}"));
         self.get(uri).await
     }
@@ -169,7 +166,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_accounts(
-        &mut self,
+        &self,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Account>, Error>> + '_>> {
         let uri = self.path_to_url("accounts");
         self.get_paginated(uri)
@@ -180,7 +177,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_satellite_bands(
-        &mut self,
+        &self,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Band>, Error>> + '_>> {
         let uri = self.path_to_url("satellite_bands/search/findAll");
         self.get_paginated(uri)
@@ -190,7 +187,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_satellite_band_by_id(
-        &mut self,
+        &self,
         satellite_band_id: i32,
     ) -> Result<Self::Container<Band>, Error> {
         let uri = self.path_to_url(format!("satellite_bands/{satellite_band_id}"));
@@ -201,7 +198,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_satellite_band_by_name(
-        &mut self,
+        &self,
         satellite_band_name: &str,
     ) -> Result<Self::Container<Band>, Error> {
         let mut uri = self.path_to_url("satellite_bands/search/findOneByName");
@@ -214,7 +211,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_satellite_bands_by_account_name(
-        &mut self,
+        &self,
         account_name: &str,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Band>, Error>> + '_>> {
         let mut uri = self.path_to_url("satellite_bands/search/findAllByAccountName");
@@ -229,7 +226,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_satellite_configurations_by_account_name(
-        &mut self,
+        &self,
         account_name: &str,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
     {
@@ -244,7 +241,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_satellite_configurations(
-        &mut self,
+        &self,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
     {
         let uri = self.path_to_url("satellite_configurations/search/findAll");
@@ -257,7 +254,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_satellite_configurations_by_id(
-        &mut self,
+        &self,
         satellite_configuration_id: i32,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
     {
@@ -272,7 +269,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_request_by_task_id(
-        &mut self,
+        &self,
         task_id: i32,
     ) -> Result<Self::Container<TaskRequest>, Error> {
         let uri = self.path_to_url(format!("requests/{task_id}"));
@@ -284,7 +281,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
-    fn get_requests(&mut self) -> PaginatedStream<'_, Self::Container<TaskRequest>> {
+    fn get_requests(&self) -> PaginatedStream<'_, Self::Container<TaskRequest>> {
         {
             let uri = self.path_to_url("requests/search/findAll");
             self.get_paginated(uri)
@@ -298,7 +295,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_requests_by_account_and_target_date_between<T>(
-        &mut self,
+        &self,
         account_uri: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
@@ -324,7 +321,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_requests_by_account_and_upcoming_today(
-        &mut self,
+        &self,
     ) -> PaginatedStream<'_, Self::Container<TaskRequest>> {
         let uri = self.path_to_url("requests/search/findByAccountUpcomingToday");
 
@@ -341,7 +338,7 @@ pub trait FreedomApi: Send {
     /// # Note
     /// The results are ordered by the creation time of the task request
     fn get_requests_by_configuration<T>(
-        &mut self,
+        &self,
         configuration_uri: T,
     ) -> PaginatedStream<'_, Self::Container<TaskRequest>>
     where
@@ -363,7 +360,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_by_configuration_and_satellite_names_and_target_date_between<T, I, S>(
-        &mut self,
+        &self,
         configuration_uri: T,
         satellites: I,
         start: OffsetDateTime,
@@ -400,7 +397,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     async fn get_requests_by_configuration_and_target_date_between<T>(
-        &mut self,
+        &self,
         configuration_uri: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
@@ -429,7 +426,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_by_ids<I, S>(
-        &mut self,
+        &self,
         ids: I,
     ) -> Result<Self::Container<Vec<TaskRequest>>, Error>
     where
@@ -453,7 +450,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_requests_by_overlapping_public(
-        &mut self,
+        &self,
         start: OffsetDateTime,
         end: OffsetDateTime,
     ) -> PaginatedStream<'_, Self::Container<TaskRequest>> {
@@ -474,7 +471,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_requests_by_satellite_name<T>(
-        &mut self,
+        &self,
         satellite_name: T,
     ) -> PaginatedStream<'_, Self::Container<TaskRequest>>
     where
@@ -493,7 +490,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_by_satellite_name_and_target_date_between<T>(
-        &mut self,
+        &self,
         satellite_name: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
@@ -523,7 +520,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_requests_by_status<T>(
-        &mut self,
+        &self,
         status: T,
     ) -> Result<PaginatedStream<'_, Self::Container<TaskRequest>>, Error>
     where
@@ -544,7 +541,7 @@ pub trait FreedomApi: Send {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_requests_by_status_and_account_and_target_date_between<T, U>(
-        &mut self,
+        &self,
         status: T,
         account_uri: U,
         start: OffsetDateTime,
@@ -573,7 +570,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_by_type_and_target_date_between<T>(
-        &mut self,
+        &self,
         typ: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
@@ -602,9 +599,7 @@ pub trait FreedomApi: Send {
     /// already occurred today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_requests_passed_today(
-        &mut self,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error> {
+    async fn get_requests_passed_today(&self) -> Result<Self::Container<Vec<TaskRequest>>, Error> {
         let uri = self.path_to_url("requests/search/findAllPassedToday");
 
         Ok(self
@@ -618,7 +613,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_requests_upcoming_today(
-        &mut self,
+        &self,
     ) -> Result<Self::Container<Vec<TaskRequest>>, Error> {
         let uri = self.path_to_url("requests/search/findAllUpcomingToday");
 
@@ -632,7 +627,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
-    fn get_satellites(&mut self) -> PaginatedStream<'_, Self::Container<Satellite>> {
+    fn get_satellites(&self) -> PaginatedStream<'_, Self::Container<Satellite>> {
         let uri = self.path_to_url("satellites");
 
         self.get_paginated(uri)
@@ -641,7 +636,7 @@ pub trait FreedomApi: Send {
     /// Produces a single [`Task`] matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_task_by_id(&mut self, task_id: i32) -> Result<Self::Container<Task>, Error> {
+    async fn get_task_by_id(&self, task_id: i32) -> Result<Self::Container<Task>, Error> {
         let uri = self.path_to_url(format!("tasks/{}", task_id));
 
         self.get(uri).await
@@ -652,7 +647,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_by_account_and_pass_overlapping<T>(
-        &mut self,
+        &self,
         account_uri: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
@@ -680,7 +675,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_by_account_and_satellite_and_band_and_pass_overlapping<T, U, V>(
-        &mut self,
+        &self,
         account_uri: T,
         satellite_config_uri: U,
         band: V,
@@ -715,7 +710,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_tasks_by_account_and_site_configuration_and_band_and_pass_overlapping<T, U, V>(
-        &mut self,
+        &self,
         account_uri: T,
         site_config_uri: U,
         band: V,
@@ -755,7 +750,7 @@ pub trait FreedomApi: Send {
     /// This differs from [`Self::get_tasks_by_pass_overlapping`] in that it only produces tasks
     /// which are wholly contained within the window.
     async fn get_tasks_by_pass_window(
-        &mut self,
+        &self,
         start: OffsetDateTime,
         end: OffsetDateTime,
     ) -> Result<Self::Container<Vec<Task>>, Error> {
@@ -783,7 +778,7 @@ pub trait FreedomApi: Send {
     /// This differs from [`Self::get_tasks_by_pass_window`] in that it also includes tasks which
     /// only partially fall within the provided time frame.
     fn get_tasks_by_pass_overlapping(
-        &mut self,
+        &self,
         start: OffsetDateTime,
         end: OffsetDateTime,
     ) -> PaginatedStream<'_, Self::Container<Task>> {
@@ -808,7 +803,7 @@ pub trait FreedomApi: Send {
     /// occurred today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_tasks_passed_today(&mut self) -> Result<Self::Container<Vec<Task>>, Error> {
+    async fn get_tasks_passed_today(&self) -> Result<Self::Container<Vec<Task>>, Error> {
         let uri = self.path_to_url("tasks/search/findAllPassedToday");
 
         Ok(self
@@ -821,7 +816,7 @@ pub trait FreedomApi: Send {
     /// today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_tasks_upcoming_today(&mut self) -> Result<Self::Container<Vec<Task>>, Error> {
+    async fn get_tasks_upcoming_today(&self) -> Result<Self::Container<Vec<Task>>, Error> {
         let uri = self.path_to_url("tasks/search/findAllUpcomingToday");
 
         Ok(self
@@ -887,9 +882,7 @@ pub trait FreedomApi: Send {
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
-    fn get_users(
-        &mut self,
-    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<User>, Error>> + '_>> {
+    fn get_users(&self) -> Pin<Box<dyn Stream<Item = Result<Self::Container<User>, Error>> + '_>> {
         let uri = self.path_to_url("users");
         self.get_paginated(uri)
     }

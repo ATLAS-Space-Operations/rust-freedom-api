@@ -43,7 +43,7 @@ impl FreedomApi for CachingClient {
     type Container<T: FreedomApiValue> = Arc<T>;
 
     #[tracing::instrument]
-    async fn get<T>(&mut self, url: Url) -> Result<T, Error>
+    async fn get<T>(&self, url: Url) -> Result<T, Error>
     where
         T: DeserializeOwned,
     {

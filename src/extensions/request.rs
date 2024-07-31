@@ -14,31 +14,31 @@ pub trait TaskRequestExt {
 
     async fn get_task<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Task>, crate::Error>
     where
         C: FreedomApi + Send;
 
-    async fn get_site<C>(&self, client: &mut C) -> Result<Site, crate::Error>
+    async fn get_site<C>(&self, client: &C) -> Result<Site, crate::Error>
     where
         C: FreedomApi + Send;
 
     async fn get_target_bands<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Vec<Band>>, crate::Error>
     where
         C: FreedomApi + Send;
 
-    async fn get_config<C>(&self, client: &mut C) -> Result<SiteConfiguration, crate::Error>
+    async fn get_config<C>(&self, client: &C) -> Result<SiteConfiguration, crate::Error>
     where
         C: FreedomApi + Send;
 
-    async fn get_satellite<C>(&self, client: &mut C) -> Result<Satellite, crate::Error>
+    async fn get_satellite<C>(&self, client: &C) -> Result<Satellite, crate::Error>
     where
         C: FreedomApi + Send;
 
-    async fn get_user<C>(&self, client: &mut C) -> Result<User, crate::Error>
+    async fn get_user<C>(&self, client: &C) -> Result<User, crate::Error>
     where
         C: FreedomApi + Send;
 }
@@ -51,7 +51,7 @@ impl TaskRequestExt for TaskRequest {
 
     async fn get_task<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Task>, crate::Error>
     where
         C: FreedomApi + Send,
@@ -59,7 +59,7 @@ impl TaskRequestExt for TaskRequest {
         super::get_item("task", &self.links, client).await
     }
 
-    async fn get_site<C>(&self, client: &mut C) -> Result<Site, crate::Error>
+    async fn get_site<C>(&self, client: &C) -> Result<Site, crate::Error>
     where
         C: FreedomApi + Send,
     {
@@ -68,7 +68,7 @@ impl TaskRequestExt for TaskRequest {
 
     async fn get_target_bands<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Vec<Band>>, crate::Error>
     where
         C: FreedomApi + Send,
@@ -76,7 +76,7 @@ impl TaskRequestExt for TaskRequest {
         super::get_embedded("targetBands", &self.links, client).await
     }
 
-    async fn get_config<C>(&self, client: &mut C) -> Result<SiteConfiguration, crate::Error>
+    async fn get_config<C>(&self, client: &C) -> Result<SiteConfiguration, crate::Error>
     where
         C: FreedomApi + Send,
     {
@@ -84,14 +84,14 @@ impl TaskRequestExt for TaskRequest {
         super::get_content("configuration", &self.links, client).await
     }
 
-    async fn get_satellite<C>(&self, client: &mut C) -> Result<Satellite, crate::Error>
+    async fn get_satellite<C>(&self, client: &C) -> Result<Satellite, crate::Error>
     where
         C: FreedomApi + Send,
     {
         super::get_content("satellite", &self.links, client).await
     }
 
-    async fn get_user<C>(&self, client: &mut C) -> Result<User, crate::Error>
+    async fn get_user<C>(&self, client: &C) -> Result<User, crate::Error>
     where
         C: FreedomApi + Send,
     {

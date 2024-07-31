@@ -51,10 +51,10 @@ fn get_id(reference: &'static str, links: &HashMap<String, url::Url>) -> Result<
 async fn get_item<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
-    client: &mut C,
+    client: &C,
 ) -> Result<T, crate::Error>
 where
-    C: FreedomApi + Send,
+    C: FreedomApi,
     T: FreedomApiValue,
 {
     let uri = links
@@ -71,10 +71,10 @@ where
 async fn get_embedded<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
-    client: &mut C,
+    client: &C,
 ) -> Result<<C as FreedomApi>::Container<T>, crate::Error>
 where
-    C: FreedomApi + Send,
+    C: FreedomApi,
     T: FreedomApiValue,
 {
     use freedom_models::utils::Embedded;
@@ -88,7 +88,7 @@ where
 async fn get_content<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
-    client: &mut C,
+    client: &C,
 ) -> Result<T, crate::Error>
 where
     C: FreedomApi + Send,

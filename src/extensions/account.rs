@@ -8,14 +8,14 @@ pub trait AccountExt {
 
     async fn get_users<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Vec<User>>, crate::Error>
     where
         C: FreedomApi + Send;
 
     async fn get_satellites<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Vec<Satellite>>, crate::Error>
     where
         C: FreedomApi + Send;
@@ -29,7 +29,7 @@ impl AccountExt for Account {
 
     async fn get_users<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Vec<User>>, crate::Error>
     where
         C: FreedomApi + Send,
@@ -39,7 +39,7 @@ impl AccountExt for Account {
 
     async fn get_satellites<C>(
         &self,
-        client: &mut C,
+        client: &C,
     ) -> Result<<C as FreedomApi>::Container<Vec<Satellite>>, crate::Error>
     where
         C: FreedomApi + Send,

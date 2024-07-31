@@ -112,7 +112,7 @@ where
 impl FreedomApi for Client {
     type Container<T: FreedomApiValue> = Inner<T>;
 
-    async fn get<T>(&mut self, url: Url) -> Result<T, crate::error::Error>
+    async fn get<T>(&self, url: Url) -> Result<T, crate::error::Error>
     where
         T: DeserializeOwned + Clone,
     {

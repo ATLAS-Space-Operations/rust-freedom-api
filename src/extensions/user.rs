@@ -6,7 +6,7 @@ use freedom_models::{account::Account, user::User};
 pub trait UserExt {
     fn get_id(&self) -> Result<i32, crate::Error>;
 
-    async fn get_account<C>(&self, client: &mut C) -> Result<Account, crate::Error>
+    async fn get_account<C>(&self, client: &C) -> Result<Account, crate::Error>
     where
         C: FreedomApi + Send;
 }
@@ -17,7 +17,7 @@ impl UserExt for User {
         super::get_id("self", &self.links)
     }
 
-    async fn get_account<C>(&self, client: &mut C) -> Result<Account, crate::Error>
+    async fn get_account<C>(&self, client: &C) -> Result<Account, crate::Error>
     where
         C: FreedomApi + Send,
     {
