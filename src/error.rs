@@ -31,6 +31,27 @@ pub enum BuilderError {
     #[error("Failed to build client, no password was provided")]
     MissingPassword,
 
+    #[error("Failed to build request, need task type")]
+    TaskType,
+
+    #[error("Failed to build request, need account ID")]
+    AccountId,
+
+    #[error("Failed to build request, need minimum duration")]
+    Duration,
+
+    #[error("Failed to build request, need target date")]
+    TargetDate,
+
+    #[error("Failed to build request, configuration ID")]
+    ConfigurationId,
+
+    #[error("Failed to build request, need site ID")]
+    SiteId,
+
+    #[error("Failed to build request, need satellite ID")]
+    SatelliteId,
+
     #[error("Failed to build client, underlying client failed to build with: {0}")]
     ClientBuild(String),
 }

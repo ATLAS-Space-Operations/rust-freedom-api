@@ -30,6 +30,8 @@ use futures_core::Stream;
 
 use crate::{error::Error, prelude::RuntimeError};
 
+pub(crate) mod post;
+
 /// A super trait containing all the requirements for Freedom API Values
 pub trait FreedomApiValue: std::fmt::Debug + DeserializeOwned + Clone + Send + Sync {}
 
@@ -140,30 +142,90 @@ pub trait FreedomApi: Send + Sync {
     async fn delete(&self, url: Url) -> Result<Response, Error>;
 
     /// Request to delete the band details object matching the provided id
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client.delete_task_request(42).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     async fn delete_band_details(&self, id: i32) -> Result<Response, Error> {
         let uri = self.path_to_url(format!("satellite_bands/{id}"));
         self.delete(uri).await
     }
 
     /// Request to delete the satellite configuration matching the provided `id`
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client.delete_satellite_configuration(42).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     async fn delete_satellite_configuration(&self, id: i32) -> Result<Response, Error> {
         let uri = self.path_to_url(format!("satellite_configurations/{id}"));
         self.delete(uri).await
     }
 
     /// Request to delete the satellite object matching the provided `id`
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client.delete_satellite(42).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     async fn delete_satellite(&self, id: i32) -> Result<Response, Error> {
         let uri = self.path_to_url(format!("satellites/{id}"));
         self.delete(uri).await
     }
 
     /// Request to delete the override matching the provided `id`
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client.delete_override(42).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     async fn delete_override(&self, id: i32) -> Result<Response, Error> {
         let uri = self.path_to_url(format!("overrides/{id}"));
         self.delete(uri).await
     }
 
     /// Request to delete the user matching the provided `id`
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client.delete_user(42).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     async fn delete_user(&self, id: i32) -> Result<Response, Error> {
         let uri = self.path_to_url(format!("users/{id}"));
         self.delete(uri).await
@@ -175,10 +237,19 @@ pub trait FreedomApi: Send + Sync {
         self.delete(uri).await
     }
 
-    async fn post<S, T>(&self, url: Url, msg: S) -> Result<T, Error>
+    async fn post_deserialize<S, T>(&self, url: Url, msg: S) -> Result<T, Error>
     where
         S: serde::Serialize + Send + Sync,
-        T: FreedomApiValue;
+        T: FreedomApiValue,
+    {
+        let resp = self.post(url, msg).await?;
+
+        resp.json::<T>().await.map_err(From::from)
+    }
+
+    async fn post<S>(&self, url: Url, msg: S) -> Result<Response, Error>
+    where
+        S: serde::Serialize + Send + Sync;
 
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
@@ -190,6 +261,172 @@ pub trait FreedomApi: Send + Sync {
         let mut uri = self.path_to_url("accounts/search/findOneByName");
         uri.set_query(Some(&format!("name={account_name}")));
         self.get(uri).await
+    }
+
+    /// Create a new satellite band object
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # use freedom_models::band::BandType;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_band_details()
+    ///     .name("My Satellite Band")
+    ///     .band_type(BandType::Receive)
+    ///     .default_band_width_mghz(1.45)
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_band_details(&self) -> post::BandDetailsBuilder<'_, Self>
+    where
+        Self: Sized,
+    {
+        post::BandDetailsBuilder::client(self)
+    }
+
+    /// Create a new satellite configuration
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_satellite_configuration()
+    ///     .name("My Satellite Configuration")
+    ///     .band_details([1, 2, 3]) // List of band IDs to associate with config
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_satellite_configuration(&self) -> post::SatelliteConfigurationBuilder<'_, Self>
+    where
+        Self: Sized,
+    {
+        post::SatelliteConfigurationBuilder::client(self)
+    }
+
+    /// Create a new satellite
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_satellite()
+    ///     .name("My Satellite")
+    ///     .description("A test satellite")
+    ///     .configuration(42)
+    ///     .norad_cat_id(3600)
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_satellite(&self) -> post::SatelliteBuilder<'_, Self>
+    where
+        Self: Sized,
+    {
+        post::SatelliteBuilder::client(self)
+    }
+
+    /// Create a new override
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_override()
+    ///     .name("downconverter.gain override for sat 1 on config 2")
+    ///     .satellite(1)
+    ///     .configuration(2)
+    ///     .add_property("site.hardware.modem.ttc.rx.demodulator.bitrate", 8096_u32)
+    ///     .add_property("site.hardware.modem.ttc.tx.modulator.bitrate", 8096_u32)
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_override(&self) -> post::OverrideBuilder<'_, Self>
+    where
+        Self: Sized,
+    {
+        post::OverrideBuilder::client(self)
+    }
+
+    /// Create a new user
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_user()
+    ///     .account_id(1)
+    ///     .first_name("Han")
+    ///     .last_name("Solo")
+    ///     .email("flyingsolo@gmail.com")
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_user(&self) -> post::UserBuilder<'_, Self>
+    where
+        Self: Sized,
+    {
+        post::UserBuilder::client(self)
+    }
+
+    /// Create a new task request
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # use time::OffsetDateTime;
+    /// # use std::time::Duration;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_task_request()
+    ///     .task_type(TaskType::Test)
+    ///     .target_date_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
+    ///     .duration(120)
+    ///     .satellite(1016)
+    ///     .target_bands([2017, 2019])
+    ///     .site(27)
+    ///     .configuration(47)
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_task_request(&self) -> post::TaskRequestBuilder<'_, Self>
+    where
+        Self: Sized,
+    {
+        post::TaskRequestBuilder::client(self)
     }
 
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
@@ -876,7 +1113,7 @@ pub trait FreedomApi: Send + Sync {
     ) -> Result<String, Error> {
         let uri = self.path_to_url("fps");
 
-        let value: Value = self.post(uri, post_val).await?;
+        let value: Value = self.post_deserialize(uri, post_val).await?;
 
         value
             .get("token")

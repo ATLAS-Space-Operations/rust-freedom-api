@@ -76,23 +76,11 @@ impl FreedomApi for CachingClient {
         }
     }
 
-    async fn post<S, T>(&self, url: Url, msg: S) -> Result<T, Error>
+    async fn post<S>(&self, url: Url, msg: S) -> Result<Response, Error>
     where
         S: serde::Serialize + Send + Sync,
-        T: DeserializeOwned,
     {
-        let resp = self
-            .inner
-            .client
-            .post(url)
-            .basic_auth(self.config().key(), Some(self.inner.config.expose_secret()))
-            .json(&msg)
-            .send()
-            .await?
-            .text()
-            .await?;
-
-        serde_json::from_str(&resp).map_err(From::from)
+        self.inner.post(url, msg).await
     }
 
     fn config(&self) -> &Config {

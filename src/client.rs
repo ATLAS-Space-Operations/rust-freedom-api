@@ -33,7 +33,7 @@ impl Client {
     ///
     /// This function expects the following environment variables:
     ///
-    /// + ATLAS_ENV: [possible values: local, dev, test, prod]
+    /// + ATLAS_ENV: [possible values: test, prod]
     /// + ATLAS_KEY: The ATLAS freedom key registered with an account
     /// + ATLAS_SECRET: The ATLAS freedom secret registered with an account
     pub fn from_env() -> Result<Self, freedom_config::Error> {
@@ -121,7 +121,6 @@ impl FreedomApi for Client {
         serde_json::from_str(&body).map_err(From::from)
     }
 
-    async fn post<S, T>(&self, url: Url, msg: S) -> Result<T, crate::error::Error>
     async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
         self.client
             .delete(url)
@@ -131,20 +130,17 @@ impl FreedomApi for Client {
             .map_err(From::from)
     }
 
-    async fn post_response<S>(&self, url: Url, msg: S) -> Result<Response, crate::error::Error>
+    async fn post<S>(&self, url: Url, msg: S) -> Result<Response, crate::error::Error>
     where
         S: serde::Serialize + Sync + Send,
-        T: DeserializeOwned + Clone,
     {
-        let resp = self
-            .client
+        self.client
             .post(url)
             .basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .json(&msg)
             .send()
-            .await?;
-
-        resp.json::<T>().await.map_err(From::from)
+            .await
+            .map_err(From::from)
     }
 
     fn config(&self) -> &Config {

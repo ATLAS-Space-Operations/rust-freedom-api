@@ -15,6 +15,9 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 /// Contains the client, data models, and error types necessary for queries
 pub mod prelude {
+    pub use crate::api::post::{
+        BandDetailsBuilder, OverrideBuilder, SatelliteBuilder, SatelliteConfigurationBuilder,
+    };
     pub use crate::api::{FreedomApi, FreedomApiContainer, FreedomApiValue};
     #[cfg(feature = "caching")]
     pub use crate::caching_client::CachingClient;
