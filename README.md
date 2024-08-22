@@ -98,14 +98,15 @@ client is backed by a concurrent caching system, and in order to avoid
 unnecessarily cloning all responses from the caching client to the call site,
 the cached values are stored as `Arc<T>` so they can be cheaply cloned from the
 cache. This complexity will be mostly transparent to the caller, since the
-container is required to implement [`Deref<T>`](std::ops::Deref). If however you
-need to mutate the data after receiving it, simply clone the value out of its
-container and mutate the cloned value.
+container is required to implement [`Deref<T>`](std::ops::Deref). 
 
-```rust
-use std::sync::Arc;
+If however you need to mutate the data after receiving it, call the
+`FreedomApiContainer::into_inner` method on the returned type to get an owned
+version of the wrapped type.
 
-let arc_value = Arc::new(String::from("Hello "));
-let mut mutable_value = (*arc_value).clone();
-mutable_value.push_str("World!");
+```rust, ignore
+let mut request = atlas_client
+    .get_request_by_id(42)
+    .await?
+    .into_inner();
 ```

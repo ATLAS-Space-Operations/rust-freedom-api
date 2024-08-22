@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use freedom_config::Config;
+use reqwest::Response;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use url::Url;
@@ -41,6 +42,10 @@ impl<T: FreedomApiValue> FreedomApiContainer<T> for Arc<T> {
 #[async_trait::async_trait]
 impl FreedomApi for CachingClient {
     type Container<T: FreedomApiValue> = Arc<T>;
+
+    async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
+        self.inner.delete(url).await
+    }
 
     #[tracing::instrument]
     async fn get<T>(&self, url: Url) -> Result<T, Error>

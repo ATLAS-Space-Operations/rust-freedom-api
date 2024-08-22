@@ -1,5 +1,5 @@
 use freedom_config::Config;
-use reqwest::StatusCode;
+use reqwest::{Response, StatusCode};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use url::Url;
 
@@ -122,6 +122,16 @@ impl FreedomApi for Client {
     }
 
     async fn post<S, T>(&self, url: Url, msg: S) -> Result<T, crate::error::Error>
+    async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
+        self.client
+            .delete(url)
+            .basic_auth(self.config.key(), Some(self.config.expose_secret()))
+            .send()
+            .await
+            .map_err(From::from)
+    }
+
+    async fn post_response<S>(&self, url: Url, msg: S) -> Result<Response, crate::error::Error>
     where
         S: serde::Serialize + Sync + Send,
         T: DeserializeOwned + Clone,

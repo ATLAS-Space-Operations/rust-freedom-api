@@ -20,6 +20,7 @@ use freedom_models::{
     user::User,
     utils::Embedded,
 };
+use reqwest::Response;
 use serde::{de::DeserializeOwned, Serialize};
 use serde_json::Value;
 use time::{format_description::well_known::Iso8601, OffsetDateTime};
@@ -134,6 +135,44 @@ pub trait FreedomApi: Send + Sync {
     fn path_to_url(&self, path: impl AsRef<str>) -> Url {
         let url = self.config().environment().freedom_entrypoint();
         url.join(path.as_ref()).expect("Invalid URL construction")
+    }
+
+    async fn delete(&self, url: Url) -> Result<Response, Error>;
+
+    /// Request to delete the band details object matching the provided id
+    async fn delete_band_details(&self, id: i32) -> Result<Response, Error> {
+        let uri = self.path_to_url(format!("satellite_bands/{id}"));
+        self.delete(uri).await
+    }
+
+    /// Request to delete the satellite configuration matching the provided `id`
+    async fn delete_satellite_configuration(&self, id: i32) -> Result<Response, Error> {
+        let uri = self.path_to_url(format!("satellite_configurations/{id}"));
+        self.delete(uri).await
+    }
+
+    /// Request to delete the satellite object matching the provided `id`
+    async fn delete_satellite(&self, id: i32) -> Result<Response, Error> {
+        let uri = self.path_to_url(format!("satellites/{id}"));
+        self.delete(uri).await
+    }
+
+    /// Request to delete the override matching the provided `id`
+    async fn delete_override(&self, id: i32) -> Result<Response, Error> {
+        let uri = self.path_to_url(format!("overrides/{id}"));
+        self.delete(uri).await
+    }
+
+    /// Request to delete the user matching the provided `id`
+    async fn delete_user(&self, id: i32) -> Result<Response, Error> {
+        let uri = self.path_to_url(format!("users/{id}"));
+        self.delete(uri).await
+    }
+
+    /// Request to delete the user matching the provided `id`
+    async fn delete_task_request(&self, id: i32) -> Result<Response, Error> {
+        let uri = self.path_to_url(format!("requests/{id}"));
+        self.delete(uri).await
     }
 
     async fn post<S, T>(&self, url: Url, msg: S) -> Result<T, Error>
