@@ -1141,9 +1141,9 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// # Warning
     ///
-    /// Do not use this method, directly. Instead prefer [`FreedomApi::get_token_by_satellite`] or
-    /// [`FreedomApi::get_token_by_site_configuration`]
-    async fn get_token<S: std::fmt::Debug + Serialize + Sync + Send>(
+    /// Do not use this method, directly. Instead prefer [`FreedomApi::new_token_by_satellite_id`] or
+    /// [`FreedomApi::new_token_by_site_configuration_id`]
+    async fn new_token<S: std::fmt::Debug + Serialize + Sync + Send>(
         &self,
         post_val: S,
     ) -> Result<String, Error> {
@@ -1163,7 +1163,7 @@ pub trait FreedomApi: Send + Sync {
     }
 
     /// Fetch an FPS token for the provided band ID and site configuration ID
-    async fn get_token_by_site_configuration(
+    async fn new_token_by_site_configuration_id(
         &self,
         band_id: u32,
         site_configuration_id: u32,
@@ -1173,11 +1173,11 @@ pub trait FreedomApi: Send + Sync {
             "configuration": format!("/api/configurations/{}", site_configuration_id),
         });
 
-        self.get_token(&payload).await
+        self.new_token(&payload).await
     }
 
     /// Fetch an FPS token for the provided band ID and satellite ID
-    async fn get_token_by_satellite(
+    async fn new_token_by_satellite_id(
         &self,
         band_id: u32,
         satellite_id: u32,
@@ -1187,7 +1187,7 @@ pub trait FreedomApi: Send + Sync {
             "satellite": format!("/api/satellites/{}", satellite_id),
         });
 
-        self.get_token(&payload).await
+        self.new_token(&payload).await
     }
 
     /// Produces a paginated stream of [`User`] objects.
