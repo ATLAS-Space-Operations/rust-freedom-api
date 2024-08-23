@@ -16,6 +16,7 @@ use freedom_models::{
     pagination::Paginated,
     satellite::Satellite,
     satellite_configuration::SatelliteConfiguration,
+    site::Site,
     task::{Task, TaskRequest, TaskStatusType, TaskType},
     user::User,
     utils::Embedded,
@@ -543,6 +544,37 @@ pub trait FreedomApi: Send + Sync {
         ));
 
         self.get_paginated(uri)
+    }
+
+    /// Produces a paginated stream of [`Site`] objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_sites(&self) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Site>, Error>> + '_>> {
+        let uri = self.path_to_url("sites");
+        self.get_paginated(uri)
+    }
+
+    /// Produces a single [`Site`] object matching the provided ID.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    async fn get_site_by_id(&self, id: i32) -> Result<Self::Container<Site>, Error> {
+        let uri = self.path_to_url(format!("sites/{id}"));
+        self.get(uri).await
+    }
+
+    /// Produces a single [`Site`] object matching the provided name.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    async fn get_site_by_name(
+        &self,
+        name: impl AsRef<str> + Send,
+    ) -> Result<Self::Container<Site>, Error> {
+        let mut uri = self.path_to_url("sites/search/findOneByName");
+        let query = format!("name={}", name.as_ref());
+        uri.set_query(Some(&query));
+
+        self.get(uri).await
     }
 
     /// Produces a single [`TaskRequest`] matching the provided ID.
