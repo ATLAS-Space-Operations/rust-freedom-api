@@ -48,6 +48,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+## Documentation
+
+The freedom API has a significant amount of documentation to get users up and 
+running quickly. To build the docs, simply run the following from the root of 
+this repository, once cloned. 
+
+```console
+$ cargo doc --no-deps --open
+```
+
 ## Chaining API Returns
 
 Many of the data types exposed in this library can be navigated to through other
