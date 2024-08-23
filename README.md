@@ -48,6 +48,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### Creating Resources
+
+In addition to fetching resources, the API can also be used to create resources
+for example a task request can be constructed with the following:
+
+```rust, no_run
+use freedom_api::prelude::*;
+use freedom_config::{Config, Test};
+use time::OffsetDateTime
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let atlas_client = Client::from_env()?;
+
+    let response = atlas_client.new_task_request()
+        .test_task("my_test_file.bin")
+        .target_time_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
+        .task_duration(120)
+        .satellite_id(1)
+        .site_id(2)
+        .site_configuration_id(3)
+        .band_ids([4, 5, 6])
+        .send()
+        .await?;
+
+    Ok(())
+}
+```
+
 ## Documentation
 
 The freedom API has a significant amount of documentation to get users up and 
