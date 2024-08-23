@@ -54,9 +54,11 @@ In addition to fetching resources, the API can also be used to create resources
 for example a task request can be constructed with the following:
 
 ```rust, no_run
+use std::time::Duration;
+
 use freedom_api::prelude::*;
 use freedom_config::{Config, Test};
-use time::OffsetDateTime
+use time::OffsetDateTime;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
