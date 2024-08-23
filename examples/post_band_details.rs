@@ -11,13 +11,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response = client
         .new_task_request()
-        .task_type(TaskType::Test)
-        .target_date_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
-        .duration(120)
-        .satellite(1016)
-        .target_bands([2017, 2019])
-        .site(27)
-        .configuration(47)
+        .test_task("idk.bin")
+        .target_time_utc(OffsetDateTime::now_utc() + Duration::from_secs(60 * 15))
+        .task_duration(120)
+        .satellite_id(1016)
+        .site_id(27)
+        .site_configuration_id(47)
+        .band_ids([2017, 2019])
         .send()
         .await?;
 

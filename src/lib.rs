@@ -17,6 +17,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub mod prelude {
     pub use crate::api::post::{
         BandDetailsBuilder, OverrideBuilder, SatelliteBuilder, SatelliteConfigurationBuilder,
+        UserBuilder,
     };
     pub use crate::api::{FreedomApi, FreedomApiContainer, FreedomApiValue};
     #[cfg(feature = "caching")]

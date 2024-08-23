@@ -269,7 +269,7 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// ```no_run
     /// # use freedom_api::prelude::*;
-    /// # use freedom_models::band::BandType;
+    /// # use freedom_models::band::{BandType, IoHardware};
     /// # tokio_test::block_on(async {
     /// let client = Client::from_env()?;
     ///
@@ -277,17 +277,19 @@ pub trait FreedomApi: Send + Sync {
     ///     .new_band_details()
     ///     .name("My Satellite Band")
     ///     .band_type(BandType::Receive)
-    ///     .default_band_width_mghz(1.45)
+    ///     .frequency(8096.0)
+    ///     .default_band_width(1.45)
+    ///     .io_hardware(IoHardware::Modem)
     ///     .send()
     ///     .await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn new_band_details(&self) -> post::BandDetailsBuilder<'_, Self>
+    fn new_band_details(&self) -> post::band::BandDetailsBuilder<'_, Self, post::band::NoName>
     where
         Self: Sized,
     {
-        post::BandDetailsBuilder::client(self)
+        post::band::new(self)
     }
 
     /// Create a new satellite configuration
@@ -302,17 +304,19 @@ pub trait FreedomApi: Send + Sync {
     /// client
     ///     .new_satellite_configuration()
     ///     .name("My Satellite Configuration")
-    ///     .band_details([1, 2, 3]) // List of band IDs to associate with config
+    ///     .band_ids([1, 2, 3]) // List of band IDs to associate with config
     ///     .send()
     ///     .await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn new_satellite_configuration(&self) -> post::SatelliteConfigurationBuilder<'_, Self>
+    fn new_satellite_configuration(
+        &self,
+    ) -> post::sat_config::SatelliteConfigurationBuilder<'_, Self, post::sat_config::NoName>
     where
         Self: Sized,
     {
-        post::SatelliteConfigurationBuilder::client(self)
+        post::sat_config::new(self)
     }
 
     /// Create a new satellite
@@ -327,19 +331,19 @@ pub trait FreedomApi: Send + Sync {
     /// client
     ///     .new_satellite()
     ///     .name("My Satellite")
+    ///     .satellite_configuration_id(42)
+    ///     .norad_id(3600)
     ///     .description("A test satellite")
-    ///     .configuration(42)
-    ///     .norad_cat_id(3600)
     ///     .send()
     ///     .await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn new_satellite(&self) -> post::SatelliteBuilder<'_, Self>
+    fn new_satellite(&self) -> post::satellite::SatelliteBuilder<'_, Self, post::satellite::NoName>
     where
         Self: Sized,
     {
-        post::SatelliteBuilder::client(self)
+        post::satellite::new(self)
     }
 
     /// Create a new override
@@ -354,8 +358,8 @@ pub trait FreedomApi: Send + Sync {
     /// client
     ///     .new_override()
     ///     .name("downconverter.gain override for sat 1 on config 2")
-    ///     .satellite(1)
-    ///     .configuration(2)
+    ///     .satellite_id(1)
+    ///     .satellite_configuration_id(2)
     ///     .add_property("site.hardware.modem.ttc.rx.demodulator.bitrate", 8096_u32)
     ///     .add_property("site.hardware.modem.ttc.tx.modulator.bitrate", 8096_u32)
     ///     .send()
@@ -363,11 +367,11 @@ pub trait FreedomApi: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn new_override(&self) -> post::OverrideBuilder<'_, Self>
+    fn new_override(&self) -> post::overrides::OverrideBuilder<'_, Self, post::overrides::NoName>
     where
         Self: Sized,
     {
-        post::OverrideBuilder::client(self)
+        post::overrides::new(self)
     }
 
     /// Create a new user
@@ -390,11 +394,11 @@ pub trait FreedomApi: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn new_user(&self) -> post::UserBuilder<'_, Self>
+    fn new_user(&self) -> post::user::UserBuilder<'_, Self, post::user::NoAccount>
     where
         Self: Sized,
     {
-        post::UserBuilder::client(self)
+        post::user::new(self)
     }
 
     /// Create a new task request
@@ -410,23 +414,23 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// client
     ///     .new_task_request()
-    ///     .task_type(TaskType::Test)
-    ///     .target_date_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
-    ///     .duration(120)
-    ///     .satellite(1016)
-    ///     .target_bands([2017, 2019])
-    ///     .site(27)
-    ///     .configuration(47)
+    ///     .test_task("my_test_file.bin")
+    ///     .target_time_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
+    ///     .task_duration(120)
+    ///     .satellite_id(1016)
+    ///     .site_id(27)
+    ///     .site_configuration_id(47)
+    ///     .band_ids([2017, 2019])
     ///     .send()
     ///     .await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn new_task_request(&self) -> post::TaskRequestBuilder<'_, Self>
+    fn new_task_request(&self) -> post::TaskRequestBuilder<'_, Self, post::request::NoType>
     where
         Self: Sized,
     {
-        post::TaskRequestBuilder::client(self)
+        post::request::new(self)
     }
 
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
