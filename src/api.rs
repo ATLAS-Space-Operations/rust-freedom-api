@@ -279,6 +279,23 @@ pub trait FreedomApi: Send + Sync {
         self.get_json_map(uri).await
     }
 
+    /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    async fn get_file_by_task_id_and_name(
+        &self,
+        task_id: i32,
+        file_name: &str,
+    ) -> Result<Bytes, Error> {
+        let path = format!("downloads/{}/{}", task_id, file_name);
+        let uri = self.path_to_url(path);
+
+        let (data, status) = self.get(uri).await?;
+        error_on_non_success(&status)?;
+
+        Ok(data)
+    }
+
     /// Create a new satellite band object
     ///
     /// # Example
