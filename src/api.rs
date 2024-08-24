@@ -9,6 +9,7 @@ use std::{ops::Deref, pin::Pin};
 
 use async_stream::stream;
 use async_trait::async_trait;
+use bytes::Bytes;
 use freedom_config::Config;
 use freedom_models::{
     account::Account,
@@ -21,7 +22,7 @@ use freedom_models::{
     user::User,
     utils::Embedded,
 };
-use reqwest::Response;
+use reqwest::{Response, StatusCode};
 use serde::{de::DeserializeOwned, Serialize};
 use serde_json::Value;
 use time::{format_description::well_known::Iso8601, OffsetDateTime};
@@ -76,10 +77,24 @@ pub trait FreedomApi: Send + Sync {
     /// authentication.
     ///
     /// The JSON response is then deserialized into the required type, erroring if the
-    /// deserialization fails, and providing the object if it does not.
-    async fn get<T>(&self, url: Url) -> Result<T, Error>
+    /// deserialization fails, and providing the object if it succeeds.
+    async fn get_json_map<T>(&self, url: Url) -> Result<T, Error>
     where
-        T: FreedomApiValue;
+        T: FreedomApiValue,
+    {
+        let (body, status) = self.get(url).await?;
+
+        error_on_non_success(&status)?;
+
+        let utf8_str = String::from_utf8_lossy(&body);
+        serde_json::from_str(&utf8_str).map_err(From::from)
+    }
+
+    /// Creates a get request at the provided absolute URI for the client's environment, using basic
+    /// authentication.
+    ///
+    /// Returns the raw binary body, and the status code.
+    async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), Error>;
 
     /// Creates a stream of items from a paginated endpoint.
     ///
@@ -104,7 +119,7 @@ pub trait FreedomApi: Send + Sync {
         Box::pin(stream! {
             loop {
                 // Get the results for the current page.
-                let pag = self.get::<Paginated<serde_json::Value>>(current_url).await?;
+                let pag = self.get_json_map::<Paginated<serde_json::Value>>(current_url).await?;
                 for item in pag.items {
                     let i = serde_json::from_value::<Self::Container<T>>(item).map_err(From::from);
                     yield i;
@@ -261,7 +276,7 @@ pub trait FreedomApi: Send + Sync {
     ) -> Result<Self::Container<Account>, Error> {
         let mut uri = self.path_to_url("accounts/search/findOneByName");
         uri.set_query(Some(&format!("name={account_name}")));
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Create a new satellite band object
@@ -439,7 +454,7 @@ pub trait FreedomApi: Send + Sync {
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_account_by_id(&self, account_id: i32) -> Result<Self::Container<Account>, Error> {
         let uri = self.path_to_url(format!("accounts/{account_id}"));
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Produces a paginated stream of [`Account`](freedom_models::account::Account) objects.
@@ -472,7 +487,7 @@ pub trait FreedomApi: Send + Sync {
         satellite_band_id: i32,
     ) -> Result<Self::Container<Band>, Error> {
         let uri = self.path_to_url(format!("satellite_bands/{satellite_band_id}"));
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Produces a single [`Band`] matching the provided name.
@@ -484,7 +499,7 @@ pub trait FreedomApi: Send + Sync {
     ) -> Result<Self::Container<Band>, Error> {
         let mut uri = self.path_to_url("satellite_bands/search/findOneByName");
         uri.set_query(Some(&format!("name={satellite_band_name}")));
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Produces a paginated stream of [`Band`] objects matching the provided account name.
@@ -560,7 +575,7 @@ pub trait FreedomApi: Send + Sync {
     /// See [`get`](Self::get) documentation for more details about the process and return type
     async fn get_site_by_id(&self, id: i32) -> Result<Self::Container<Site>, Error> {
         let uri = self.path_to_url(format!("sites/{id}"));
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Produces a single [`Site`] object matching the provided name.
@@ -574,7 +589,7 @@ pub trait FreedomApi: Send + Sync {
         let query = format!("name={}", name.as_ref());
         uri.set_query(Some(&query));
 
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Produces a single [`TaskRequest`] matching the provided ID.
@@ -586,7 +601,7 @@ pub trait FreedomApi: Send + Sync {
     ) -> Result<Self::Container<TaskRequest>, Error> {
         let uri = self.path_to_url(format!("requests/{task_request_id}"));
 
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Produces a paginated stream of [`TaskRequest`] objects.
@@ -697,7 +712,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
             .await?
             .items)
     }
@@ -727,7 +742,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
             .await?
             .items)
     }
@@ -751,7 +766,7 @@ pub trait FreedomApi: Send + Sync {
         uri.set_query(Some(&format!("ids={}", ids_string)));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
             .await?
             .items)
     }
@@ -821,7 +836,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
             .await?
             .items)
     }
@@ -902,7 +917,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
             .await?
             .items)
     }
@@ -915,7 +930,7 @@ pub trait FreedomApi: Send + Sync {
         let uri = self.path_to_url("requests/search/findAllPassedToday");
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
             .await?
             .items)
     }
@@ -930,7 +945,7 @@ pub trait FreedomApi: Send + Sync {
         let uri = self.path_to_url("requests/search/findAllUpcomingToday");
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
             .await?
             .items)
     }
@@ -951,7 +966,7 @@ pub trait FreedomApi: Send + Sync {
     async fn get_task_by_id(&self, task_id: i32) -> Result<Self::Container<Task>, Error> {
         let uri = self.path_to_url(format!("tasks/{}", task_id));
 
-        self.get(uri).await
+        self.get_json_map(uri).await
     }
 
     /// Produces a vector of [`Task`] items, representing all the tasks which match the provided
@@ -977,7 +992,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<Task>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
             .await?
             .items)
     }
@@ -1012,7 +1027,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<Task>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
             .await?
             .items)
     }
@@ -1047,7 +1062,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<Task>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
             .await?
             .items)
     }
@@ -1075,7 +1090,7 @@ pub trait FreedomApi: Send + Sync {
         )));
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<Task>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
             .await?
             .items)
     }
@@ -1119,7 +1134,7 @@ pub trait FreedomApi: Send + Sync {
         let uri = self.path_to_url("tasks/search/findAllPassedToday");
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<Task>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
             .await?
             .items)
     }
@@ -1132,7 +1147,7 @@ pub trait FreedomApi: Send + Sync {
         let uri = self.path_to_url("tasks/search/findAllUpcomingToday");
 
         Ok(self
-            .get::<Embedded<Self::Container<Vec<Task>>>>(uri)
+            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
             .await?
             .items)
     }
@@ -1198,4 +1213,12 @@ pub trait FreedomApi: Send + Sync {
         let uri = self.path_to_url("users");
         self.get_paginated(uri)
     }
+}
+
+fn error_on_non_success(status: &StatusCode) -> Result<(), Error> {
+    if !status.is_success() {
+        return Err(Error::Runtime(RuntimeError::Response(status.to_string())));
+    }
+
+    Ok(())
 }

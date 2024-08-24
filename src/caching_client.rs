@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
+use bytes::Bytes;
 use freedom_config::Config;
-use reqwest::Response;
-use serde::de::DeserializeOwned;
-use serde_json::Value;
+use reqwest::{Response, StatusCode};
 use url::Url;
 
 use crate::{
@@ -24,7 +23,7 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct CachingClient {
     pub(crate) inner: Client,
-    pub(crate) cache: moka::future::Cache<Url, serde_json::Value>,
+    pub(crate) cache: moka::future::Cache<Url, (Bytes, StatusCode)>,
 }
 
 impl PartialEq for CachingClient {
@@ -48,31 +47,28 @@ impl FreedomApi for CachingClient {
     }
 
     #[tracing::instrument]
-    async fn get<T>(&self, url: Url) -> Result<T, Error>
-    where
-        T: DeserializeOwned,
-    {
+    async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), Error> {
         use crate::error::RuntimeError;
 
         // This is a rather cheap clone. Something like 50 bytes. This is necessary since we will
         // be passing this to the tokio executor which has lifetime requirements of `'static`
-        let client = self.inner.clone();
+        let client = &self.inner;
         let value = self
             .cache
-            .try_get_with(url.clone(), async move {
-                match client.get_body(url.clone()).await {
-                    Ok(body) => match serde_json::from_str::<Value>(&body) {
-                        Ok(val) => Ok(val),
-                        Err(e) => Err(RuntimeError::Deserialization(e.to_string())),
-                    },
-                    Err(e) => Err(RuntimeError::Response(e.to_string())),
+            .try_get_with(url.clone(), async {
+                let (body, status) = client.get(url).await?;
+
+                if !status.is_success() {
+                    return Err(Error::Runtime(RuntimeError::Response(status.to_string())));
                 }
+
+                Ok((body, status))
             })
             .await;
 
         match value {
-            Ok(val) => Ok(serde_json::from_value::<T>(val)?),
-            Err(e) => Err(Error::Runtime((*e).clone())),
+            Ok(val) => Ok(val),
+            Err(e) => Err((*e).clone()),
         }
     }
 

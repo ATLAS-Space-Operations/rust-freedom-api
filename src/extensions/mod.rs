@@ -62,7 +62,7 @@ where
         .ok_or(crate::error::RuntimeError::MissingUri(reference))?
         .clone();
 
-    client.get(uri).await
+    client.get_json_map(uri).await
 }
 
 // TODO: There are BOTH "_embedded" and "content" wrapping maps. However the former contains the

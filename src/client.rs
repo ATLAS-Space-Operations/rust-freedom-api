@@ -1,6 +1,7 @@
+use bytes::Bytes;
 use freedom_config::Config;
 use reqwest::{Response, StatusCode};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use url::Url;
 
 use crate::api::{FreedomApi, FreedomApiContainer, FreedomApiValue};
@@ -39,38 +40,6 @@ impl Client {
     pub fn from_env() -> Result<Self, freedom_config::Error> {
         let config = Config::from_env()?;
         Ok(Self::from_config(config))
-    }
-
-    pub(crate) async fn get_body(&self, url: Url) -> Result<String, crate::error::Error> {
-        let resp = self
-            .client
-            .get(url.clone())
-            .basic_auth(self.config.key(), Some(&self.config.expose_secret()))
-            .send()
-            .await;
-
-        let resp = match resp {
-            Ok(r) => r,
-            Err(e) => {
-                tracing::warn!(error = ?e, "Received ERR response");
-                return Err(From::from(e));
-            }
-        };
-        tracing::debug!(?resp, "Received OK response");
-
-        if resp.status() != StatusCode::OK {
-            tracing::warn!(status = ?resp.status(), url = url.as_str(), "Received non-OK HTTP code");
-        }
-        let body = match resp.text().await {
-            Ok(b) => b,
-            Err(e) => {
-                tracing::warn!(error = ?e, "Received ERR body");
-                return Err(From::from(e));
-            }
-        };
-        tracing::debug!(?body, "Received OK body");
-
-        Ok(body)
     }
 }
 
@@ -112,13 +81,17 @@ where
 impl FreedomApi for Client {
     type Container<T: FreedomApiValue> = Inner<T>;
 
-    async fn get<T>(&self, url: Url) -> Result<T, crate::error::Error>
-    where
-        T: DeserializeOwned + Clone,
-    {
-        let body = self.get_body(url).await?;
+    async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), crate::error::Error> {
+        let resp = self
+            .client
+            .get(url)
+            .basic_auth(self.config.key(), Some(&self.config.expose_secret()))
+            .send()
+            .await?;
 
-        serde_json::from_str(&body).map_err(From::from)
+        let status = resp.status();
+        let body = resp.bytes().await?;
+        Ok((body, status))
     }
 
     async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
