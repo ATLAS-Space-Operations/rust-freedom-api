@@ -1169,19 +1169,19 @@ pub trait FreedomApi: Send + Sync {
             .items)
     }
 
-    /// Fetch a token by providing a POST value
-    ///
-    /// # Warning
-    ///
-    /// Do not use this method, directly. Instead prefer [`FreedomApi::new_token_by_satellite_id`] or
-    /// [`FreedomApi::new_token_by_site_configuration_id`]
-    async fn new_token<S: std::fmt::Debug + Serialize + Sync + Send>(
+    /// Fetch an FPS token for the provided band ID and site configuration ID
+    async fn new_token_by_site_configuration_id(
         &self,
-        post_val: S,
-    ) -> Result<String, Error> {
-        let uri = self.path_to_url("fps");
+        band_id: u32,
+        site_configuration_id: u32,
+    ) -> Result<String, crate::Error> {
+        let url = self.path_to_url("fps");
+        let payload = serde_json::json!({
+            "band": format!("/api/satellite_bands/{}", band_id),
+            "configuration": format!("/api/configurations/{}", site_configuration_id),
+        });
 
-        let value: Value = self.post_deserialize(uri, post_val).await?;
+        let value: Value = self.post_deserialize(url, &payload).await?;
 
         value
             .get("token")
@@ -1194,32 +1194,29 @@ pub trait FreedomApi: Send + Sync {
             .map_err(From::from)
     }
 
-    /// Fetch an FPS token for the provided band ID and site configuration ID
-    async fn new_token_by_site_configuration_id(
-        &self,
-        band_id: u32,
-        site_configuration_id: u32,
-    ) -> Result<String, crate::Error> {
-        let payload = serde_json::json!({
-            "band": format!("/api/satellite_bands/{}", band_id),
-            "configuration": format!("/api/configurations/{}", site_configuration_id),
-        });
-
-        self.new_token(&payload).await
-    }
-
     /// Fetch an FPS token for the provided band ID and satellite ID
     async fn new_token_by_satellite_id(
         &self,
         band_id: u32,
         satellite_id: u32,
     ) -> Result<String, crate::Error> {
+        let url = self.path_to_url("fps");
         let payload = serde_json::json!({
             "band": format!("/api/satellite_bands/{}", band_id),
             "satellite": format!("/api/satellites/{}", satellite_id),
         });
 
-        self.new_token(&payload).await
+        let value: Value = self.post_deserialize(url, &payload).await?;
+
+        value
+            .get("token")
+            .ok_or(RuntimeError::Response(String::from("Missing token field")))?
+            .as_str()
+            .ok_or(RuntimeError::Response(String::from(
+                "Invalid type for token",
+            )))
+            .map(|s| s.to_owned())
+            .map_err(From::from)
     }
 
     /// Produces a paginated stream of [`User`] objects.
