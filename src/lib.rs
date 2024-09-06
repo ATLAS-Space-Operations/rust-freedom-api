@@ -23,10 +23,7 @@ pub mod prelude {
     #[cfg(feature = "caching")]
     pub use crate::caching_client::CachingClient;
     pub use crate::extensions::*;
-    pub use crate::{
-        client::Client,
-        error::{BuilderError, Error, RuntimeError},
-    };
+    pub use crate::{client::Client, error::Error};
     pub use freedom_models::{
         account::*, satellite::*, satellite_configuration::*, site::*, task::*, user::*,
     };

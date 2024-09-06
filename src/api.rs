@@ -23,14 +23,14 @@ use freedom_models::{
     utils::Embedded,
 };
 use reqwest::{Response, StatusCode};
-use serde::{de::DeserializeOwned, Serialize};
+use serde::de::DeserializeOwned;
 use serde_json::Value;
 use time::{format_description::well_known::Iso8601, OffsetDateTime};
 use url::Url;
 
 use futures_core::Stream;
 
-use crate::{error::Error, prelude::RuntimeError};
+use crate::error::Error;
 
 pub(crate) mod post;
 
@@ -1185,11 +1185,9 @@ pub trait FreedomApi: Send + Sync {
 
         value
             .get("token")
-            .ok_or(RuntimeError::Response(String::from("Missing token field")))?
+            .ok_or(Error::Response(String::from("Missing token field")))?
             .as_str()
-            .ok_or(RuntimeError::Response(String::from(
-                "Invalid type for token",
-            )))
+            .ok_or(Error::Response(String::from("Invalid type for token")))
             .map(|s| s.to_owned())
             .map_err(From::from)
     }
@@ -1210,11 +1208,9 @@ pub trait FreedomApi: Send + Sync {
 
         value
             .get("token")
-            .ok_or(RuntimeError::Response(String::from("Missing token field")))?
+            .ok_or(Error::Response(String::from("Missing token field")))?
             .as_str()
-            .ok_or(RuntimeError::Response(String::from(
-                "Invalid type for token",
-            )))
+            .ok_or(Error::Response(String::from("Invalid type for token")))
             .map(|s| s.to_owned())
             .map_err(From::from)
     }
@@ -1231,7 +1227,7 @@ pub trait FreedomApi: Send + Sync {
 
 fn error_on_non_success(status: &StatusCode) -> Result<(), Error> {
     if !status.is_success() {
-        return Err(Error::Runtime(RuntimeError::Response(status.to_string())));
+        return Err(Error::Response(status.to_string()));
     }
 
     Ok(())

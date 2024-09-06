@@ -33,19 +33,15 @@ pub use {
 fn get_id(reference: &'static str, links: &HashMap<String, url::Url>) -> Result<i32, crate::Error> {
     let url = links
         .get(reference)
-        .ok_or(crate::error::RuntimeError::MissingUri(reference))?;
+        .ok_or(crate::error::Error::MissingUri(reference))?;
 
     let id_str = url
         .path_segments()
-        .ok_or(crate::error::RuntimeError::InvalidUri(
-            "Missing Path".into(),
-        ))?
+        .ok_or(crate::error::Error::InvalidUri("Missing Path".into()))?
         .last()
         .unwrap();
 
-    id_str
-        .parse()
-        .map_err(|_| From::from(crate::error::RuntimeError::InvalidId))
+    id_str.parse().map_err(|_| crate::error::Error::InvalidId)
 }
 
 async fn get_item<T, C>(
@@ -59,7 +55,7 @@ where
 {
     let uri = links
         .get(reference)
-        .ok_or(crate::error::RuntimeError::MissingUri(reference))?
+        .ok_or(crate::error::Error::MissingUri(reference))?
         .clone();
 
     client.get_json_map(uri).await

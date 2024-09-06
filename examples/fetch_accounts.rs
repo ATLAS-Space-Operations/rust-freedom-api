@@ -1,11 +1,9 @@
 use freedom_api::prelude::*;
-use freedom_config::Config;
 use futures::StreamExt;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = Config::from_env()?;
-    let client = Client::from_config(config);
+    let client = Client::from_env()?;
     let accounts = client
         .get_accounts()
         .filter_map(|result| async move { result.ok() })
@@ -13,7 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .collect::<Vec<_>>()
         .await;
 
-    println!("{:?}", accounts);
+    println!("{:#?}", accounts);
 
     Ok(())
 }

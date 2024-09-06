@@ -48,8 +48,6 @@ impl FreedomApi for CachingClient {
 
     #[tracing::instrument]
     async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), Error> {
-        use crate::error::RuntimeError;
-
         // This is a rather cheap clone. Something like 50 bytes. This is necessary since we will
         // be passing this to the tokio executor which has lifetime requirements of `'static`
         let client = &self.inner;
@@ -59,7 +57,7 @@ impl FreedomApi for CachingClient {
                 let (body, status) = client.get(url).await?;
 
                 if !status.is_success() {
-                    return Err(Error::Runtime(RuntimeError::Response(status.to_string())));
+                    return Err(Error::Response(status.to_string()));
                 }
 
                 Ok((body, status))
