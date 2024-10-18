@@ -1,0 +1,192 @@
+{
+  "_embedded": {
+    "satellite_bands": [
+      {
+        "created": "2022-03-24T19:47:18Z",
+        "modified": "2023-10-11T19:37:46Z",
+        "name": "FooBarBand1",
+        "type": "RECEIVE",
+        "frequencyMghz": 1000.0,
+        "defaultBandWidthMghz": 1000.0,
+        "ioConfiguration": {
+          "startHexPattern": "",
+          "endHexPattern": "",
+          "stripPattern": false,
+          "ioHardware": "MODEM"
+        },
+        "polarization": "RIGHT",
+        "manualTransmitControl": false,
+        "accountName": "ABC Space",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_bands/1573"
+          },
+          "bands": {
+            "href": "http://localhost:8080/api/satellite_bands/1573"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_bands/1573/account"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:27:55Z",
+        "modified": "2023-07-28T14:15:34Z",
+        "name": "",
+        "type": "RECEIVE",
+        "frequencyMghz": 2250.0,
+        "defaultBandWidthMghz": 1000.0,
+        "modulation": "qpsk",
+        "ioConfiguration": {
+          "startHexPattern": "",
+          "endHexPattern": "",
+          "stripPattern": false,
+          "ioHardware": "MODEM"
+        },
+        "polarization": "LEFT",
+        "manualTransmitControl": false,
+        "accountName": "ABC Space",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_bands/1574"
+          },
+          "bands": {
+            "href": "http://localhost:8080/api/satellite_bands/1574"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_bands/1574/account"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:38:10Z",
+        "modified": "2023-07-28T14:14:03Z",
+        "name": "",
+        "type": "RECEIVE",
+        "frequencyMghz": 1000.0,
+        "defaultBandWidthMghz": 1000.0,
+        "ioConfiguration": {
+          "startHexPattern": "",
+          "endHexPattern": "",
+          "stripPattern": false,
+          "ioHardware": "MODEM"
+        },
+        "polarization": "RIGHT",
+        "manualTransmitControl": false,
+        "accountName": "ABC Space",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_bands/1575"
+          },
+          "bands": {
+            "href": "http://localhost:8080/api/satellite_bands/1575"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_bands/1575/account"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:39:39Z",
+        "modified": "2022-03-24T20:39:39Z",
+        "name": "",
+        "type": "RECEIVE",
+        "frequencyMghz": 1000.0,
+        "defaultBandWidthMghz": 1000.0,
+        "ioConfiguration": {
+          "startHexPattern": "",
+          "endHexPattern": "",
+          "stripPattern": false,
+          "ioHardware": "MODEM"
+        },
+        "manualTransmitControl": false,
+        "accountName": "ABC Space",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_bands/1576"
+          },
+          "bands": {
+            "href": "http://localhost:8080/api/satellite_bands/1576"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_bands/1576/account"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:40:57Z",
+        "modified": "2022-03-24T20:40:57Z",
+        "name": "",
+        "type": "RECEIVE",
+        "frequencyMghz": 1000.0,
+        "defaultBandWidthMghz": 1000.0,
+        "ioConfiguration": {
+          "startHexPattern": "",
+          "endHexPattern": "",
+          "stripPattern": false,
+          "ioHardware": "MODEM"
+        },
+        "manualTransmitControl": false,
+        "accountName": "ABC Space",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_bands/1577"
+          },
+          "bands": {
+            "href": "http://localhost:8080/api/satellite_bands/1577"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_bands/1577/account"
+          }
+        }
+      },
+      {
+        "created": "2022-04-05T13:31:08Z",
+        "modified": "2024-02-28T19:40:00Z",
+        "name": "",
+        "type": "TRANSMIT",
+        "frequencyMghz": 2215.0,
+        "defaultBandWidthMghz": 2.0,
+        "modulation": "QPSK",
+        "ioConfiguration": {
+          "startHexPattern": "",
+          "endHexPattern": "",
+          "stripPattern": false,
+          "ioHardware": "MODEM"
+        },
+        "polarization": "RIGHT",
+        "manualTransmitControl": false,
+        "accountName": "ABC Space",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_bands/1581"
+          },
+          "bands": {
+            "href": "http://localhost:8080/api/satellite_bands/1581"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_bands/1581/account"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/satellite_bands{?page,size,sort}",
+      "templated": true
+    },
+    "profile": {
+      "href": "http://localhost:8080/api/profile/satellite_bands"
+    },
+    "search": {
+      "href": "http://localhost:8080/api/satellite_bands/search"
+    }
+  },
+  "page": {
+    "size": 20,
+    "totalElements": 6,
+    "totalPages": 1,
+    "number": 0
+  }
+}

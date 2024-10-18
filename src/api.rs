@@ -557,7 +557,7 @@ pub trait FreedomApi: Send + Sync {
         &self,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
     {
-        let uri = self.path_to_url("satellite_configurations/search/findAll");
+        let uri = self.path_to_url("satellite_configurations");
 
         self.get_paginated(uri)
     }

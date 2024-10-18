@@ -1,0 +1,125 @@
+{
+  "_embedded": {
+    "accounts": [
+      {
+        "created": "2022-03-24T14:35:40Z",
+        "modified": "2023-11-16T17:56:56Z",
+        "name": "ABC Space",
+        "storageKey": "ABCSpace",
+        "tiers": [
+          {
+            "tier": 1,
+            "price": 1.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/19"
+              }
+            }
+          },
+          {
+            "tier": 1,
+            "price": 1.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/66"
+              }
+            }
+          },
+          {
+            "tier": 1,
+            "price": 1.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/51"
+              }
+            }
+          },
+          {
+            "tier": 2,
+            "price": 2.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/52"
+              }
+            }
+          },
+          {
+            "tier": 2,
+            "price": 2.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/34"
+              }
+            }
+          },
+          {
+            "tier": 3,
+            "price": 1.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/15"
+              }
+            }
+          },
+          {
+            "tier": 4,
+            "price": 1.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/90"
+              }
+            }
+          },
+          {
+            "tier": 9,
+            "price": 1.0,
+            "_links": {
+              "configuration": {
+                "href": "http://localhost:8080/api/configurations/46"
+              }
+            }
+          }
+        ],
+        "postProcessDoneByAccount": false,
+        "weeksOfDataStorage": 2,
+        "record": true,
+        "demo": false,
+        "verified": true,
+        "accessRealtimeCidr": [
+          {
+            "name": "ABC Space 1",
+            "cidr": "1.2.3.4/32"
+          }
+        ],
+        "accessApiCidr": [],
+        "storageGroup": "test-freedom-atlas-100",
+        "fpsHostname": "",
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/accounts/34"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/accounts/34"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/accounts/34/satellites"
+          },
+          "users": {
+            "href": "http://localhost:8080/api/accounts/34/users"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/accounts/?page=0&size=20"
+    }
+  },
+  "page": {
+    "size": 20,
+    "totalElements": 1,
+    "totalPages": 1,
+    "number": 0
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "_embedded": {
+    "satellite_configurations": [
+      {
+        "created": "2022-03-24T19:47:37Z",
+        "modified": "2024-02-28T19:58:56Z",
+        "name": "FooBarConfig1",
+        "orbit": "LEO",
+        "pullTLE": true,
+        "doppler": false,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/812"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/812"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/812/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/812/bandDetails"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:28:11Z",
+        "modified": "2022-11-10T15:33:03Z",
+        "name": "",
+        "orbit": "LEO",
+        "pullTLE": false,
+        "doppler": false,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/813"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/813"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/813/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/813/bandDetails"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:38:19Z",
+        "modified": "2022-03-24T20:38:19Z",
+        "name": "",
+        "orbit": "LEO",
+        "pullTLE": false,
+        "doppler": false,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/814"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/814"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/814/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/814/bandDetails"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:39:47Z",
+        "modified": "2022-03-24T20:39:47Z",
+        "name": "",
+        "orbit": "LEO",
+        "pullTLE": false,
+        "doppler": false,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/815"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/815"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/815/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/815/bandDetails"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:41:08Z",
+        "modified": "2022-05-02T13:14:10Z",
+        "name": "",
+        "orbit": "LEO",
+        "pullTLE": false,
+        "doppler": false,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/816"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/816"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/816/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/816/bandDetails"
+          }
+        }
+      },
+      {
+        "created": "2022-05-20T18:59:43Z",
+        "modified": "2022-05-20T18:59:43Z",
+        "name": "",
+        "orbit": "GEO",
+        "pullTLE": true,
+        "doppler": true,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/832"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/832"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/832/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/832/bandDetails"
+          }
+        }
+      },
+      {
+        "created": "2022-11-21T19:16:15Z",
+        "modified": "2022-11-21T19:16:15Z",
+        "name": "",
+        "orbit": "LEO",
+        "pullTLE": true,
+        "doppler": false,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/886"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/886"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/886/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/886/bandDetails"
+          }
+        }
+      },
+      {
+        "created": "2023-04-18T14:41:25Z",
+        "modified": "2023-06-20T14:17:22Z",
+        "name": "",
+        "orbit": "GEO",
+        "pullTLE": false,
+        "doppler": false,
+        "properties": {},
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellite_configurations/908"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellite_configurations/908"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellite_configurations/908/account"
+          },
+          "bandDetails": {
+            "href": "http://localhost:8080/api/satellite_configurations/908/bandDetails"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/satellite_configurations/search/findAll?page=0&size=20"
+    }
+  },
+  "page": {
+    "size": 20,
+    "totalElements": 8,
+    "totalPages": 1,
+    "number": 0
+  }
+}

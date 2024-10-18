@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .collect::<Vec<_>>()
         .await;
 
-    println!("{:?}", satellite_configurations);
+    println!("{:#?}", satellite_configurations);
 
     Ok(())
 }

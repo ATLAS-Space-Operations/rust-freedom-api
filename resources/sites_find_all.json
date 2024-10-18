@@ -1,0 +1,47 @@
+{
+  "_embedded": {
+    "sites": [
+      {
+        "created": "2019-04-22T23:25:40Z",
+        "modified": "2023-01-26T16:26:48Z",
+        "name": "LOAG",
+        "description": "Los Angeles",
+        "location": {
+          "longitude": -2.15,
+          "latitude": 50.5,
+          "elevation": 32.652
+        },
+        "baseFpsPort": 20100,
+        "properties": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/sites/14"
+          },
+          "sites": {
+            "href": "http://localhost:8080/api/sites/14"
+          },
+          "configurations": {
+            "href": "http://localhost:8080/api/sites/14/configurations"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/sites/?page=0&size=20"
+    },
+    "search": {
+      "href": "http://localhost:8080/api/sites/search"
+    },
+    "profile": {
+      "href": "http://localhost:8080/api/profile/sites"
+    }
+  },
+  "page": {
+    "size": 20,
+    "totalElements": 1,
+    "totalPages": 1,
+    "number": 0
+  }
+}

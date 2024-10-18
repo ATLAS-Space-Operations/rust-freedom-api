@@ -1,0 +1,28 @@
+{
+  "created": "2022-03-24T19:47:18Z",
+  "modified": "2023-10-11T19:37:46Z",
+  "name": "FooBarBand1",
+  "type": "RECEIVE",
+  "frequencyMghz": 1000.0,
+  "defaultBandWidthMghz": 1000.0,
+  "ioConfiguration": {
+    "startHexPattern": "",
+    "endHexPattern": "",
+    "stripPattern": false,
+    "ioHardware": "MODEM"
+  },
+  "polarization": "RIGHT",
+  "manualTransmitControl": false,
+  "accountName": "ABC Space",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/satellite_bands/1573"
+    },
+    "bands": {
+      "href": "http://localhost:8080/api/satellite_bands/1573"
+    },
+    "account": {
+      "href": "http://localhost:8080/api/satellite_bands/1573/account"
+    }
+  }
+}

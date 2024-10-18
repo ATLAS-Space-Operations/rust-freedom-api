@@ -1,0 +1,25 @@
+{
+  "created": "2022-03-24T19:47:37Z",
+  "modified": "2024-02-28T19:58:56Z",
+  "name": "FooBarConfig1",
+  "orbit": "LEO",
+  "pullTLE": true,
+  "doppler": false,
+  "properties": {},
+  "accountName": "ABC Space",
+  "metaData": {},
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/satellite_configurations/812"
+    },
+    "configuration": {
+      "href": "http://localhost:8080/api/satellite_configurations/812"
+    },
+    "account": {
+      "href": "http://localhost:8080/api/satellite_configurations/812/account"
+    },
+    "bandDetails": {
+      "href": "http://localhost:8080/api/satellite_configurations/812/bandDetails"
+    }
+  }
+}

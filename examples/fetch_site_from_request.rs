@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .get_site(&atlas_client)
         .await?;
 
-    println!("{:?}", site_from_request);
+    println!("{:#?}", site_from_request);
 
     Ok(())
 }

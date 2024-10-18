@@ -1,0 +1,496 @@
+{
+  "_embedded": {
+    "satellites": [
+      {
+        "created": "2022-03-24T19:48:19Z",
+        "modified": "2024-10-18T00:00:53Z",
+        "name": "FooBar 6",
+        "description": "FooBar 6 Demo Satellite",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "orbitInfoType": "AUTO_TLE",
+        "orbitInfoName": "Auto TLE set by sat config",
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/710"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/710"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/710/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/710/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/710/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/710/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:27:15Z",
+        "modified": "2023-10-11T19:42:30Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "orbitInfoType": "USER_TLE",
+        "orbitInfoName": "USER_TLE_20231011194131",
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/711"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/711"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/711/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/711/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/711/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/711/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:30:11Z",
+        "modified": "2024-05-13T13:25:15Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "orbitInfoType": "USER_TLE",
+        "orbitInfoName": "EOS1",
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/712"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/712"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/712/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/712/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/712/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/712/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:30:36Z",
+        "modified": "2022-05-23T14:41:26Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/713"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/713"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/713/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/713/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/713/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/713/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:31:04Z",
+        "modified": "2022-03-25T19:33:09Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/714"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/714"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/714/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/714/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/714/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/714/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:34:52Z",
+        "modified": "2022-09-06T20:39:42Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/715"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/715"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/715/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/715/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/715/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/715/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:35:23Z",
+        "modified": "2023-12-05T16:13:44Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/716"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/716"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/716/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/716/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/716/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/716/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:35:43Z",
+        "modified": "2023-05-31T18:12:50Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/717"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/717"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/717/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/717/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/717/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/717/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:38:55Z",
+        "modified": "2022-03-25T19:34:52Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/718"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/718"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/718/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/718/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/718/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/718/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:40:31Z",
+        "modified": "2022-03-25T19:35:50Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/719"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/719"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/719/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/719/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/719/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/719/configuration"
+          }
+        }
+      },
+      {
+        "created": "2022-03-24T20:41:52Z",
+        "modified": "2022-03-25T19:35:21Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/720"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/720"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/720/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/720/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/720/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/720/configuration"
+          }
+        }
+      },
+      {
+        "created": "2024-01-17T02:51:30Z",
+        "modified": "2024-10-18T00:00:33Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "orbitInfoType": "AUTO_TLE",
+        "orbitInfoName": "Auto TLE set by sat config",
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/1019"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/1019"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/1019/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/1019/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/1019/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/1019/configuration"
+          }
+        }
+      },
+      {
+        "created": "2024-01-17T02:55:54Z",
+        "modified": "2024-10-18T00:00:55Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "orbitInfoType": "AUTO_TLE",
+        "orbitInfoName": "Auto TLE set by sat config",
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/1020"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/1020"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/1020/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/1020/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/1020/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/1020/configuration"
+          }
+        }
+      },
+      {
+        "created": "2024-05-13T13:36:28Z",
+        "modified": "2024-05-13T13:36:28Z",
+        "name": "",
+        "description": "",
+        "noradCatId": 100,
+        "tle": {
+          "line1": "TLE",
+          "line2": "TLE"
+        },
+        "accountName": "ABC Space",
+        "metaData": {},
+        "_links": {
+          "self": {
+            "href": "http://localhost:8080/api/satellites/1257"
+          },
+          "satellites": {
+            "href": "http://localhost:8080/api/satellites/1257"
+          },
+          "upcomingVisibilities": {
+            "href": "http://localhost:8080/api/satellites/1257/upcomingVisibilities"
+          },
+          "account": {
+            "href": "http://localhost:8080/api/satellites/1257/account"
+          },
+          "orbitInfo": {
+            "href": "http://localhost:8080/api/satellites/1257/orbitInfo"
+          },
+          "configuration": {
+            "href": "http://localhost:8080/api/satellites/1257/configuration"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/satellites{?page,size,sort}",
+      "templated": true
+    },
+    "profile": {
+      "href": "http://localhost:8080/api/profile/satellites"
+    },
+    "search": {
+      "href": "http://localhost:8080/api/satellites/search"
+    }
+  },
+  "page": {
+    "size": 20,
+    "totalElements": 14,
+    "totalPages": 1,
+    "number": 0
+  }
+}

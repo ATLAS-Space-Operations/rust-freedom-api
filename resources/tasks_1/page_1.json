@@ -1,0 +1,944 @@
+{
+  "_embedded" : {
+    "tasks" : [ {
+      "created" : "2022-05-25T16:45:24Z",
+      "modified" : "2022-12-01T13:22:22Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-05-26T04:57:26Z",
+      "visibilityEnd" : "2022-05-26T05:10:11Z",
+      "start" : "2022-05-26T04:57:26Z",
+      "end" : "2022-05-26T05:10:11Z",
+      "billable" : true,
+      "durationInSeconds" : 765,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M45S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/74344"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/74344"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/74344/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/74344"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/74344/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/74344/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/74344"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/74344/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/74344/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/74344/config"
+        }
+      }
+    }, {
+      "created" : "2022-06-02T15:55:24Z",
+      "modified" : "2022-12-01T13:15:20Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-06-03T06:02:02Z",
+      "visibilityEnd" : "2022-06-03T06:13:21Z",
+      "start" : "2022-06-03T06:02:02Z",
+      "end" : "2022-06-03T06:13:21Z",
+      "billable" : true,
+      "durationInSeconds" : 679,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT11M19S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/74580"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/74580"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/74580/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/74580"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/74580/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/74580/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/74580"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/74580/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/74580/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/74580/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T14:45:24Z",
+      "modified" : "2022-12-01T13:15:21Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-06T02:11:55Z",
+      "visibilityEnd" : "2022-08-06T02:23:13Z",
+      "start" : "2022-08-06T02:11:55Z",
+      "end" : "2022-08-06T02:23:13Z",
+      "billable" : true,
+      "durationInSeconds" : 678,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT11M18S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79224"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79224"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79224/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79224"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79224/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79224/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79224"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79224/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79224/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79224/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:00:28Z",
+      "modified" : "2022-12-01T13:22:23Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-06T11:24:20Z",
+      "visibilityEnd" : "2022-08-06T11:36:44Z",
+      "start" : "2022-08-06T11:24:20Z",
+      "end" : "2022-08-06T11:36:44Z",
+      "billable" : true,
+      "durationInSeconds" : 744,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M24S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79225"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79225"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79225/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79225"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79225/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79225/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79225"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79225/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79225/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79225/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:00:28Z",
+      "modified" : "2022-12-01T13:15:21Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-08T23:48:19Z",
+      "visibilityEnd" : "2022-08-08T23:55:42Z",
+      "start" : "2022-08-08T23:48:19Z",
+      "end" : "2022-08-08T23:55:42Z",
+      "billable" : true,
+      "durationInSeconds" : 443,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT7M23S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79226"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79226"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79226/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79226"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79226/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79226/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79226"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79226/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79226/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79226/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:00:28Z",
+      "modified" : "2022-12-01T13:22:23Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-09T02:55:22Z",
+      "visibilityEnd" : "2022-08-09T03:08:06Z",
+      "start" : "2022-08-09T02:55:22Z",
+      "end" : "2022-08-09T03:08:06Z",
+      "billable" : true,
+      "durationInSeconds" : 764,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M44S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79227"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79227"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79227/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79227"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79227/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79227/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79227"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79227/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79227/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79227/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:00:28Z",
+      "modified" : "2022-12-01T13:22:24Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-09T14:36:27Z",
+      "visibilityEnd" : "2022-08-09T14:43:10Z",
+      "start" : "2022-08-09T14:36:27Z",
+      "end" : "2022-08-09T14:43:10Z",
+      "billable" : true,
+      "durationInSeconds" : 403,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT6M43S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79228"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79228"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79228/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79228"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79228/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79228/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79228"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79228/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79228/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79228/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:00:28Z",
+      "modified" : "2022-12-01T13:15:22Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-10T02:38:08Z",
+      "visibilityEnd" : "2022-08-10T02:44:43Z",
+      "start" : "2022-08-10T02:38:08Z",
+      "end" : "2022-08-10T02:44:43Z",
+      "billable" : true,
+      "durationInSeconds" : 395,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT6M35S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79229"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79229"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79229/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79229"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79229/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79229/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79229"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79229/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79229/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79229/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:00:28Z",
+      "modified" : "2022-12-01T13:22:24Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-10T12:39:04Z",
+      "visibilityEnd" : "2022-08-10T12:51:50Z",
+      "start" : "2022-08-10T12:39:04Z",
+      "end" : "2022-08-10T12:51:50Z",
+      "billable" : true,
+      "durationInSeconds" : 766,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M46S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79230"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79230"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79230/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79230"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79230/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79230/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79230"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79230/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79230/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79230/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:00:28Z",
+      "modified" : "2022-12-01T13:15:22Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-10T22:55:33Z",
+      "visibilityEnd" : "2022-08-10T23:06:51Z",
+      "start" : "2022-08-10T22:55:33Z",
+      "end" : "2022-08-10T23:06:51Z",
+      "billable" : true,
+      "durationInSeconds" : 678,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT11M18S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79231"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79231"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79231/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79231"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79231/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79231/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79231"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79231/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79231/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79231/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:05:24Z",
+      "modified" : "2022-12-01T13:22:25Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-11T03:25:49Z",
+      "visibilityEnd" : "2022-08-11T03:38:06Z",
+      "start" : "2022-08-11T03:25:49Z",
+      "end" : "2022-08-11T03:38:06Z",
+      "billable" : true,
+      "durationInSeconds" : 737,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M17S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79232"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79232"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79232/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79232"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79232/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79232/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79232"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79232/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79232/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79232/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:05:24Z",
+      "modified" : "2022-12-01T13:15:22Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-11T13:59:29Z",
+      "visibilityEnd" : "2022-08-11T14:11:32Z",
+      "start" : "2022-08-11T13:59:29Z",
+      "end" : "2022-08-11T14:11:32Z",
+      "billable" : true,
+      "durationInSeconds" : 723,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M3S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79233"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79233"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79233/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79233"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79233/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79233/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79233"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79233/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79233/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79233/config"
+        }
+      }
+    }, {
+      "created" : "2022-08-05T15:05:24Z",
+      "modified" : "2022-12-01T13:22:25Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-08-12T03:15:27Z",
+      "visibilityEnd" : "2022-08-12T03:28:00Z",
+      "start" : "2022-08-12T03:15:27Z",
+      "end" : "2022-08-12T03:28:00Z",
+      "billable" : true,
+      "durationInSeconds" : 753,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M33S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/79234"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/79234"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/79234/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/79234"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/79234/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/79234/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/79234"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/79234/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/79234/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/79234/config"
+        }
+      }
+    }, {
+      "created" : "2022-09-01T19:35:28Z",
+      "modified" : "2022-12-01T13:22:26Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-09-02T01:58:13Z",
+      "visibilityEnd" : "2022-09-02T02:10:49Z",
+      "start" : "2022-09-02T01:58:13Z",
+      "end" : "2022-09-02T02:10:49Z",
+      "billable" : true,
+      "durationInSeconds" : 756,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M36S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/81488"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/81488"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/81488/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/81488"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/81488/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/81488/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/81488"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/81488/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/81488/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/81488/config"
+        }
+      }
+    }, {
+      "created" : "2022-09-02T20:10:01Z",
+      "modified" : "2022-12-01T13:15:23Z",
+      "score" : 100,
+      "foundVisibility" : false,
+      "start" : "2022-09-02T20:27:24Z",
+      "end" : "2022-09-02T20:37:24Z",
+      "billable" : true,
+      "durationInSeconds" : 600,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT10M",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/81626"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/81626"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/81626/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/81626"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/81626/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/81626/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/81626"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/81626/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/81626/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/81626/config"
+        }
+      }
+    }, {
+      "created" : "2022-09-06T13:10:24Z",
+      "modified" : "2022-12-01T13:22:27Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-09-06T23:14:40Z",
+      "visibilityEnd" : "2022-09-06T23:23:34Z",
+      "start" : "2022-09-06T23:14:40Z",
+      "end" : "2022-09-06T23:23:34Z",
+      "billable" : true,
+      "durationInSeconds" : 534,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT8M54S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/81650"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/81650"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/81650/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/81650"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/81650/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/81650/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/81650"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/81650/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/81650/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/81650/config"
+        }
+      }
+    }, {
+      "created" : "2022-09-06T13:10:24Z",
+      "modified" : "2022-12-01T13:22:27Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-09-07T02:37:05Z",
+      "visibilityEnd" : "2022-09-07T02:49:33Z",
+      "start" : "2022-09-07T02:37:05Z",
+      "end" : "2022-09-07T02:49:33Z",
+      "billable" : true,
+      "durationInSeconds" : 748,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M28S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/81651"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/81651"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/81651/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/81651"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/81651/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/81651/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/81651"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/81651/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/81651/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/81651/config"
+        }
+      }
+    }, {
+      "created" : "2022-09-06T13:10:24Z",
+      "modified" : "2022-12-01T13:15:24Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-09-07T13:05:15Z",
+      "visibilityEnd" : "2022-09-07T13:16:36Z",
+      "start" : "2022-09-07T13:05:15Z",
+      "end" : "2022-09-07T13:16:36Z",
+      "billable" : true,
+      "durationInSeconds" : 681,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT11M21S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/81652"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/81652"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/81652/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/81652"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/81652/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/81652/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/81652"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/81652/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/81652/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/81652/config"
+        }
+      }
+    }, {
+      "created" : "2022-09-06T13:10:24Z",
+      "modified" : "2022-12-01T13:22:28Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-09-08T02:26:46Z",
+      "visibilityEnd" : "2022-09-08T02:39:26Z",
+      "start" : "2022-09-08T02:26:46Z",
+      "end" : "2022-09-08T02:39:26Z",
+      "billable" : true,
+      "durationInSeconds" : 760,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT12M40S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/81653"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/81653"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/81653/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/81653"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/81653/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/81653/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/81653"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/81653/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/81653/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/81653/config"
+        }
+      }
+    }, {
+      "created" : "2022-09-06T13:10:24Z",
+      "modified" : "2022-12-01T13:15:24Z",
+      "foundVisibility" : true,
+      "visibilityStart" : "2022-09-09T02:52:21Z",
+      "visibilityEnd" : "2022-09-09T02:56:35Z",
+      "start" : "2022-09-09T02:52:21Z",
+      "end" : "2022-09-09T02:56:35Z",
+      "billable" : true,
+      "durationInSeconds" : 254,
+      "taskWithinConfigWindow" : false,
+      "duration" : "PT4M14S",
+      "fileResults" : [ ],
+      "metaData" : { },
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/tasks/81654"
+        },
+        "tasks" : {
+          "href" : "http://localhost:8080/api/tasks/81654"
+        },
+        "azel" : {
+          "href" : "http://localhost:8080/api/tasks/81654/azel"
+        },
+        "metrics" : {
+          "href" : "http://localhost:8080/downloads/tasks/metrics/81654"
+        },
+        "doppler" : {
+          "href" : "http://localhost:8080/api/tasks/81654/doppler"
+        },
+        "visibility" : {
+          "href" : "http://localhost:8080/api/tasks/81654/visibility"
+        },
+        "fileResults" : {
+          "href" : "http://localhost:8080/downloads/tasks/81654"
+        },
+        "groundCommands" : {
+          "href" : "http://localhost:8080/api/tasks/81654/groundCommands"
+        },
+        "taskRequest" : {
+          "href" : "http://localhost:8080/api/tasks/81654/taskRequest"
+        },
+        "config" : {
+          "href" : "http://localhost:8080/api/tasks/81654/config"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "first" : {
+      "href" : "http://localhost:8080/api/tasks/search/findByOverlapping?start=2022-05-26T04:57:26Z&end=2022-12-05T01:00:00Z&page=0&size=20"
+    },
+    "self" : {
+      "href" : "http://localhost:8080/api/tasks/search/findByOverlapping?start=2022-05-26T04:57:26Z&end=2022-12-05T01:00:00Z&page=0&size=20"
+    },
+    "next" : {
+      "href" : "http://localhost:8080/api/tasks/search/findByOverlapping?start=2022-05-26T04:57:26Z&end=2022-12-05T01:00:00Z&page=1&size=20"
+    },
+    "last" : {
+      "href" : "http://localhost:8080/api/tasks/search/findByOverlapping?start=2022-05-26T04:57:26Z&end=2022-12-05T01:00:00Z&page=1&size=20"
+    }
+  },
+  "page" : {
+    "size" : 20,
+    "totalElements" : 34,
+    "totalPages" : 2,
+    "number" : 0
+  }
+}
