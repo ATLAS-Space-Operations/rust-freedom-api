@@ -1,9 +1,9 @@
 # ATLAS Freedom API
 
-This library is a Rust library which focuses on wrapping the ATLAS Freedom REST API in an easy
-to use and idiomatic way. The API is entirely asynchronous, support for a blocking client may
-be added sometime in the future, but for now an executor is required for usage, we recommend
-[tokio](https://tokio.rs/).
+This library is a Rust library which focuses on wrapping the ATLAS Freedom REST
+API in an easy to use and idiomatic way. The API is entirely asynchronous,
+support for a blocking client may be added sometime in the future, but for now
+an executor is required for usage, we recommend [tokio](https://tokio.rs/).
 
 ## Installation 
 
@@ -123,9 +123,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Async Trait
 
-When looking at the return type of the API methods, they may appear daunting. This is mostly
-resulting from async lifetimes brought about by usage of [`async_trait`](https://docs.rs/async-trait/latest/async_trait/).
-Once the [async trait feature](https://blog.rust-lang.org/inside-rust/2023/05/03/stabilizing-async-fn-in-trait.html)
+When looking at the return type of the API methods, they may appear
+daunting. This is mostly resulting from async lifetimes brought about by usage
+of [`async_trait`](https://docs.rs/async-trait/latest/async_trait/).  Once the
+[async trait feature](https://blog.rust-lang.org/inside-rust/2023/05/03/stabilizing-async-fn-in-trait.html)
 is release in stable rust. This complexity will be alleviated.
 
 ### Container
@@ -139,7 +140,7 @@ client is backed by a concurrent caching system, and in order to avoid
 unnecessarily cloning all responses from the caching client to the call site,
 the cached values are stored as `Arc<T>` so they can be cheaply cloned from the
 cache. This complexity will be mostly transparent to the caller, since the
-container is required to implement [`Deref<T>`](std::ops::Deref). 
+container is required to implement [`Deref<T>`](std::ops::Deref).
 
 If however you need to mutate the data after receiving it, call the
 `FreedomApiContainer::into_inner` method on the returned type to get an owned
