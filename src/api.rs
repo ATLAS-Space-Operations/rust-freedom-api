@@ -562,20 +562,17 @@ pub trait FreedomApi: Send + Sync {
         self.get_paginated(uri)
     }
 
-    /// Produces a paginated stream of [`SatelliteConfiguration`] objects.
-    ///
-    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
-    /// and return type
-    fn get_satellite_configurations_by_id(
+    /// Produces a single satellite configuration matching the provided satellite configuration ID
+    async fn get_satellite_configuration_by_id(
         &self,
         satellite_configuration_id: i32,
-    ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<SatelliteConfiguration>, Error>> + '_>>
-    {
+    ) -> Result<Self::Container<SatelliteConfiguration>, Error> {
         let uri = self.path_to_url(format!(
             "satellite_configurations/{satellite_configuration_id}"
         ));
 
-        self.get_paginated(uri)
+        self.get_json_map(uri).await
+    }
     }
 
     /// Produces a paginated stream of [`Site`] objects.
