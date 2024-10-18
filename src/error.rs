@@ -9,9 +9,6 @@ pub enum Error {
     #[error("Failed to deserialize the response: {0}")]
     Deserialization(String),
 
-    #[error("Failed to serialize the post: {0}")]
-    Serialization(String),
-
     #[error("Paginated item failed deserialized: {0}")]
     PaginationItemDeserialization(String),
 
@@ -19,9 +16,6 @@ pub enum Error {
     // does not implement Clone, PartialEq, or Eq
     #[error("Time parsing error: {0}")]
     TimeFormatError(String),
-
-    #[error("Failed to deserialize the item into an Enum: {0}")]
-    EnumDeserialization(String),
 
     #[error("Failed to parse item into valid URI: {0}")]
     InvalidUri(String),

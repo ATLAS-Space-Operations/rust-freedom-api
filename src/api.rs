@@ -492,7 +492,7 @@ pub trait FreedomApi: Send + Sync {
     fn get_satellite_bands(
         &self,
     ) -> Pin<Box<dyn Stream<Item = Result<Self::Container<Band>, Error>> + '_>> {
-        let uri = self.path_to_url("satellite_bands/search/findAll");
+        let uri = self.path_to_url("satellite_bands");
         self.get_paginated(uri)
     }
 
@@ -975,6 +975,27 @@ pub trait FreedomApi: Send + Sync {
         let uri = self.path_to_url("satellites");
 
         self.get_paginated(uri)
+    }
+
+    /// Produces single satellite object matching the provided satellite ID
+    async fn get_satellite_by_id(
+        &self,
+        satellite_id: i32,
+    ) -> Result<Self::Container<Satellite>, Error> {
+        let uri = self.path_to_url(format!("satellites/{}", satellite_id));
+
+        self.get_json_map(uri).await
+    }
+
+    /// Produces single satellite object matching the provided satellite name
+    async fn get_satellite_by_name(
+        &self,
+        satellite_name: &str,
+    ) -> Result<Self::Container<Satellite>, Error> {
+        let mut uri = self.path_to_url("satellites/findOneByName");
+        uri.set_query(Some(&format!("name={satellite_name}")));
+
+        self.get_json_map(uri).await
     }
 
     /// Produces a single [`Task`] matching the provided ID.
