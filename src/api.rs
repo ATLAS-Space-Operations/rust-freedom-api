@@ -573,6 +573,16 @@ pub trait FreedomApi: Send + Sync {
 
         self.get_json_map(uri).await
     }
+
+    /// Produces a single satellite configuration matching the provided satellite configuration name
+    async fn get_satellite_configuration_by_name(
+        &self,
+        satellite_configuration_name: &str,
+    ) -> Result<Self::Container<SatelliteConfiguration>, Error> {
+        let mut uri = self.path_to_url("satellite_configurations/search/findOneByName");
+        uri.set_query(Some(&format!("name={satellite_configuration_name}")));
+
+        self.get_json_map(uri).await
     }
 
     /// Produces a paginated stream of [`Site`] objects.
