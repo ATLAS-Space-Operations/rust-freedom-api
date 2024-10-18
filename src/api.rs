@@ -639,6 +639,24 @@ pub trait FreedomApi: Send + Sync {
         }
     }
 
+    /// Produces a vector of [`TaskRequest`] items, representing all the task requests matching the
+    /// target time overlapping with the provided time range.
+    async fn get_requests_by_target_date_between(
+        &self,
+        start: OffsetDateTime,
+        end: OffsetDateTime,
+    ) -> Result<Self::Container<Vec<TaskRequest>>, Error> {
+        let mut uri = self.path_to_url("requests/search/findAllByTargetDateBetween");
+
+        uri.set_query(Some(&format!(
+            "start={}&end={}",
+            start.format(&Iso8601::DEFAULT).unwrap(),
+            end.format(&Iso8601::DEFAULT).unwrap(),
+        )));
+
+        self.get_json_map(uri).await
+    }
+
     /// Produces a vector of [`TaskRequest`] items,
     /// representing all the task requests matching the account at the provided URI and whose
     /// target time overlaps with the provided time range.
