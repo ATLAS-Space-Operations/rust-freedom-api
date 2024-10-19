@@ -121,14 +121,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## API Return Type
 
-### Async Trait
-
-When looking at the return type of the API methods, they may appear
-daunting. This is mostly resulting from async lifetimes brought about by usage
-of [`async_trait`](https://docs.rs/async-trait/latest/async_trait/).  Once the
-[async trait feature](https://blog.rust-lang.org/inside-rust/2023/05/03/stabilizing-async-fn-in-trait.html)
-is release in stable rust. This complexity will be alleviated.
-
 ### Container
 
 There is however another complexity that exists in the return types of API

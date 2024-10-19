@@ -1,38 +1,37 @@
+use std::future::Future;
+
 use crate::api::FreedomApi;
-use async_trait::async_trait;
 use freedom_models::{
     azel::AzEl,
     site::SiteConfiguration,
     task::{Task, TaskRequest},
 };
 
-#[async_trait]
 pub trait TaskExt {
     fn get_id(&self) -> Result<i32, crate::Error>;
 
-    async fn get_task_request<C>(
+    fn get_task_request<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<TaskRequest>, crate::Error>
+    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<TaskRequest>, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_config<C>(
+    fn get_config<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<SiteConfiguration>, crate::Error>
+    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<SiteConfiguration>, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_azel<C>(
+    fn get_azel<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<AzEl>, crate::Error>
+    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<AzEl>, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 }
 
-#[async_trait]
 impl TaskExt for Task {
     fn get_id(&self) -> Result<i32, crate::Error> {
         super::get_id("self", &self.links)

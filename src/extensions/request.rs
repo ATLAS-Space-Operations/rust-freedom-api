@@ -1,5 +1,6 @@
+use std::future::Future;
+
 use crate::api::FreedomApi;
-use async_trait::async_trait;
 use freedom_models::{
     band::Band,
     satellite::Satellite,
@@ -8,42 +9,46 @@ use freedom_models::{
     user::User,
 };
 
-#[async_trait]
 pub trait TaskRequestExt {
     fn get_id(&self) -> Result<i32, crate::Error>;
 
-    async fn get_task<C>(
+    fn get_task<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<Task>, crate::Error>
+    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<Task>, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_site<C>(&self, client: &C) -> Result<Site, crate::Error>
+    fn get_site<C>(&self, client: &C) -> impl Future<Output = Result<Site, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_target_bands<C>(
+    fn get_target_bands<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<Vec<Band>>, crate::Error>
+    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<Vec<Band>>, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_config<C>(&self, client: &C) -> Result<SiteConfiguration, crate::Error>
+    fn get_config<C>(
+        &self,
+        client: &C,
+    ) -> impl Future<Output = Result<SiteConfiguration, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_satellite<C>(&self, client: &C) -> Result<Satellite, crate::Error>
+    fn get_satellite<C>(
+        &self,
+        client: &C,
+    ) -> impl Future<Output = Result<Satellite, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_user<C>(&self, client: &C) -> Result<User, crate::Error>
+    fn get_user<C>(&self, client: &C) -> impl Future<Output = Result<User, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 }
 
-#[async_trait]
 impl TaskRequestExt for TaskRequest {
     fn get_id(&self) -> Result<i32, crate::Error> {
         super::get_id("self", &self.links)

@@ -77,7 +77,6 @@ where
     }
 }
 
-#[async_trait::async_trait]
 impl FreedomApi for Client {
     type Container<T: FreedomApiValue> = Inner<T>;
 

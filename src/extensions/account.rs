@@ -1,27 +1,26 @@
+use std::future::Future;
+
 use crate::api::FreedomApi;
-use async_trait::async_trait;
 use freedom_models::{account::Account, satellite::Satellite, user::User};
 
-#[async_trait]
 pub trait AccountExt {
     fn get_id(&self) -> Result<i32, crate::Error>;
 
-    async fn get_users<C>(
+    fn get_users<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<Vec<User>>, crate::Error>
+    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<Vec<User>>, crate::Error>> + Send
     where
         C: FreedomApi + Send;
 
-    async fn get_satellites<C>(
+    fn get_satellites<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<Vec<Satellite>>, crate::Error>
+    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<Vec<Satellite>>, crate::Error>>
     where
         C: FreedomApi + Send;
 }
 
-#[async_trait]
 impl AccountExt for Account {
     fn get_id(&self) -> Result<i32, crate::Error> {
         super::get_id("self", &self.links)

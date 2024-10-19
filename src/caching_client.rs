@@ -38,7 +38,6 @@ impl<T: FreedomApiValue> FreedomApiContainer<T> for Arc<T> {
     }
 }
 
-#[async_trait::async_trait]
 impl FreedomApi for CachingClient {
     type Container<T: FreedomApiValue> = Arc<T>;
 
