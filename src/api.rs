@@ -5,10 +5,9 @@
 //!
 //! The API trait
 #![allow(clippy::type_complexity)]
-use std::{ops::Deref, pin::Pin};
+use std::{future::Future, ops::Deref, pin::Pin};
 
 use async_stream::stream;
-use async_trait::async_trait;
 use bytes::Bytes;
 use freedom_config::Config;
 use freedom_models::{
@@ -65,7 +64,6 @@ pub trait FreedomApiContainer<T>: Deref<Target = T> + FreedomApiValue {
 pub type PaginatedStream<'a, T> = Pin<Box<dyn Stream<Item = Result<T, Error>> + 'a + Send>>;
 
 /// The primary trait for interfacing with Freedom
-#[async_trait]
 pub trait FreedomApi: Send + Sync {
     /// The [`FreedomApi`] supports implementors with different so-called "container" types.
     ///
@@ -78,23 +76,25 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// The JSON response is then deserialized into the required type, erroring if the
     /// deserialization fails, and providing the object if it succeeds.
-    async fn get_json_map<T>(&self, url: Url) -> Result<T, Error>
+    fn get_json_map<T>(&self, url: Url) -> impl Future<Output = Result<T, Error>> + Send
     where
         T: FreedomApiValue,
     {
-        let (body, status) = self.get(url).await?;
+        async move {
+            let (body, status) = self.get(url).await?;
 
-        error_on_non_success(&status)?;
+            error_on_non_success(&status)?;
 
-        let utf8_str = String::from_utf8_lossy(&body);
-        serde_json::from_str(&utf8_str).map_err(From::from)
+            let utf8_str = String::from_utf8_lossy(&body);
+            serde_json::from_str(&utf8_str).map_err(From::from)
+        }
     }
 
     /// Creates a get request at the provided absolute URI for the client's environment, using basic
     /// authentication.
     ///
     /// Returns the raw binary body, and the status code.
-    async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), Error>;
+    fn get(&self, url: Url) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send;
 
     /// Creates a stream of items from a paginated endpoint.
     ///
@@ -155,7 +155,7 @@ pub trait FreedomApi: Send + Sync {
         url.join(path.as_ref()).expect("Invalid URL construction")
     }
 
-    async fn delete(&self, url: Url) -> Result<Response, Error>;
+    fn delete(&self, url: Url) -> impl Future<Output = Result<Response, Error>> + Send;
 
     /// Request to delete the band details object matching the provided id
     ///
@@ -170,9 +170,11 @@ pub trait FreedomApi: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    async fn delete_band_details(&self, id: i32) -> Result<Response, Error> {
-        let uri = self.path_to_url(format!("satellite_bands/{id}"));
-        self.delete(uri).await
+    fn delete_band_details(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("satellite_bands/{id}"));
+            self.delete(uri).await
+        }
     }
 
     /// Request to delete the satellite configuration matching the provided `id`
@@ -188,9 +190,14 @@ pub trait FreedomApi: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    async fn delete_satellite_configuration(&self, id: i32) -> Result<Response, Error> {
-        let uri = self.path_to_url(format!("satellite_configurations/{id}"));
-        self.delete(uri).await
+    fn delete_satellite_configuration(
+        &self,
+        id: i32,
+    ) -> impl Future<Output = Result<Response, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("satellite_configurations/{id}"));
+            self.delete(uri).await
+        }
     }
 
     /// Request to delete the satellite object matching the provided `id`
@@ -206,9 +213,11 @@ pub trait FreedomApi: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    async fn delete_satellite(&self, id: i32) -> Result<Response, Error> {
-        let uri = self.path_to_url(format!("satellites/{id}"));
-        self.delete(uri).await
+    fn delete_satellite(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("satellites/{id}"));
+            self.delete(uri).await
+        }
     }
 
     /// Request to delete the override matching the provided `id`
@@ -224,9 +233,11 @@ pub trait FreedomApi: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    async fn delete_override(&self, id: i32) -> Result<Response, Error> {
-        let uri = self.path_to_url(format!("overrides/{id}"));
-        self.delete(uri).await
+    fn delete_override(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("overrides/{id}"));
+            self.delete(uri).await
+        }
     }
 
     /// Request to delete the user matching the provided `id`
@@ -242,58 +253,72 @@ pub trait FreedomApi: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    async fn delete_user(&self, id: i32) -> Result<Response, Error> {
-        let uri = self.path_to_url(format!("users/{id}"));
-        self.delete(uri).await
+    fn delete_user(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("users/{id}"));
+            self.delete(uri).await
+        }
     }
 
     /// Request to delete the user matching the provided `id`
-    async fn delete_task_request(&self, id: i32) -> Result<Response, Error> {
-        let uri = self.path_to_url(format!("requests/{id}"));
-        self.delete(uri).await
+    fn delete_task_request(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("requests/{id}"));
+            self.delete(uri).await
+        }
     }
 
-    async fn post_deserialize<S, T>(&self, url: Url, msg: S) -> Result<T, Error>
+    fn post_deserialize<S, T>(
+        &self,
+        url: Url,
+        msg: S,
+    ) -> impl Future<Output = Result<T, Error>> + Send
     where
         S: serde::Serialize + Send + Sync,
         T: FreedomApiValue,
     {
-        let resp = self.post(url, msg).await?;
+        async move {
+            let resp = self.post(url, msg).await?;
 
-        resp.json::<T>().await.map_err(From::from)
+            resp.json::<T>().await.map_err(From::from)
+        }
     }
 
-    async fn post<S>(&self, url: Url, msg: S) -> Result<Response, Error>
+    fn post<S>(&self, url: Url, msg: S) -> impl Future<Output = Result<Response, Error>> + Send
     where
         S: serde::Serialize + Send + Sync;
 
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_account_by_name(
+    fn get_account_by_name(
         &self,
         account_name: &str,
-    ) -> Result<Self::Container<Account>, Error> {
-        let mut uri = self.path_to_url("accounts/search/findOneByName");
-        uri.set_query(Some(&format!("name={account_name}")));
-        self.get_json_map(uri).await
+    ) -> impl Future<Output = Result<Self::Container<Account>, Error>> + Send {
+        async move {
+            let mut uri = self.path_to_url("accounts/search/findOneByName");
+            uri.set_query(Some(&format!("name={account_name}")));
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_file_by_task_id_and_name(
+    fn get_file_by_task_id_and_name(
         &self,
         task_id: i32,
         file_name: &str,
-    ) -> Result<Bytes, Error> {
-        let path = format!("downloads/{}/{}", task_id, file_name);
-        let uri = self.path_to_url(path);
+    ) -> impl Future<Output = Result<Bytes, Error>> + Send {
+        async move {
+            let path = format!("downloads/{}/{}", task_id, file_name);
+            let uri = self.path_to_url(path);
 
-        let (data, status) = self.get(uri).await?;
-        error_on_non_success(&status)?;
+            let (data, status) = self.get(uri).await?;
+            error_on_non_success(&status)?;
 
-        Ok(data)
+            Ok(data)
+        }
     }
 
     /// Create a new satellite band object
@@ -469,9 +494,14 @@ pub trait FreedomApi: Send + Sync {
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_account_by_id(&self, account_id: i32) -> Result<Self::Container<Account>, Error> {
-        let uri = self.path_to_url(format!("accounts/{account_id}"));
-        self.get_json_map(uri).await
+    fn get_account_by_id(
+        &self,
+        account_id: i32,
+    ) -> impl Future<Output = Result<Self::Container<Account>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("accounts/{account_id}"));
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a paginated stream of [`Account`](freedom_models::account::Account) objects.
@@ -499,24 +529,28 @@ pub trait FreedomApi: Send + Sync {
     /// Produces a single [`Band`] matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_satellite_band_by_id(
+    fn get_satellite_band_by_id(
         &self,
         satellite_band_id: i32,
-    ) -> Result<Self::Container<Band>, Error> {
-        let uri = self.path_to_url(format!("satellite_bands/{satellite_band_id}"));
-        self.get_json_map(uri).await
+    ) -> impl Future<Output = Result<Self::Container<Band>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("satellite_bands/{satellite_band_id}"));
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a single [`Band`] matching the provided name.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_satellite_band_by_name(
+    fn get_satellite_band_by_name(
         &self,
         satellite_band_name: &str,
-    ) -> Result<Self::Container<Band>, Error> {
-        let mut uri = self.path_to_url("satellite_bands/search/findOneByName");
-        uri.set_query(Some(&format!("name={satellite_band_name}")));
-        self.get_json_map(uri).await
+    ) -> impl Future<Output = Result<Self::Container<Band>, Error>> + Send {
+        async move {
+            let mut uri = self.path_to_url("satellite_bands/search/findOneByName");
+            uri.set_query(Some(&format!("name={satellite_band_name}")));
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a paginated stream of [`Band`] objects matching the provided account name.
@@ -563,26 +597,30 @@ pub trait FreedomApi: Send + Sync {
     }
 
     /// Produces a single satellite configuration matching the provided satellite configuration ID
-    async fn get_satellite_configuration_by_id(
+    fn get_satellite_configuration_by_id(
         &self,
         satellite_configuration_id: i32,
-    ) -> Result<Self::Container<SatelliteConfiguration>, Error> {
-        let uri = self.path_to_url(format!(
-            "satellite_configurations/{satellite_configuration_id}"
-        ));
+    ) -> impl Future<Output = Result<Self::Container<SatelliteConfiguration>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!(
+                "satellite_configurations/{satellite_configuration_id}"
+            ));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a single satellite configuration matching the provided satellite configuration name
-    async fn get_satellite_configuration_by_name(
+    fn get_satellite_configuration_by_name(
         &self,
         satellite_configuration_name: &str,
-    ) -> Result<Self::Container<SatelliteConfiguration>, Error> {
-        let mut uri = self.path_to_url("satellite_configurations/search/findOneByName");
-        uri.set_query(Some(&format!("name={satellite_configuration_name}")));
+    ) -> impl Future<Output = Result<Self::Container<SatelliteConfiguration>, Error>> + Send {
+        async move {
+            let mut uri = self.path_to_url("satellite_configurations/search/findOneByName");
+            uri.set_query(Some(&format!("name={satellite_configuration_name}")));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a paginated stream of [`Site`] objects.
@@ -597,35 +635,44 @@ pub trait FreedomApi: Send + Sync {
     /// Produces a single [`Site`] object matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_site_by_id(&self, id: i32) -> Result<Self::Container<Site>, Error> {
-        let uri = self.path_to_url(format!("sites/{id}"));
-        self.get_json_map(uri).await
+    fn get_site_by_id(
+        &self,
+        id: i32,
+    ) -> impl Future<Output = Result<Self::Container<Site>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("sites/{id}"));
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a single [`Site`] object matching the provided name.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_site_by_name(
+    fn get_site_by_name(
         &self,
         name: impl AsRef<str> + Send,
-    ) -> Result<Self::Container<Site>, Error> {
-        let mut uri = self.path_to_url("sites/search/findOneByName");
-        let query = format!("name={}", name.as_ref());
-        uri.set_query(Some(&query));
+    ) -> impl Future<Output = Result<Self::Container<Site>, Error>> + Send {
+        async move {
+            let mut uri = self.path_to_url("sites/search/findOneByName");
+            let query = format!("name={}", name.as_ref());
+            uri.set_query(Some(&query));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a single [`TaskRequest`] matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_request_by_id(
+    fn get_request_by_id(
         &self,
         task_request_id: i32,
-    ) -> Result<Self::Container<TaskRequest>, Error> {
-        let uri = self.path_to_url(format!("requests/{task_request_id}"));
+    ) -> impl Future<Output = Result<Self::Container<TaskRequest>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("requests/{task_request_id}"));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a paginated stream of [`TaskRequest`] objects.
@@ -641,20 +688,22 @@ pub trait FreedomApi: Send + Sync {
 
     /// Produces a vector of [`TaskRequest`] items, representing all the task requests matching the
     /// target time overlapping with the provided time range.
-    async fn get_requests_by_target_date_between(
+    fn get_requests_by_target_date_between(
         &self,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error> {
-        let mut uri = self.path_to_url("requests/search/findAllByTargetDateBetween");
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send {
+        async move {
+            let mut uri = self.path_to_url("requests/search/findAllByTargetDateBetween");
 
-        uri.set_query(Some(&format!(
-            "start={}&end={}",
-            start.format(&Iso8601::DEFAULT).unwrap(),
-            end.format(&Iso8601::DEFAULT).unwrap(),
-        )));
+            uri.set_query(Some(&format!(
+                "start={}&end={}",
+                start.format(&Iso8601::DEFAULT).unwrap(),
+                end.format(&Iso8601::DEFAULT).unwrap(),
+            )));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a vector of [`TaskRequest`] items,
@@ -728,35 +777,37 @@ pub trait FreedomApi: Send + Sync {
     /// of `satellite_name`, and which overlaps the provided time range.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_requests_by_configuration_and_satellite_names_and_target_date_between<T, I, S>(
+    fn get_requests_by_configuration_and_satellite_names_and_target_date_between<T, I, S>(
         &self,
         configuration_uri: T,
         satellites: I,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send
     where
         T: AsRef<str> + Send,
         I: IntoIterator<Item = S> + Send,
         S: AsRef<str> + Send,
     {
-        let satellites_string = crate::utils::list_to_string(satellites);
-        let mut uri = self.path_to_url(
-            "requests/search/findAllByConfigurationAndSatelliteNamesAndTargetDateBetween",
-        );
+        async move {
+            let satellites_string = crate::utils::list_to_string(satellites);
+            let mut uri = self.path_to_url(
+                "requests/search/findAllByConfigurationAndSatelliteNamesAndTargetDateBetween",
+            );
 
-        uri.set_query(Some(&format!(
-            "configuration={}&satelliteNames={}&start={}&end={}",
-            configuration_uri.as_ref(),
-            satellites_string,
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?,
-        )));
+            uri.set_query(Some(&format!(
+                "configuration={}&satelliteNames={}&start={}&end={}",
+                configuration_uri.as_ref(),
+                satellites_string,
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?,
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`TaskRequest`] items, representing all the task requests matching the
@@ -765,28 +816,30 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
-    async fn get_requests_by_configuration_and_target_date_between<T>(
+    fn get_requests_by_configuration_and_target_date_between<T>(
         &self,
         configuration_uri: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send
     where
         T: AsRef<str> + Send,
     {
-        let mut uri =
-            self.path_to_url("requests/search/findAllByConfigurationAndTargetDateBetween");
-        uri.set_query(Some(&format!(
-            "configuration={}&start={}&end={}",
-            configuration_uri.as_ref(),
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?,
-        )));
+        async move {
+            let mut uri =
+                self.path_to_url("requests/search/findAllByConfigurationAndTargetDateBetween");
+            uri.set_query(Some(&format!(
+                "configuration={}&start={}&end={}",
+                configuration_uri.as_ref(),
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?,
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`TaskRequest`] items,
@@ -794,23 +847,25 @@ pub trait FreedomApi: Send + Sync {
     /// `ids`.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_requests_by_ids<I, S>(
+    fn get_requests_by_ids<I, S>(
         &self,
         ids: I,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send
     where
         I: IntoIterator<Item = S> + Send,
         S: AsRef<str> + Send,
     {
-        let ids_string = crate::utils::list_to_string(ids);
-        let mut uri = self.path_to_url("requests/search/findAllByIds");
+        async move {
+            let ids_string = crate::utils::list_to_string(ids);
+            let mut uri = self.path_to_url("requests/search/findAllByIds");
 
-        uri.set_query(Some(&format!("ids={}", ids_string)));
+            uri.set_query(Some(&format!("ids={}", ids_string)));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a paginated stream of [`TaskRequest`] objects which are public, and which overlap
@@ -858,29 +913,31 @@ pub trait FreedomApi: Send + Sync {
     /// time range.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_requests_by_satellite_name_and_target_date_between<T>(
+    fn get_requests_by_satellite_name_and_target_date_between<T>(
         &self,
         satellite_name: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send
     where
         T: AsRef<str> + Send,
     {
-        let mut uri =
-            self.path_to_url("requests/search/findAllBySatelliteNameAndTargetDateBetween");
+        async move {
+            let mut uri =
+                self.path_to_url("requests/search/findAllBySatelliteNameAndTargetDateBetween");
 
-        uri.set_query(Some(&format!(
-            "name={}&start={}&end={}",
-            satellite_name.as_ref(),
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?
-        )));
+            uri.set_query(Some(&format!(
+                "name={}&start={}&end={}",
+                satellite_name.as_ref(),
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a paginated stream of [`TaskRequest`] objects whose status matches the provided
@@ -938,58 +995,66 @@ pub trait FreedomApi: Send + Sync {
     /// provided type, overlap with the provided time range.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_requests_by_type_and_target_date_between<T>(
+    fn get_requests_by_type_and_target_date_between<T>(
         &self,
         typ: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send
     where
         T: TryInto<TaskType> + Send,
         Error: From<<T as TryInto<TaskType>>::Error>,
     {
-        let typ: TaskType = typ.try_into()?;
-        let mut uri = self.path_to_url("requests/search/findAllByTypeAndTargetDateBetween");
+        async move {
+            let typ: TaskType = typ.try_into()?;
+            let mut uri = self.path_to_url("requests/search/findAllByTypeAndTargetDateBetween");
 
-        uri.set_query(Some(&format!(
-            "type={}&start={}&end={}",
-            typ.as_ref(),
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?
-        )));
+            uri.set_query(Some(&format!(
+                "type={}&start={}&end={}",
+                typ.as_ref(),
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`TaskRequest`] items, representing the list of tasks which have
     /// already occurred today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_requests_passed_today(&self) -> Result<Self::Container<Vec<TaskRequest>>, Error> {
-        let uri = self.path_to_url("requests/search/findAllPassedToday");
+    fn get_requests_passed_today(
+        &self,
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url("requests/search/findAllPassedToday");
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`TaskRequest`] items, representing the list of tasks which will occur
     /// later today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_requests_upcoming_today(
+    fn get_requests_upcoming_today(
         &self,
-    ) -> Result<Self::Container<Vec<TaskRequest>>, Error> {
-        let uri = self.path_to_url("requests/search/findAllUpcomingToday");
+    ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url("requests/search/findAllUpcomingToday");
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a paginated stream of [`Satellite`] objects.
@@ -1003,131 +1068,148 @@ pub trait FreedomApi: Send + Sync {
     }
 
     /// Produces single satellite object matching the provided satellite ID
-    async fn get_satellite_by_id(
+    fn get_satellite_by_id(
         &self,
         satellite_id: i32,
-    ) -> Result<Self::Container<Satellite>, Error> {
-        let uri = self.path_to_url(format!("satellites/{}", satellite_id));
+    ) -> impl Future<Output = Result<Self::Container<Satellite>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("satellites/{}", satellite_id));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces single satellite object matching the provided satellite name
-    async fn get_satellite_by_name(
+    fn get_satellite_by_name(
         &self,
         satellite_name: &str,
-    ) -> Result<Self::Container<Satellite>, Error> {
-        let mut uri = self.path_to_url("satellites/findOneByName");
-        uri.set_query(Some(&format!("name={satellite_name}")));
+    ) -> impl Future<Output = Result<Self::Container<Satellite>, Error>> + Send {
+        async move {
+            let mut uri = self.path_to_url("satellites/findOneByName");
+            uri.set_query(Some(&format!("name={satellite_name}")));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a single [`Task`] matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_task_by_id(&self, task_id: i32) -> Result<Self::Container<Task>, Error> {
-        let uri = self.path_to_url(format!("tasks/{}", task_id));
+    fn get_task_by_id(
+        &self,
+        task_id: i32,
+    ) -> impl Future<Output = Result<Self::Container<Task>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url(format!("tasks/{}", task_id));
 
-        self.get_json_map(uri).await
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a vector of [`Task`] items, representing all the tasks which match the provided
     /// account, and intersect with the provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_tasks_by_account_and_pass_overlapping<T>(
+    fn get_tasks_by_account_and_pass_overlapping<T>(
         &self,
         account_uri: T,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<Task>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send
     where
         T: AsRef<str> + Send,
     {
-        let mut uri = self.path_to_url("tasks/search/findByAccountAndPassOverlapping");
+        async move {
+            let mut uri = self.path_to_url("tasks/search/findByAccountAndPassOverlapping");
 
-        uri.set_query(Some(&format!(
-            "account={}&start={}&end={}",
-            account_uri.as_ref(),
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?
-        )));
+            uri.set_query(Some(&format!(
+                "account={}&start={}&end={}",
+                account_uri.as_ref(),
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`Task`] items, representing all the tasks which match the provided
     /// account, satellite, band, and intersect with the provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_tasks_by_account_and_satellite_and_band_and_pass_overlapping<T, U, V>(
+    fn get_tasks_by_account_and_satellite_and_band_and_pass_overlapping<T, U, V>(
         &self,
         account_uri: T,
         satellite_config_uri: U,
         band: V,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<Task>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send
     where
         T: AsRef<str> + Send,
         U: AsRef<str> + Send,
         V: AsRef<str> + Send,
     {
-        let mut uri = self
-            .path_to_url("tasks/search/findByAccountAndSiteConfigurationAndBandAndPassOverlapping");
+        async move {
+            let mut uri = self.path_to_url(
+                "tasks/search/findByAccountAndSiteConfigurationAndBandAndPassOverlapping",
+            );
 
-        uri.set_query(Some(&format!(
-            "account={}&satellite={}&band={}&start={}&end={}",
-            account_uri.as_ref(),
-            satellite_config_uri.as_ref(),
-            band.as_ref(),
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?,
-        )));
+            uri.set_query(Some(&format!(
+                "account={}&satellite={}&band={}&start={}&end={}",
+                account_uri.as_ref(),
+                satellite_config_uri.as_ref(),
+                band.as_ref(),
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?,
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`Task`] representing all the tasks which match the provided account,
     /// site configuration, band, and intersect with the provided time frame.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_tasks_by_account_and_site_configuration_and_band_and_pass_overlapping<T, U, V>(
+    fn get_tasks_by_account_and_site_configuration_and_band_and_pass_overlapping<T, U, V>(
         &self,
         account_uri: T,
         site_config_uri: U,
         band: V,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<Task>>, Error>
+    ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send
     where
         T: AsRef<str> + Send,
         U: AsRef<str> + Send,
         V: AsRef<str> + Send,
     {
-        let mut uri = self
-            .path_to_url("tasks/search/findByAccountAndSiteConfigurationAndBandAndPassOverlapping");
+        async move {
+            let mut uri = self.path_to_url(
+                "tasks/search/findByAccountAndSiteConfigurationAndBandAndPassOverlapping",
+            );
 
-        uri.set_query(Some(&format!(
-            "account={}&siteConfig={}&band={}&start={}&end={}",
-            account_uri.as_ref(),
-            site_config_uri.as_ref(),
-            band.as_ref(),
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?
-        )));
+            uri.set_query(Some(&format!(
+                "account={}&siteConfig={}&band={}&start={}&end={}",
+                account_uri.as_ref(),
+                site_config_uri.as_ref(),
+                band.as_ref(),
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`Task`] items, representing all the tasks contained within the
@@ -1139,23 +1221,25 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// This differs from [`Self::get_tasks_by_pass_overlapping`] in that it only produces tasks
     /// which are wholly contained within the window.
-    async fn get_tasks_by_pass_window(
+    fn get_tasks_by_pass_window(
         &self,
         start: OffsetDateTime,
         end: OffsetDateTime,
-    ) -> Result<Self::Container<Vec<Task>>, Error> {
-        let mut uri = self.path_to_url("tasks/search/findByStartBetweenOrderByStartAsc");
+    ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send {
+        async move {
+            let mut uri = self.path_to_url("tasks/search/findByStartBetweenOrderByStartAsc");
 
-        uri.set_query(Some(&format!(
-            "start={}&end={}",
-            start.format(&Iso8601::DEFAULT)?,
-            end.format(&Iso8601::DEFAULT)?
-        )));
+            uri.set_query(Some(&format!(
+                "start={}&end={}",
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?
+            )));
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a paginated stream of [`Task`] items, representing all the tasks which overlap the
@@ -1193,72 +1277,84 @@ pub trait FreedomApi: Send + Sync {
     /// occurred today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_tasks_passed_today(&self) -> Result<Self::Container<Vec<Task>>, Error> {
-        let uri = self.path_to_url("tasks/search/findAllPassedToday");
+    fn get_tasks_passed_today(
+        &self,
+    ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url("tasks/search/findAllPassedToday");
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Produces a vector of [`Task`] items, representing the list of tasks which will occur later
     /// today.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
-    async fn get_tasks_upcoming_today(&self) -> Result<Self::Container<Vec<Task>>, Error> {
-        let uri = self.path_to_url("tasks/search/findAllUpcomingToday");
+    fn get_tasks_upcoming_today(
+        &self,
+    ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send {
+        async move {
+            let uri = self.path_to_url("tasks/search/findAllUpcomingToday");
 
-        Ok(self
-            .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
-            .await?
-            .items)
+            Ok(self
+                .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
+                .await?
+                .items)
+        }
     }
 
     /// Fetch an FPS token for the provided band ID and site configuration ID
-    async fn new_token_by_site_configuration_id(
+    fn new_token_by_site_configuration_id(
         &self,
         band_id: u32,
         site_configuration_id: u32,
-    ) -> Result<String, crate::Error> {
-        let url = self.path_to_url("fps");
-        let payload = serde_json::json!({
-            "band": format!("/api/satellite_bands/{}", band_id),
-            "configuration": format!("/api/configurations/{}", site_configuration_id),
-        });
+    ) -> impl Future<Output = Result<String, crate::Error>> + Send {
+        async move {
+            let url = self.path_to_url("fps");
+            let payload = serde_json::json!({
+                "band": format!("/api/satellite_bands/{}", band_id),
+                "configuration": format!("/api/configurations/{}", site_configuration_id),
+            });
 
-        let value: Value = self.post_deserialize(url, &payload).await?;
+            let value: Value = self.post_deserialize(url, &payload).await?;
 
-        value
-            .get("token")
-            .ok_or(Error::Response(String::from("Missing token field")))?
-            .as_str()
-            .ok_or(Error::Response(String::from("Invalid type for token")))
-            .map(|s| s.to_owned())
-            .map_err(From::from)
+            value
+                .get("token")
+                .ok_or(Error::Response(String::from("Missing token field")))?
+                .as_str()
+                .ok_or(Error::Response(String::from("Invalid type for token")))
+                .map(|s| s.to_owned())
+                .map_err(From::from)
+        }
     }
 
     /// Fetch an FPS token for the provided band ID and satellite ID
-    async fn new_token_by_satellite_id(
+    fn new_token_by_satellite_id(
         &self,
         band_id: u32,
         satellite_id: u32,
-    ) -> Result<String, crate::Error> {
-        let url = self.path_to_url("fps");
-        let payload = serde_json::json!({
-            "band": format!("/api/satellite_bands/{}", band_id),
-            "satellite": format!("/api/satellites/{}", satellite_id),
-        });
+    ) -> impl Future<Output = Result<String, crate::Error>> + Send {
+        async move {
+            let url = self.path_to_url("fps");
+            let payload = serde_json::json!({
+                "band": format!("/api/satellite_bands/{}", band_id),
+                "satellite": format!("/api/satellites/{}", satellite_id),
+            });
 
-        let value: Value = self.post_deserialize(url, &payload).await?;
+            let value: Value = self.post_deserialize(url, &payload).await?;
 
-        value
-            .get("token")
-            .ok_or(Error::Response(String::from("Missing token field")))?
-            .as_str()
-            .ok_or(Error::Response(String::from("Invalid type for token")))
-            .map(|s| s.to_owned())
-            .map_err(From::from)
+            value
+                .get("token")
+                .ok_or(Error::Response(String::from("Missing token field")))?
+                .as_str()
+                .ok_or(Error::Response(String::from("Invalid type for token")))
+                .map(|s| s.to_owned())
+                .map_err(From::from)
+        }
     }
 
     /// Produces a paginated stream of [`User`] objects.
