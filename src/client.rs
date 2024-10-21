@@ -23,6 +23,22 @@ impl PartialEq for Client {
 }
 
 impl Client {
+    /// Construct an API client from the provided Freedom config
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use freedom_api::prelude::*;
+    /// let config = Config::builder()
+    ///     .environment(Test)
+    ///     .key("foo")
+    ///     .secret("bar")
+    ///     .build()
+    ///     .unwrap();
+    /// let client = Client::from_config(config);
+    ///
+    /// assert_eq!(client.config().key(), "foo");
+    /// ```
     pub fn from_config(config: Config) -> Self {
         Self {
             config,
@@ -120,5 +136,118 @@ impl Api for Client {
 
     fn config_mut(&mut self) -> &mut Config {
         &mut self.config
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use freedom_config::Test;
+    use httpmock::{
+        Method::{GET, POST},
+        MockServer,
+    };
+
+    use super::*;
+
+    fn default_client() -> Client {
+        let config = Config::builder()
+            .environment(Test)
+            .key("foo")
+            .secret("bar")
+            .build()
+            .unwrap();
+
+        Client::from_config(config)
+    }
+
+    #[test]
+    fn clients_are_eq_based_on_config() {
+        let config = Config::builder()
+            .environment(Test)
+            .key("foo")
+            .secret("bar")
+            .build()
+            .unwrap();
+
+        let client_1 = Client::from_config(config.clone());
+        let client_2 = Client::from_config(config);
+        assert_eq!(client_1, client_2);
+    }
+
+    #[test]
+    fn wrap_and_unwrap_inner() {
+        let val = String::from("foobar");
+        let inner = Inner(val.clone());
+        assert_eq!(*inner, val);
+        let unwrapped = inner.into_inner();
+        assert_eq!(val, unwrapped);
+    }
+
+    #[test]
+    fn load_from_env() {
+        unsafe {
+            std::env::set_var("ATLAS_ENV", "TEST");
+            std::env::set_var("ATLAS_KEY", "foo");
+            std::env::set_var("ATLAS_SECRET", "bar");
+        };
+        let client = Client::from_env().unwrap();
+        assert_eq!(client.config().key(), "foo");
+        assert_eq!(client.config().expose_secret(), "bar");
+    }
+
+    #[tokio::test]
+    async fn get_ok_response() {
+        const RESPONSE: &str = "it's working";
+        let client = default_client();
+        let server = MockServer::start();
+        let addr = server.address();
+        let mock = server.mock(|when, then| {
+            when.method(GET).path("/testing");
+            then.body(RESPONSE.as_bytes());
+        });
+        let url = Url::parse(&format!("http://{}/testing", addr)).unwrap();
+        let (response, status) = client.get(url).await.unwrap();
+
+        assert_eq!(response, RESPONSE.as_bytes());
+        assert_eq!(status, StatusCode::OK);
+        mock.assert_hits(1);
+    }
+
+    #[tokio::test]
+    async fn get_err_response() {
+        const RESPONSE: &str = "NOPE";
+        let client = default_client();
+        let server = MockServer::start();
+        let addr = server.address();
+        let mock = server.mock(|when, then| {
+            when.method(GET).path("/testing");
+            then.body(RESPONSE.as_bytes()).status(404);
+        });
+        let url = Url::parse(&format!("http://{}/testing", addr)).unwrap();
+        let (response, status) = client.get(url).await.unwrap();
+
+        assert_eq!(response, RESPONSE.as_bytes());
+        assert_eq!(status, StatusCode::NOT_FOUND);
+        mock.assert_hits(1);
+    }
+
+    #[tokio::test]
+    async fn post_json() {
+        let client = default_client();
+        let server = MockServer::start();
+        let addr = server.address();
+        let json = serde_json::json!({
+            "name": "foo",
+            "data": 12
+        });
+        let json_clone = json.clone();
+        let mock = server.mock(|when, then| {
+            when.method(POST).path("/testing").json_body(json_clone);
+            then.body(b"OK").status(200);
+        });
+        let url = Url::parse(&format!("http://{}/testing", addr)).unwrap();
+        client.post(url, &json).await.unwrap();
+
+        mock.assert_hits(1);
     }
 }
