@@ -96,7 +96,7 @@ impl Default for TestingEnv {
     }
 }
 
-impl freedom_config::AtlasEnv for TestingEnv {
+impl freedom_config::Env for TestingEnv {
     fn from_str(_val: &str) -> Option<Self>
     where
         Self: Sized,
