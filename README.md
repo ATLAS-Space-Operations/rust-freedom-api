@@ -29,17 +29,17 @@ use futures::stream::StreamExt;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Build the client, grabbing the API keys from environment variables
-    let atlas_config = Config::builder()
+    let config = Config::builder()
         .environment(Test)
         .key_from_env()?    // Sources the key from ATLAS_KEY
         .secret_from_env()? // Sources the secret from ATLAS_SECRET
         .build()?;
 
-    let atlas_client = Client::from_config(atlas_config);
+    let client = Client::from_config(config);
 
     // Query Freedom for a list of all Satellites, printing the names of the 
     // satellite which passed deserialization
-    atlas_client.get_satellites()
+    client.get_satellites()
         .collect::<Vec<_>>()
         .await
         .iter()
@@ -63,9 +63,9 @@ use time::OffsetDateTime;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let atlas_client = Client::from_env()?;
+    let client = Client::from_env()?;
 
-    let response = atlas_client.new_task_request()
+    let response = client.new_task_request()
         .test_task("my_test_file.bin")
         .target_time_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
         .task_duration(120)
@@ -105,15 +105,14 @@ use freedom_api::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let atlas_config = Config::from_env()?;
-    let atlas_client = Client::from_config(atlas_config);
+    let config = Config::from_env()?;
+    let client = Client::from_config(config);
 
-    let site_from_request: Site = atlas_client
+    let site_from_request: Site = client
         .get_request_by_id(42)
         .await?
-        .get_site(&atlas_client)
+        .get_site(&client)
         .await?;
-
 
     Ok(())
 }
