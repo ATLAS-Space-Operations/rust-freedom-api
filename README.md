@@ -1,5 +1,8 @@
 # ATLAS Freedom API
 
+[![Crates.io](https://img.shields.io/crates/v/freedom-api.svg)](https://crates.io/crates/freedom-api)
+[![Documentation](https://docs.rs/freedom-api/badge.svg)](https://docs.rs/freedom-api/)
+
 This library is a Rust library which focuses on wrapping the ATLAS Freedom REST
 API in an easy to use and idiomatic way. The API is entirely asynchronous,
 support for a blocking client may be added sometime in the future, but for now
