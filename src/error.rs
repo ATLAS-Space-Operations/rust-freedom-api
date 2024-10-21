@@ -1,3 +1,4 @@
+//! Error and Result types for Freedom API
 use serde::Serialize;
 
 /// Result type for the API

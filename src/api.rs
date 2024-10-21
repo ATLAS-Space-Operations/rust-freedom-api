@@ -50,18 +50,20 @@ impl<'a, T: 'a + Send> PaginatedErr<'a, T> for Error {
 
 /// The trait defining the required functionality of container types
 ///
-/// The Freedom API is generic over "containers". Each implementer of the [`FreedomApi`] trait must
+/// The Freedom API is generic over "containers". Each implementer of the [`Api`] trait must
 /// also define a container. This is useful since certain clients will return Arc'd values, i.e. the
 /// caching client. While others return the values wrapped in a simple `Inner` type which is just
 /// a stack value.
 ///
-/// Every container must implement Deref for the type it wraps, so for read-only operations the
-/// container can be used as if it were `T`. For mutable access see [`Self::into_inner`].
+/// Every container must implement [`Deref`](std::ops::Deref) for the type it wraps, so for
+/// read-only operations the container can be used as if it were `T`. For mutable access see
+/// [`Self::into_inner`].
 pub trait Container<T>: Deref<Target = T> + Value {
     /// All containers are capable of returning the value they wrap
     ///
-    /// The cost of this however depends on the client type. For [`crate::Client`], this operation
-    /// is essentially free, however for the caching client, this results in a clone of the value.
+    /// However, the runtime performance of this varies by client type. For [`crate::Client`], this
+    /// operation is essentially free, however for the caching client, this results in a clone of
+    /// the value.
     fn into_inner(self) -> T;
 }
 
@@ -72,9 +74,9 @@ pub type PaginatedStream<'a, T> = Pin<Box<dyn Stream<Item = Result<T, Error>> + 
 
 /// The primary trait for interfacing with the Freedom API
 pub trait Api: Send + Sync {
-    /// The [`FreedomApi`] supports implementors with different so-called "container" types.
+    /// The [`Api`] supports implementors with different so-called "container" types.
     ///
-    /// Certain [`FreedomApi`] clients return an `Arc<T>` for each call, others return an `Inner<T>`
+    /// Certain [`Api`] clients return an `Arc<T>` for each call, others return an `Inner<T>`
     /// which is a simple wrapper for a stack value.
     type Container<T: Value>: Container<T>;
 
