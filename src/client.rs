@@ -4,7 +4,7 @@ use reqwest::{Response, StatusCode};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
-use crate::api::{FreedomApi, FreedomApiContainer, FreedomApiValue};
+use crate::api::{FreedomApi, FreedomApiContainer, Value};
 
 /// An asynchronous `Client` for interfacing with the ATLAS freedom API.
 ///
@@ -70,7 +70,7 @@ impl<T> std::ops::DerefMut for Inner<T> {
 
 impl<T> FreedomApiContainer<T> for Inner<T>
 where
-    T: FreedomApiValue,
+    T: Value,
 {
     fn into_inner(self) -> T {
         self.0
@@ -78,7 +78,7 @@ where
 }
 
 impl FreedomApi for Client {
-    type Container<T: FreedomApiValue> = Inner<T>;
+    type Container<T: Value> = Inner<T>;
 
     async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), crate::error::Error> {
         let resp = self

@@ -12,7 +12,7 @@ mod utils;
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub use self::{
-    api::{FreedomApi, FreedomApiContainer, FreedomApiValue},
+    api::{FreedomApi, FreedomApiContainer, Value},
     client::Client,
     error::Error,
 };
@@ -27,7 +27,7 @@ pub mod prelude {
                 BandDetailsBuilder, OverrideBuilder, SatelliteBuilder,
                 SatelliteConfigurationBuilder, UserBuilder,
             },
-            FreedomApi, FreedomApiContainer, FreedomApiValue,
+            FreedomApi, FreedomApiContainer, Value,
         },
         client::Client,
         error::Error,

@@ -23,7 +23,7 @@ use freedom_models::{
 };
 use reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
-use serde_json::Value;
+use serde_json::Value as JsonValue;
 use time::{format_description::well_known::Iso8601, OffsetDateTime};
 use url::Url;
 
@@ -34,9 +34,9 @@ use crate::error::Error;
 pub(crate) mod post;
 
 /// A super trait containing all the requirements for Freedom API Values
-pub trait FreedomApiValue: std::fmt::Debug + DeserializeOwned + Clone + Send + Sync {}
+pub trait Value: std::fmt::Debug + DeserializeOwned + Clone + Send + Sync {}
 
-impl<T> FreedomApiValue for T where T: std::fmt::Debug + DeserializeOwned + Clone + Send + Sync {}
+impl<T> Value for T where T: std::fmt::Debug + DeserializeOwned + Clone + Send + Sync {}
 
 trait PaginatedErr<'a, T> {
     fn once_err(self) -> PaginatedStream<'a, T>;
@@ -57,7 +57,7 @@ impl<'a, T: 'a + Send> PaginatedErr<'a, T> for Error {
 ///
 /// Every container must implement Deref for the type it wraps, so for read-only operations the
 /// container can be used as if it were `T`. For mutable access see [`Self::into_inner`].
-pub trait FreedomApiContainer<T>: Deref<Target = T> + FreedomApiValue {
+pub trait FreedomApiContainer<T>: Deref<Target = T> + Value {
     /// All containers are capable of returning the value they wrap
     ///
     /// The cost of this however depends on the client type. For [`crate::Client`], this operation
@@ -76,7 +76,7 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// Certain [`FreedomApi`] clients return an `Arc<T>` for each call, others return an `Inner<T>`
     /// which is a simple wrapper for a stack value.
-    type Container<T: FreedomApiValue>: FreedomApiContainer<T>;
+    type Container<T: Value>: FreedomApiContainer<T>;
 
     /// Creates a get request at the provided absolute URI for the client's environment, using basic
     /// authentication.
@@ -85,7 +85,7 @@ pub trait FreedomApi: Send + Sync {
     /// deserialization fails, and providing the object if it succeeds.
     fn get_json_map<T>(&self, url: Url) -> impl Future<Output = Result<T, Error>> + Send
     where
-        T: FreedomApiValue,
+        T: Value,
     {
         async move {
             let (body, status) = self.get(url).await?;
@@ -119,14 +119,14 @@ pub trait FreedomApi: Send + Sync {
     /// of the async book.
     fn get_paginated<T>(&self, head_url: Url) -> PaginatedStream<'_, Self::Container<T>>
     where
-        T: 'static + FreedomApiValue,
+        T: 'static + Value,
     {
         let base = self.config().environment().freedom_entrypoint();
         let mut current_url = head_url; // Not necessary but makes control flow more obvious
         Box::pin(stream! {
             loop {
                 // Get the results for the current page.
-                let pag = self.get_json_map::<Paginated<serde_json::Value>>(current_url).await?;
+                let pag = self.get_json_map::<Paginated<JsonValue>>(current_url).await?;
                 for item in pag.items {
                     let i = serde_json::from_value::<Self::Container<T>>(item).map_err(From::from);
                     yield i;
@@ -295,7 +295,7 @@ pub trait FreedomApi: Send + Sync {
     ) -> impl Future<Output = Result<T, Error>> + Send
     where
         S: serde::Serialize + Send + Sync,
-        T: FreedomApiValue,
+        T: Value,
     {
         async move {
             let resp = self.post(url, msg).await?;
@@ -1392,7 +1392,7 @@ pub trait FreedomApi: Send + Sync {
                 "configuration": format!("/api/configurations/{}", site_configuration_id),
             });
 
-            let value: Value = self.post_deserialize(url, &payload).await?;
+            let value: JsonValue = self.post_deserialize(url, &payload).await?;
 
             value
                 .get("token")
@@ -1434,7 +1434,7 @@ pub trait FreedomApi: Send + Sync {
                 "satellite": format!("/api/satellites/{}", satellite_id),
             });
 
-            let value: Value = self.post_deserialize(url, &payload).await?;
+            let value: JsonValue = self.post_deserialize(url, &payload).await?;
 
             value
                 .get("token")
