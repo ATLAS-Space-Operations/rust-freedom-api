@@ -48,7 +48,7 @@ impl Client {
 /// This container exists to allow us to store items on the stack, without needing to allocate with
 /// something like `Box<T>`. For all other intents and purposes, it acts as the `T` which it
 /// contains.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
 #[serde(transparent)]
 pub struct Inner<T>(T);
@@ -56,7 +56,6 @@ pub struct Inner<T>(T);
 impl<T> std::ops::Deref for Inner<T> {
     type Target = T;
 
-    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
