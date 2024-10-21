@@ -35,8 +35,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let atlas_client = Client::from_config(atlas_config);
 
-    // Query Freedom for a list of all Satellites, printing the names of the satellite which
-    // passed deserialization
+    // Query Freedom for a list of all Satellites, printing the names of the 
+    // satellite which passed deserialization
     atlas_client.get_satellites()
         .collect::<Vec<_>>()
         .await
@@ -123,8 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Container
 
-There is however another complexity that exists in the return types of API
-methods. You will note that what is returned by a given method call is of type
+You will note that what is returned by the `get_` methods of the API is of type
 `Self::Container<T>` rather than simply type `T`. This complexity is required
 since there are multiple API clients, most notably the default [`Client`] and
 the `CachingClient` (available via the `caching` feature flag). The caching
@@ -135,7 +134,7 @@ cache. This complexity will be mostly transparent to the caller, since the
 container is required to implement [`Deref<T>`](std::ops::Deref).
 
 If however you need to mutate the data after receiving it, call the
-`FreedomApiContainer::into_inner` method on the returned type to get an owned
+`Container::into_inner` method on the returned type to get an owned
 version of the wrapped type.
 
 ```rust, ignore
