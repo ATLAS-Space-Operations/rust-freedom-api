@@ -4,6 +4,7 @@ version = "1.0.0"
 edition = "2021"
 authors = ["Caleb Leinz <caleb.leinz@atlasspace.com>"]
 description = "Freedom API for Rustaceans"
+license = "MIT"
 readme = "README.md"
 repository = "https://github.com/ATLAS-Space-Operations/rust-freedom-api"
 # Support for Async fn in traits
