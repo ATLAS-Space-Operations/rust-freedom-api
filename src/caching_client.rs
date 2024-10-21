@@ -6,7 +6,7 @@ use reqwest::{Response, StatusCode};
 use url::Url;
 
 use crate::{
-    api::{Container, FreedomApi, Value},
+    api::{Api, Container, Value},
     error::Error,
     Client,
 };
@@ -38,7 +38,7 @@ impl<T: Value> Container<T> for Arc<T> {
     }
 }
 
-impl FreedomApi for CachingClient {
+impl Api for CachingClient {
     type Container<T: Value> = Arc<T>;
 
     async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {

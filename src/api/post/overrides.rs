@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use reqwest::Response;
 use serde::Serialize;
 
-use crate::{api::FreedomApi, Error};
+use crate::{api::Api, Error};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -43,7 +43,7 @@ pub struct NoSatellite {
 
 impl<'a, C> OverrideBuilder<'a, C, NoSatellite>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub fn satellite_id(self, id: impl Into<i32>) -> OverrideBuilder<'a, C, NoConfig> {
         let satellite = self
@@ -74,7 +74,7 @@ pub struct NoConfig {
 
 impl<'a, C> OverrideBuilder<'a, C, NoConfig>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub fn satellite_configuration_id(
         self,
@@ -117,7 +117,7 @@ impl<'a, C> OverrideBuilder<'a, C, Override> {
 
 impl<'a, C> OverrideBuilder<'a, C, Override>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub async fn send(self) -> Result<Response, Error> {
         let client = self.client;

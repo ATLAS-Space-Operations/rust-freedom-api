@@ -71,7 +71,7 @@ pub trait Container<T>: Deref<Target = T> + Value {
 pub type PaginatedStream<'a, T> = Pin<Box<dyn Stream<Item = Result<T, Error>> + 'a + Send>>;
 
 /// The primary trait for interfacing with the Freedom API
-pub trait FreedomApi: Send + Sync {
+pub trait Api: Send + Sync {
     /// The [`FreedomApi`] supports implementors with different so-called "container" types.
     ///
     /// Certain [`FreedomApi`] clients return an `Arc<T>` for each call, others return an `Inner<T>`

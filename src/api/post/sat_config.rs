@@ -1,7 +1,7 @@
 use reqwest::Response;
 use serde::Serialize;
 
-use crate::{api::FreedomApi, Error};
+use crate::{api::Api, Error};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -62,7 +62,7 @@ impl<'a, C> SatelliteConfigurationBuilder<'a, C, NoBand> {
 
 impl<'a, C> SatelliteConfigurationBuilder<'a, C, NoBand>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub fn band_ids(
         self,
@@ -93,7 +93,7 @@ impl<'a, C> SatelliteConfigurationBuilder<'a, C, SatelliteConfiguration> {
 
 impl<'a, C> SatelliteConfigurationBuilder<'a, C, SatelliteConfiguration>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub async fn send(self) -> Result<Response, Error> {
         let client = self.client;

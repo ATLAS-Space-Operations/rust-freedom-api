@@ -3,7 +3,7 @@ use reqwest::Response;
 use serde::Serialize;
 use time::OffsetDateTime;
 
-use crate::{api::FreedomApi, Error};
+use crate::{api::Api, Error};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -183,7 +183,7 @@ pub struct NoSatellite<T> {
 
 impl<'a, C, T> TaskRequestBuilder<'a, C, NoSatellite<T>>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub fn satellite_id(self, id: impl Into<i32>) -> TaskRequestBuilder<'a, C, NoSite<T>> {
         let satellite = self
@@ -218,7 +218,7 @@ pub struct NoSite<T> {
 
 impl<'a, C, T> TaskRequestBuilder<'a, C, NoSite<T>>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub fn site_id(self, id: impl Into<i32>) -> TaskRequestBuilder<'a, C, NoConfig<T>> {
         let site = self
@@ -255,7 +255,7 @@ pub struct NoConfig<T> {
 
 impl<'a, C, T> TaskRequestBuilder<'a, C, NoConfig<T>>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub fn site_configuration_id(self, id: impl Into<i32>) -> TaskRequestBuilder<'a, C, NoBand<T>> {
         let configuration = self
@@ -304,7 +304,7 @@ where
         ids: impl IntoIterator<Item = i32>,
     ) -> TaskRequestBuilder<'a, C, TaskRequest>
     where
-        C: FreedomApi,
+        C: Api,
     {
         let client = self.client;
         let bands = ids.into_iter().map(|id| {
@@ -363,7 +363,7 @@ impl<'a, C> TaskRequestBuilder<'a, C, TaskRequest> {
 
 impl<'a, C> TaskRequestBuilder<'a, C, TaskRequest>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub fn override_id(self, id: impl Into<i32>) -> Self {
         let override_url = self

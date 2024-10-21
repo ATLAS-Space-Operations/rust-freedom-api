@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 use freedom_models::{utils::Content, Hateoas};
 
-use crate::{api::Value, prelude::FreedomApi};
+use crate::{api::Value, prelude::Api};
 mod account;
 mod band;
 mod request;
@@ -50,7 +50,7 @@ async fn get_item<T, C>(
     client: &C,
 ) -> Result<T, crate::Error>
 where
-    C: FreedomApi,
+    C: Api,
     T: Value,
 {
     let uri = links
@@ -68,15 +68,15 @@ async fn get_embedded<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
     client: &C,
-) -> Result<<C as FreedomApi>::Container<T>, crate::Error>
+) -> Result<<C as Api>::Container<T>, crate::Error>
 where
-    C: FreedomApi,
+    C: Api,
     T: Value,
 {
     use freedom_models::utils::Embedded;
 
     let wrapped =
-        get_item::<Embedded<<C as FreedomApi>::Container<T>>, C>(reference, links, client).await?;
+        get_item::<Embedded<<C as Api>::Container<T>>, C>(reference, links, client).await?;
 
     Ok(wrapped.items)
 }
@@ -87,7 +87,7 @@ async fn get_content<T, C>(
     client: &C,
 ) -> Result<T, crate::Error>
 where
-    C: FreedomApi + Send,
+    C: Api + Send,
     T: Value + Hateoas,
 {
     let wrapped = get_item::<Content<T>, C>(reference, links, client).await?;

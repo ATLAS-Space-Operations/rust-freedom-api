@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use crate::api::FreedomApi;
+use crate::api::Api;
 use freedom_models::{account::Account, satellite::Satellite, user::User};
 
 pub trait AccountExt {
@@ -9,16 +9,16 @@ pub trait AccountExt {
     fn get_users<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<Vec<User>>, crate::Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<User>>, crate::Error>> + Send
     where
-        C: FreedomApi + Send;
+        C: Api + Send;
 
     fn get_satellites<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as FreedomApi>::Container<Vec<Satellite>>, crate::Error>>
+    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<Satellite>>, crate::Error>>
     where
-        C: FreedomApi + Send;
+        C: Api + Send;
 }
 
 impl AccountExt for Account {
@@ -29,9 +29,9 @@ impl AccountExt for Account {
     async fn get_users<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<Vec<User>>, crate::Error>
+    ) -> Result<<C as Api>::Container<Vec<User>>, crate::Error>
     where
-        C: FreedomApi + Send,
+        C: Api + Send,
     {
         super::get_item("users", &self.links, client).await
     }
@@ -39,9 +39,9 @@ impl AccountExt for Account {
     async fn get_satellites<C>(
         &self,
         client: &C,
-    ) -> Result<<C as FreedomApi>::Container<Vec<Satellite>>, crate::Error>
+    ) -> Result<<C as Api>::Container<Vec<Satellite>>, crate::Error>
     where
-        C: FreedomApi + Send,
+        C: Api + Send,
     {
         super::get_embedded("satellites", &self.links, client).await
     }

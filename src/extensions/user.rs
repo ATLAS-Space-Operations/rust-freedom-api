@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use crate::api::FreedomApi;
+use crate::api::Api;
 use freedom_models::{account::Account, user::User};
 
 pub trait UserExt {
@@ -11,7 +11,7 @@ pub trait UserExt {
         client: &C,
     ) -> impl Future<Output = Result<Account, crate::Error>> + Send
     where
-        C: FreedomApi + Send;
+        C: Api + Send;
 }
 
 impl UserExt for User {
@@ -21,7 +21,7 @@ impl UserExt for User {
 
     async fn get_account<C>(&self, client: &C) -> Result<Account, crate::Error>
     where
-        C: FreedomApi + Send,
+        C: Api + Send,
     {
         super::get_content("account", &self.links, client).await
     }

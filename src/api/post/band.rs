@@ -5,7 +5,7 @@ use freedom_models::{
 use reqwest::Response;
 use serde::Serialize;
 
-use crate::{api::FreedomApi, Error};
+use crate::{api::Api, Error};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -166,7 +166,7 @@ impl<'a, C> BandDetailsBuilder<'a, C, BandDetails> {
 
 impl<'a, C> BandDetailsBuilder<'a, C, BandDetails>
 where
-    C: FreedomApi,
+    C: Api,
 {
     pub async fn send(self) -> Result<Response, Error> {
         let client = self.client;
