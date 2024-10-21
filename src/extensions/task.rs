@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use crate::api::Api;
+use crate::{api::Api, error::Error};
 use freedom_models::{
     azel::AzEl,
     site::SiteConfiguration,
@@ -8,39 +8,39 @@ use freedom_models::{
 };
 
 pub trait TaskExt {
-    fn get_id(&self) -> Result<i32, crate::Error>;
+    fn get_id(&self) -> Result<i32, Error>;
 
     fn get_task_request<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<TaskRequest>, crate::Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<TaskRequest>, Error>> + Send
     where
         C: Api + Send;
 
     fn get_config<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<SiteConfiguration>, crate::Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<SiteConfiguration>, Error>> + Send
     where
         C: Api + Send;
 
     fn get_azel<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<AzEl>, crate::Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<AzEl>, Error>> + Send
     where
         C: Api + Send;
 }
 
 impl TaskExt for Task {
-    fn get_id(&self) -> Result<i32, crate::Error> {
+    fn get_id(&self) -> Result<i32, Error> {
         super::get_id("self", &self.links)
     }
 
     async fn get_task_request<C>(
         &self,
         client: &C,
-    ) -> Result<<C as Api>::Container<TaskRequest>, crate::Error>
+    ) -> Result<<C as Api>::Container<TaskRequest>, Error>
     where
         C: Api,
     {
@@ -50,14 +50,14 @@ impl TaskExt for Task {
     async fn get_config<C>(
         &self,
         client: &C,
-    ) -> Result<<C as Api>::Container<SiteConfiguration>, crate::Error>
+    ) -> Result<<C as Api>::Container<SiteConfiguration>, Error>
     where
         C: Api + Send + Sync,
     {
         super::get_item("config", &self.links, client).await
     }
 
-    async fn get_azel<C>(&self, client: &C) -> Result<<C as Api>::Container<AzEl>, crate::Error>
+    async fn get_azel<C>(&self, client: &C) -> Result<<C as Api>::Container<AzEl>, Error>
     where
         C: Api + Send + Sync,
     {

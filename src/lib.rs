@@ -8,16 +8,12 @@ pub mod error;
 pub mod extensions;
 mod utils;
 
-/// Result type for the API
-pub type Result<T> = std::result::Result<T, Error>;
-
 pub use self::{
     api::{Api, Container, Value},
     client::Client,
-    error::Error,
 };
 
-/// Contains the client, data models, and error types necessary for queries
+/// Contains the client, data models, error types, and traits necessary for queries
 pub mod prelude {
     #[cfg(feature = "caching")]
     pub use crate::caching_client::CachingClient;
@@ -30,7 +26,6 @@ pub mod prelude {
             Api, Container, Value,
         },
         client::Client,
-        error::Error,
         extensions::*,
         models::*,
     };

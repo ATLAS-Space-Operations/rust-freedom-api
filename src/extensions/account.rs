@@ -1,35 +1,32 @@
 use std::future::Future;
 
-use crate::api::Api;
+use crate::{api::Api, error::Error};
 use freedom_models::{account::Account, satellite::Satellite, user::User};
 
 pub trait AccountExt {
-    fn get_id(&self) -> Result<i32, crate::Error>;
+    fn get_id(&self) -> Result<i32, Error>;
 
     fn get_users<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<User>>, crate::Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<User>>, Error>> + Send
     where
         C: Api + Send;
 
     fn get_satellites<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<Satellite>>, crate::Error>>
+    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<Satellite>>, Error>>
     where
         C: Api + Send;
 }
 
 impl AccountExt for Account {
-    fn get_id(&self) -> Result<i32, crate::Error> {
+    fn get_id(&self) -> Result<i32, Error> {
         super::get_id("self", &self.links)
     }
 
-    async fn get_users<C>(
-        &self,
-        client: &C,
-    ) -> Result<<C as Api>::Container<Vec<User>>, crate::Error>
+    async fn get_users<C>(&self, client: &C) -> Result<<C as Api>::Container<Vec<User>>, Error>
     where
         C: Api + Send,
     {
@@ -39,7 +36,7 @@ impl AccountExt for Account {
     async fn get_satellites<C>(
         &self,
         client: &C,
-    ) -> Result<<C as Api>::Container<Vec<Satellite>>, crate::Error>
+    ) -> Result<<C as Api>::Container<Vec<Satellite>>, Error>
     where
         C: Api + Send,
     {

@@ -3,7 +3,7 @@ use reqwest::Response;
 use serde::Serialize;
 use time::OffsetDateTime;
 
-use crate::{api::Api, Error};
+use crate::{api::Api, error::Error};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]

@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 use freedom_models::{utils::Content, Hateoas};
 
-use crate::{api::Value, prelude::Api};
+use crate::{api::Value, error, prelude::Api};
 mod account;
 mod band;
 mod request;
@@ -30,32 +30,32 @@ pub use {
     user::UserExt,
 };
 
-fn get_id(reference: &'static str, links: &HashMap<String, url::Url>) -> Result<i32, crate::Error> {
+fn get_id(reference: &'static str, links: &HashMap<String, url::Url>) -> Result<i32, error::Error> {
     let url = links
         .get(reference)
-        .ok_or(crate::error::Error::MissingUri(reference))?;
+        .ok_or(error::Error::MissingUri(reference))?;
 
     let id_str = url
         .path_segments()
-        .ok_or(crate::error::Error::InvalidUri("Missing Path".into()))?
+        .ok_or(error::Error::InvalidUri("Missing Path".into()))?
         .last()
         .unwrap();
 
-    id_str.parse().map_err(|_| crate::error::Error::InvalidId)
+    id_str.parse().map_err(|_| error::Error::InvalidId)
 }
 
 async fn get_item<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
     client: &C,
-) -> Result<T, crate::Error>
+) -> Result<T, error::Error>
 where
     C: Api,
     T: Value,
 {
     let uri = links
         .get(reference)
-        .ok_or(crate::error::Error::MissingUri(reference))?
+        .ok_or(error::Error::MissingUri(reference))?
         .clone();
 
     client.get_json_map(uri).await
@@ -68,7 +68,7 @@ async fn get_embedded<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
     client: &C,
-) -> Result<<C as Api>::Container<T>, crate::Error>
+) -> Result<<C as Api>::Container<T>, error::Error>
 where
     C: Api,
     T: Value,
@@ -85,7 +85,7 @@ async fn get_content<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
     client: &C,
-) -> Result<T, crate::Error>
+) -> Result<T, error::Error>
 where
     C: Api + Send,
     T: Value + Hateoas,

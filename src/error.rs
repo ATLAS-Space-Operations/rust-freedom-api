@@ -1,5 +1,8 @@
 use serde::Serialize;
 
+/// Result type for the API
+pub type Result<T> = std::result::Result<T, Error>;
+
 /// The combined error type for the client builder and for API errors
 #[derive(Debug, Clone, thiserror::Error, PartialEq, Eq, Serialize)]
 pub enum Error {

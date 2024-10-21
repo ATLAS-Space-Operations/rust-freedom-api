@@ -5,7 +5,7 @@ use freedom_models::{
 use reqwest::Response;
 use serde::Serialize;
 
-use crate::{api::Api, Error};
+use crate::{api::Api, error::Error};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]

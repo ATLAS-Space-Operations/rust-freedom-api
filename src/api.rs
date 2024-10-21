@@ -1384,7 +1384,7 @@ pub trait Api: Send + Sync {
         &self,
         band_id: u32,
         site_configuration_id: u32,
-    ) -> impl Future<Output = Result<String, crate::Error>> + Send {
+    ) -> impl Future<Output = Result<String, Error>> + Send {
         async move {
             let url = self.path_to_url("fps");
             let payload = serde_json::json!({
@@ -1426,7 +1426,7 @@ pub trait Api: Send + Sync {
         &self,
         band_id: u32,
         satellite_id: u32,
-    ) -> impl Future<Output = Result<String, crate::Error>> + Send {
+    ) -> impl Future<Output = Result<String, Error>> + Send {
         async move {
             let url = self.path_to_url("fps");
             let payload = serde_json::json!({

@@ -41,7 +41,7 @@ impl<T: Value> Container<T> for Arc<T> {
 impl Api for CachingClient {
     type Container<T: Value> = Arc<T>;
 
-    async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
+    async fn delete(&self, url: Url) -> Result<Response, Error> {
         self.inner.delete(url).await
     }
 
