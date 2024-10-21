@@ -8,9 +8,14 @@ pub mod error;
 pub mod extensions;
 mod utils;
 
-pub use client::Client;
-pub use error::Error;
+pub use self::{
+    api::{FreedomApi, FreedomApiContainer, FreedomApiValue},
+    client::Client,
+    error::Error,
+};
+pub use freedom_models::{account::*, satellite::*, site::*, task::*, user::*};
 
+/// Result type for the API
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// Contains the client, data models, and error types necessary for queries
@@ -28,5 +33,3 @@ pub mod prelude {
         account::*, satellite::*, satellite_configuration::*, site::*, task::*, user::*,
     };
 }
-
-pub use freedom_models::{account::*, satellite::*, site::*, task::*, user::*};

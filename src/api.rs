@@ -48,13 +48,20 @@ impl<'a, T: 'a + Send> PaginatedErr<'a, T> for Error {
     }
 }
 
-/// The trait defining the required functionality container types
+/// The trait defining the required functionality of container types
 ///
 /// The Freedom API is generic over "containers". Each implementer of the [`FreedomApi`] trait must
 /// also define a container. This is useful since certain clients will return Arc'd values, i.e. the
 /// caching client. While others return the values wrapped in a simple `Inner` type which is just
-/// a stack value
+/// a stack value.
+///
+/// Every container must implement Deref for the type it wraps, so for read-only operations the
+/// container can be used as if it were `T`. For mutable access see [`Self::into_inner`].
 pub trait FreedomApiContainer<T>: Deref<Target = T> + FreedomApiValue {
+    /// All containers are capable of returning the value they wrap
+    ///
+    /// The cost of this however depends on the client type. For [`crate::Client`], this operation
+    /// is essentially free, however for the caching client, this results in a clone of the value.
     fn into_inner(self) -> T;
 }
 
@@ -63,7 +70,7 @@ pub trait FreedomApiContainer<T>: Deref<Target = T> + FreedomApiValue {
 /// Each item in the stream is a result, since one or more items may fail to be serialized
 pub type PaginatedStream<'a, T> = Pin<Box<dyn Stream<Item = Result<T, Error>> + 'a + Send>>;
 
-/// The primary trait for interfacing with Freedom
+/// The primary trait for interfacing with the Freedom API
 pub trait FreedomApi: Send + Sync {
     /// The [`FreedomApi`] supports implementors with different so-called "container" types.
     ///
@@ -261,6 +268,18 @@ pub trait FreedomApi: Send + Sync {
     }
 
     /// Request to delete the user matching the provided `id`
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client.delete_task_request(42).await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     fn delete_task_request(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
         async move {
             let uri = self.path_to_url(format!("requests/{id}"));
@@ -268,6 +287,7 @@ pub trait FreedomApi: Send + Sync {
         }
     }
 
+    /// Lower level method, not intended for direct use
     fn post_deserialize<S, T>(
         &self,
         url: Url,
@@ -284,6 +304,7 @@ pub trait FreedomApi: Send + Sync {
         }
     }
 
+    /// Lower level method, not intended for direct use
     fn post<S>(&self, url: Url, msg: S) -> impl Future<Output = Result<Response, Error>> + Send
     where
         S: serde::Serialize + Send + Sync;
@@ -291,6 +312,19 @@ pub trait FreedomApi: Send + Sync {
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// let account = client.get_account_by_name("ATLAS").await?;
+    /// println!("{}", account.name);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     fn get_account_by_name(
         &self,
         account_name: &str,
@@ -305,6 +339,18 @@ pub trait FreedomApi: Send + Sync {
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// let data = client.get_file_by_task_id_and_name(42, "data.bin").await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     fn get_file_by_task_id_and_name(
         &self,
         task_id: i32,
@@ -319,176 +365,6 @@ pub trait FreedomApi: Send + Sync {
 
             Ok(data)
         }
-    }
-
-    /// Create a new satellite band object
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use freedom_api::prelude::*;
-    /// # use freedom_models::band::{BandType, IoHardware};
-    /// # tokio_test::block_on(async {
-    /// let client = Client::from_env()?;
-    ///
-    /// client
-    ///     .new_band_details()
-    ///     .name("My Satellite Band")
-    ///     .band_type(BandType::Receive)
-    ///     .frequency(8096.0)
-    ///     .default_band_width(1.45)
-    ///     .io_hardware(IoHardware::Modem)
-    ///     .send()
-    ///     .await?;
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
-    /// ```
-    fn new_band_details(&self) -> post::band::BandDetailsBuilder<'_, Self, post::band::NoName>
-    where
-        Self: Sized,
-    {
-        post::band::new(self)
-    }
-
-    /// Create a new satellite configuration
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use freedom_api::prelude::*;
-    /// # tokio_test::block_on(async {
-    /// let client = Client::from_env()?;
-    ///
-    /// client
-    ///     .new_satellite_configuration()
-    ///     .name("My Satellite Configuration")
-    ///     .band_ids([1, 2, 3]) // List of band IDs to associate with config
-    ///     .send()
-    ///     .await?;
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
-    /// ```
-    fn new_satellite_configuration(
-        &self,
-    ) -> post::sat_config::SatelliteConfigurationBuilder<'_, Self, post::sat_config::NoName>
-    where
-        Self: Sized,
-    {
-        post::sat_config::new(self)
-    }
-
-    /// Create a new satellite
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use freedom_api::prelude::*;
-    /// # tokio_test::block_on(async {
-    /// let client = Client::from_env()?;
-    ///
-    /// client
-    ///     .new_satellite()
-    ///     .name("My Satellite")
-    ///     .satellite_configuration_id(42)
-    ///     .norad_id(3600)
-    ///     .description("A test satellite")
-    ///     .send()
-    ///     .await?;
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
-    /// ```
-    fn new_satellite(&self) -> post::satellite::SatelliteBuilder<'_, Self, post::satellite::NoName>
-    where
-        Self: Sized,
-    {
-        post::satellite::new(self)
-    }
-
-    /// Create a new override
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use freedom_api::prelude::*;
-    /// # tokio_test::block_on(async {
-    /// let client = Client::from_env()?;
-    ///
-    /// client
-    ///     .new_override()
-    ///     .name("downconverter.gain override for sat 1 on config 2")
-    ///     .satellite_id(1)
-    ///     .satellite_configuration_id(2)
-    ///     .add_property("site.hardware.modem.ttc.rx.demodulator.bitrate", 8096_u32)
-    ///     .add_property("site.hardware.modem.ttc.tx.modulator.bitrate", 8096_u32)
-    ///     .send()
-    ///     .await?;
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
-    /// ```
-    fn new_override(&self) -> post::overrides::OverrideBuilder<'_, Self, post::overrides::NoName>
-    where
-        Self: Sized,
-    {
-        post::overrides::new(self)
-    }
-
-    /// Create a new user
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use freedom_api::prelude::*;
-    /// # tokio_test::block_on(async {
-    /// let client = Client::from_env()?;
-    ///
-    /// client
-    ///     .new_user()
-    ///     .account_id(1)
-    ///     .first_name("Han")
-    ///     .last_name("Solo")
-    ///     .email("flyingsolo@gmail.com")
-    ///     .send()
-    ///     .await?;
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
-    /// ```
-    fn new_user(&self) -> post::user::UserBuilder<'_, Self, post::user::NoAccount>
-    where
-        Self: Sized,
-    {
-        post::user::new(self)
-    }
-
-    /// Create a new task request
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use freedom_api::prelude::*;
-    /// # use time::OffsetDateTime;
-    /// # use std::time::Duration;
-    /// # tokio_test::block_on(async {
-    /// let client = Client::from_env()?;
-    ///
-    /// client
-    ///     .new_task_request()
-    ///     .test_task("my_test_file.bin")
-    ///     .target_time_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
-    ///     .task_duration(120)
-    ///     .satellite_id(1016)
-    ///     .site_id(27)
-    ///     .site_configuration_id(47)
-    ///     .band_ids([2017, 2019])
-    ///     .send()
-    ///     .await?;
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
-    /// ```
-    fn new_task_request(&self) -> post::TaskRequestBuilder<'_, Self, post::request::NoType>
-    where
-        Self: Sized,
-    {
-        post::request::new(self)
     }
 
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
@@ -1307,7 +1183,203 @@ pub trait FreedomApi: Send + Sync {
         }
     }
 
+    /// Produces a paginated stream of [`User`] objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_users(&self) -> Pin<Box<dyn Stream<Item = Result<Self::Container<User>, Error>> + '_>> {
+        let uri = self.path_to_url("users");
+        self.get_paginated(uri)
+    }
+
+    /// Create a new satellite band object
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # use freedom_models::band::{BandType, IoHardware};
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_band_details()
+    ///     .name("My Satellite Band")
+    ///     .band_type(BandType::Receive)
+    ///     .frequency(8096.0)
+    ///     .default_band_width(1.45)
+    ///     .io_hardware(IoHardware::Modem)
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_band_details(&self) -> post::band::BandDetailsBuilder<'_, Self, post::band::NoName>
+    where
+        Self: Sized,
+    {
+        post::band::new(self)
+    }
+
+    /// Create a new satellite configuration
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_satellite_configuration()
+    ///     .name("My Satellite Configuration")
+    ///     .band_ids([1, 2, 3]) // List of band IDs to associate with config
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_satellite_configuration(
+        &self,
+    ) -> post::sat_config::SatelliteConfigurationBuilder<'_, Self, post::sat_config::NoName>
+    where
+        Self: Sized,
+    {
+        post::sat_config::new(self)
+    }
+
+    /// Create a new satellite
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_satellite()
+    ///     .name("My Satellite")
+    ///     .satellite_configuration_id(42)
+    ///     .norad_id(3600)
+    ///     .description("A test satellite")
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_satellite(&self) -> post::satellite::SatelliteBuilder<'_, Self, post::satellite::NoName>
+    where
+        Self: Sized,
+    {
+        post::satellite::new(self)
+    }
+
+    /// Create a new override
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_override()
+    ///     .name("downconverter.gain override for sat 1 on config 2")
+    ///     .satellite_id(1)
+    ///     .satellite_configuration_id(2)
+    ///     .add_property("site.hardware.modem.ttc.rx.demodulator.bitrate", 8096_u32)
+    ///     .add_property("site.hardware.modem.ttc.tx.modulator.bitrate", 8096_u32)
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_override(&self) -> post::overrides::OverrideBuilder<'_, Self, post::overrides::NoName>
+    where
+        Self: Sized,
+    {
+        post::overrides::new(self)
+    }
+
+    /// Create a new user
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_user()
+    ///     .account_id(1)
+    ///     .first_name("Han")
+    ///     .last_name("Solo")
+    ///     .email("flyingsolo@gmail.com")
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_user(&self) -> post::user::UserBuilder<'_, Self, post::user::NoAccount>
+    where
+        Self: Sized,
+    {
+        post::user::new(self)
+    }
+
+    /// Create a new task request
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # use time::OffsetDateTime;
+    /// # use std::time::Duration;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// client
+    ///     .new_task_request()
+    ///     .test_task("my_test_file.bin")
+    ///     .target_time_utc(OffsetDateTime::now_utc() + Duration::from_secs(15 * 60))
+    ///     .task_duration(120)
+    ///     .satellite_id(1016)
+    ///     .site_id(27)
+    ///     .site_configuration_id(47)
+    ///     .band_ids([2017, 2019])
+    ///     .send()
+    ///     .await?;
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn new_task_request(&self) -> post::TaskRequestBuilder<'_, Self, post::request::NoType>
+    where
+        Self: Sized,
+    {
+        post::request::new(self)
+    }
+
     /// Fetch an FPS token for the provided band ID and site configuration ID
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// const BAND_ID: u32 = 42;
+    /// const SITE_CONFIG_ID: u32 = 201;
+    ///
+    /// let client = Client::from_env()?;
+    ///
+    /// let token = client.new_token_by_site_configuration_id(BAND_ID, SITE_CONFIG_ID).await?;
+    /// // Submit token to FPS ...
+    /// println!("{:?}", token);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     fn new_token_by_site_configuration_id(
         &self,
         band_id: u32,
@@ -1333,6 +1405,23 @@ pub trait FreedomApi: Send + Sync {
     }
 
     /// Fetch an FPS token for the provided band ID and satellite ID
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// const BAND_ID: u32 = 42;
+    /// const SATELLITE_ID: u32 = 101;
+    ///
+    /// let client = Client::from_env()?;
+    ///
+    /// let token = client.new_token_by_satellite_id(BAND_ID, SATELLITE_ID).await?;
+    /// // Submit token to FPS ...
+    /// println!("{:?}", token);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
     fn new_token_by_satellite_id(
         &self,
         band_id: u32,
@@ -1355,15 +1444,6 @@ pub trait FreedomApi: Send + Sync {
                 .map(|s| s.to_owned())
                 .map_err(From::from)
         }
-    }
-
-    /// Produces a paginated stream of [`User`] objects.
-    ///
-    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
-    /// and return type
-    fn get_users(&self) -> Pin<Box<dyn Stream<Item = Result<Self::Container<User>, Error>> + '_>> {
-        let uri = self.path_to_url("users");
-        self.get_paginated(uri)
     }
 }
 
