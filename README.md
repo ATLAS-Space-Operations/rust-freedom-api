@@ -24,7 +24,6 @@ query:
 
 ```rust, no_run
 use freedom_api::prelude::*;
-use freedom_config::{Config, Test};
 use futures::stream::StreamExt;
 
 #[tokio::main]
@@ -60,7 +59,6 @@ for example a task request can be constructed with the following:
 use std::time::Duration;
 
 use freedom_api::prelude::*;
-use freedom_config::{Config, Test};
 use time::OffsetDateTime;
 
 #[tokio::main]
@@ -104,7 +102,6 @@ return of the request call:
 
 ```rust, no_run
 use freedom_api::prelude::*;
-use freedom_config::Config;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

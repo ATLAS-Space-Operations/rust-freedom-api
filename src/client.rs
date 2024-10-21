@@ -8,7 +8,7 @@ use crate::api::{Api, Container, Value};
 
 /// An asynchronous `Client` for interfacing with the ATLAS freedom API.
 ///
-/// The client is primarily defined based on it's [`AtlasEnv`](freedom_config::AtlasEnv)
+/// The client is primarily defined based on it's [`Env`](crate::config::Env)
 /// and it's credentials (username and password).
 #[derive(Clone, Debug)]
 pub struct Client {
