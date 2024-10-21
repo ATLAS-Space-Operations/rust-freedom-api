@@ -1200,7 +1200,6 @@ pub trait Api: Send + Sync {
     ///
     /// ```no_run
     /// # use freedom_api::prelude::*;
-    /// # use freedom_models::band::{BandType, IoHardware};
     /// # tokio_test::block_on(async {
     /// let client = Client::from_env()?;
     ///
