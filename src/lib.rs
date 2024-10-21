@@ -8,28 +8,40 @@ pub mod error;
 pub mod extensions;
 mod utils;
 
+/// Result type for the API
+pub type Result<T> = std::result::Result<T, Error>;
+
 pub use self::{
     api::{FreedomApi, FreedomApiContainer, FreedomApiValue},
     client::Client,
     error::Error,
 };
-pub use freedom_models::{account::*, satellite::*, site::*, task::*, user::*};
-
-/// Result type for the API
-pub type Result<T> = std::result::Result<T, Error>;
 
 /// Contains the client, data models, and error types necessary for queries
 pub mod prelude {
-    pub use crate::api::post::{
-        BandDetailsBuilder, OverrideBuilder, SatelliteBuilder, SatelliteConfigurationBuilder,
-        UserBuilder,
-    };
-    pub use crate::api::{FreedomApi, FreedomApiContainer, FreedomApiValue};
     #[cfg(feature = "caching")]
     pub use crate::caching_client::CachingClient;
-    pub use crate::extensions::*;
-    pub use crate::{client::Client, error::Error};
+    pub use crate::{
+        api::{
+            post::{
+                BandDetailsBuilder, OverrideBuilder, SatelliteBuilder,
+                SatelliteConfigurationBuilder, UserBuilder,
+            },
+            FreedomApi, FreedomApiContainer, FreedomApiValue,
+        },
+        client::Client,
+        error::Error,
+        extensions::*,
+        models::*,
+    };
+}
+
+/// Data type exposed by the Freedom API
+///
+/// Re-export of the models found in the `freedom-models` crate.
+pub mod models {
     pub use freedom_models::{
-        account::*, satellite::*, satellite_configuration::*, site::*, task::*, user::*,
+        account::*, azel::*, band::*, satellite::*, satellite_configuration::*, site::*, task::*,
+        user::*,
     };
 }
