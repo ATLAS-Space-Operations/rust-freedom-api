@@ -57,7 +57,7 @@ impl<'a, T: 'a + Send> PaginatedErr<'a, T> for Error {
 ///
 /// Every container must implement Deref for the type it wraps, so for read-only operations the
 /// container can be used as if it were `T`. For mutable access see [`Self::into_inner`].
-pub trait FreedomApiContainer<T>: Deref<Target = T> + Value {
+pub trait Container<T>: Deref<Target = T> + Value {
     /// All containers are capable of returning the value they wrap
     ///
     /// The cost of this however depends on the client type. For [`crate::Client`], this operation
@@ -76,7 +76,7 @@ pub trait FreedomApi: Send + Sync {
     ///
     /// Certain [`FreedomApi`] clients return an `Arc<T>` for each call, others return an `Inner<T>`
     /// which is a simple wrapper for a stack value.
-    type Container<T: Value>: FreedomApiContainer<T>;
+    type Container<T: Value>: Container<T>;
 
     /// Creates a get request at the provided absolute URI for the client's environment, using basic
     /// authentication.

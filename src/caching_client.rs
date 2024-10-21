@@ -6,7 +6,7 @@ use reqwest::{Response, StatusCode};
 use url::Url;
 
 use crate::{
-    api::{FreedomApi, FreedomApiContainer, Value},
+    api::{Container, FreedomApi, Value},
     error::Error,
     Client,
 };
@@ -32,7 +32,7 @@ impl PartialEq for CachingClient {
     }
 }
 
-impl<T: Value> FreedomApiContainer<T> for Arc<T> {
+impl<T: Value> Container<T> for Arc<T> {
     fn into_inner(self) -> T {
         std::sync::Arc::<T>::unwrap_or_clone(self)
     }
