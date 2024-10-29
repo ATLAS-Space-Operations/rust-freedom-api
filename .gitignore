@@ -3,5 +3,6 @@
 # already existing elements were commented out
 
 *.env
+.envrc
 /target
 /Cargo.lock
