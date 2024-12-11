@@ -45,14 +45,14 @@ impl Api for CachingClient {
         self.inner.delete(url).await
     }
 
-    async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), crate::error::Error> {
+    async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), Error> {
         let client = &self.inner;
         let url_clone = url.clone();
 
         let fut = async {
             let (body, status) = client.get(url_clone).await?;
 
-            Ok((body, status))
+            Ok::<_, Error>((body, status))
         };
 
         let (body, status) = match self.cache.get(&url).await {
