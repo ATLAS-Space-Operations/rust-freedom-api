@@ -105,6 +105,15 @@ impl Api for Client {
 
         let status = resp.status();
         let body = resp.bytes().await?;
+
+        if !status.is_success() {
+            let readable_body = String::from_utf8_lossy(&body);
+            return Err(crate::error::Error::Response(format!(
+                "{}\n{readable_body}",
+                status
+            )));
+        }
+
         Ok((body, status))
     }
 
