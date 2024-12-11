@@ -52,10 +52,6 @@ impl Api for CachingClient {
         let fut = async {
             let (body, status) = client.get(url_clone).await?;
 
-            if !status.is_success() {
-                return Err(Error::Response(status.to_string()));
-            }
-
             Ok((body, status))
         };
 
