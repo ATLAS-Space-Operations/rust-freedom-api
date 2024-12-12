@@ -52,18 +52,36 @@ impl<'a, T: 'a + Send + Sync> PaginatedErr<'a, T> for Error {
 ///
 /// The Freedom API is generic over "containers". Each implementer of the [`Api`] trait must
 /// also define a container. This is useful since certain clients will return Arc'd values, i.e. the
-/// caching client. While others return the values wrapped in a simple `Inner` type which is just
+/// caching client, while others return the values wrapped in a simple [`Inner`] type which is just
 /// a stack value.
 ///
-/// Every container must implement [`Deref`](std::ops::Deref) for the type it wraps, so for
-/// read-only operations the container can be used as if it were `T`. For mutable access see
-/// [`Self::into_inner`].
+/// However, for most cases this complexity can be ignored, since containers are required to
+/// implement [`Deref`](std::ops::Deref) of `T`. So for read-only operations the container can be
+/// used as if it were `T`. For mutable access see [`Self::into_inner`].
+///
+/// # Example
+///
+/// ```no_run
+/// # use freedom_api::prelude::*;
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// # let config = Config::from_env()?;
+/// # let client = Client::from_config(config);
+/// let request: Site = client
+///     .get_request_by_id(42)
+///     .await?
+///
+/// println!("Created on {}", request.created); // Direct access to created field
+///                                             // through the Container
+/// # Ok(())
+/// # }
+/// ```
 pub trait Container<T>: Deref<Target = T> + Value {
     /// All containers are capable of returning the value they wrap
     ///
     /// However, the runtime performance of this varies by client type. For [`crate::Client`], this
-    /// operation is essentially free, however for the caching client, this results in a clone of
-    /// the value.
+    /// operation is essentially free, however for the caching client, this often results in a clone
+    /// of the value.
     fn into_inner(self) -> T;
 }
 
@@ -123,8 +141,7 @@ pub type PaginatedStream<'a, T> = Pin<Box<dyn Stream<Item = Result<T, Error>> + 
 pub trait Api: Send + Sync {
     /// The [`Api`] supports implementors with different so-called "container" types.
     ///
-    /// Certain [`Api`] clients return an `Arc<T>` for each call, others return an `Inner<T>`
-    /// which is a simple wrapper for a stack value.
+    /// For a more detailed description, see the [`Container`] trait.
     type Container<T: Value>: Container<T>;
 
     /// Creates a get request at the provided absolute URI for the client's environment, using basic
@@ -200,8 +217,10 @@ pub trait Api: Send + Sync {
         })
     }
 
+    /// Returns the freedom configuration for the API
     fn config(&self) -> &Config;
 
+    /// Returns a mutable reference to the freedom configuration for the API
     fn config_mut(&mut self) -> &mut Config;
 
     /// Fetch the URL from the given path

@@ -13,7 +13,7 @@ pub use self::{
     client::Client,
 };
 
-/// Contains the client, data models, error types, and traits necessary for queries
+/// Contains the client, data models, and traits necessary for queries
 pub mod prelude {
     #[cfg(feature = "caching")]
     pub use crate::caching_client::CachingClient;
