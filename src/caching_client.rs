@@ -45,22 +45,28 @@ impl Api for CachingClient {
         self.inner.delete(url).await
     }
 
+    #[tracing::instrument]
     async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), Error> {
+        // This is a rather cheap clone. Something like 50 bytes. This is necessary since we will
+        // be passing this to the tokio executor which has lifetime requirements of `'static`
         let client = &self.inner;
-        let url_clone = url.clone();
+        let value = self
+            .cache
+            .try_get_with(url.clone(), async {
+                let (body, status) = client.get(url).await?;
 
-        let fut = async {
-            let (body, status) = client.get(url_clone).await?;
+                if !status.is_success() {
+                    return Err(Error::Response(status.to_string()));
+                }
 
-            Ok::<_, Error>((body, status))
-        };
+                Ok((body, status))
+            })
+            .await;
 
-        let (body, status) = match self.cache.get(&url).await {
-            Some(out) => out,
-            None => fut.await?,
-        };
-
-        Ok((body, status))
+        match value {
+            Ok(val) => Ok(val),
+            Err(e) => Err((*e).clone()),
+        }
     }
 
     async fn post<S>(&self, url: Url, msg: S) -> Result<Response, Error>
@@ -76,5 +82,22 @@ impl Api for CachingClient {
 
     fn config_mut(&mut self) -> &mut Config {
         self.inner.config_mut()
+    }
+}
+
+#[tracing::instrument]
+fn deserialize_from_value<T>(value: serde_json::Value) -> Result<T, Error>
+where
+    T: serde::de::DeserializeOwned + std::fmt::Debug,
+{
+    match serde_json::from_value::<T>(value).map_err(From::from) {
+        Ok(item) => {
+            tracing::debug!(object = ?item, "Received valid object");
+            Ok(item)
+        }
+        e => {
+            tracing::warn!(error= ?e, "Object failed deserialization");
+            e
+        }
     }
 }

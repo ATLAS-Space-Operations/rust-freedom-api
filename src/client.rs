@@ -105,7 +105,6 @@ impl Api for Client {
 
         let status = resp.status();
         let body = resp.bytes().await?;
-
         Ok((body, status))
     }
 
