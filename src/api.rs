@@ -67,9 +67,9 @@ impl<'a, T: 'a + Send + Sync> PaginatedErr<'a, T> for Error {
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// # let config = Config::from_env()?;
 /// # let client = Client::from_config(config);
-/// let request: Site = client
+/// let request = client
 ///     .get_request_by_id(42)
-///     .await?
+///     .await?;
 ///
 /// println!("Created on {}", request.created); // Direct access to created field
 ///                                             // through the Container
