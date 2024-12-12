@@ -1,10 +1,9 @@
 use bytes::Bytes;
 use freedom_config::Config;
 use reqwest::{Response, StatusCode};
-use serde::{Deserialize, Serialize};
 use url::Url;
 
-use crate::api::{Api, Container, Value};
+use crate::api::{Api, Inner, Value};
 
 /// An asynchronous `Client` for interfacing with the ATLAS freedom API.
 ///
@@ -56,39 +55,6 @@ impl Client {
     pub fn from_env() -> Result<Self, freedom_config::Error> {
         let config = Config::from_env()?;
         Ok(Self::from_config(config))
-    }
-}
-
-/// A simple container which stores a `T`.
-///
-/// This container exists to allow us to store items on the stack, without needing to allocate with
-/// something like `Box<T>`. For all other intents and purposes, it acts as the `T` which it
-/// contains.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(transparent)]
-#[serde(transparent)]
-pub struct Inner<T>(T);
-
-impl<T> std::ops::Deref for Inner<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> std::ops::DerefMut for Inner<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Container<T> for Inner<T>
-where
-    T: Value,
-{
-    fn into_inner(self) -> T {
-        self.0
     }
 }
 
@@ -148,6 +114,8 @@ mod tests {
         MockServer,
     };
 
+    use crate::Container;
+
     use super::*;
 
     fn default_client() -> Client {
@@ -178,7 +146,7 @@ mod tests {
     #[test]
     fn wrap_and_unwrap_inner() {
         let val = String::from("foobar");
-        let inner = Inner(val.clone());
+        let inner = Inner::new(val.clone());
         assert_eq!(*inner, val);
         let unwrapped = inner.into_inner();
         assert_eq!(val, unwrapped);

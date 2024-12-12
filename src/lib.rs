@@ -9,7 +9,7 @@ pub mod extensions;
 mod utils;
 
 pub use self::{
-    api::{Api, Container, Value},
+    api::{Api, Container, Inner, PaginatedStream, Value},
     client::Client,
 };
 
@@ -23,7 +23,7 @@ pub mod prelude {
                 BandDetailsBuilder, OverrideBuilder, SatelliteBuilder,
                 SatelliteConfigurationBuilder, UserBuilder,
             },
-            Api, Container, Value,
+            Api, Container, Inner, PaginatedStream, Value,
         },
         client::Client,
         config::*,

@@ -67,6 +67,53 @@ pub trait Container<T>: Deref<Target = T> + Value {
     fn into_inner(self) -> T;
 }
 
+impl<T: Deref<Target = T> + Value> Container<T> for Box<T> {
+    fn into_inner(self) -> T {
+        *self
+    }
+}
+
+/// A simple container which stores a `T`.
+///
+/// This container exists to allow us to store items on the stack, without needing to allocate with
+/// something like `Box<T>`. For all other intents and purposes, it acts as the `T` which it
+/// contains.
+#[derive(
+    Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash,
+)]
+#[repr(transparent)]
+#[serde(transparent)]
+pub struct Inner<T>(T);
+
+impl<T> std::ops::Deref for Inner<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T> std::ops::DerefMut for Inner<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<T> Container<T> for Inner<T>
+where
+    T: Value,
+{
+    fn into_inner(self) -> T {
+        self.0
+    }
+}
+
+impl<T> Inner<T> {
+    pub fn new(inner: T) -> Self {
+        Self(inner)
+    }
+}
+
 /// A stream of paginated results from freedom.
 ///
 /// Each item in the stream is a result, since one or more items may fail to be serialized
