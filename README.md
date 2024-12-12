@@ -6,7 +6,8 @@
 This library is a Rust library which focuses on wrapping the ATLAS Freedom REST
 API in an easy to use and idiomatic way. The API is entirely asynchronous,
 support for a blocking client may be added sometime in the future, but for now
-an executor is required for usage, we recommend [tokio](https://tokio.rs/).
+an executor is required for usage. We recommend [tokio](https://tokio.rs/), as
+it is already a dependency of the asynchronous http client used.
 
 ## Installation 
 
@@ -14,10 +15,24 @@ To incorporate the Freedom API into an existing cargo project simply invoke the
 following from the project's root directory:
 
 ```console
-$ cargo add --git https://github.com/ATLAS-Space-Operations/rust-freedom-api
+$ cargo add freedom-api
 ```
 
-## Getting Started
+## Documentation
+
+The freedom API has a significant amount of documentation to get users up and 
+running quickly. 
+
+The latest docs are available
+[here](https://docs.rs/freedom-api/latest/freedom_api/), via docs.rs. If you
+would like to build them locally, you may also clone the repo and run the
+following from the top-level:
+
+```console
+$ cargo doc --no-deps --open
+```
+
+## Usage
 
 Once added, simply import the crate's prelude, build a client and make a
 query:
@@ -80,28 +95,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Documentation
-
-The freedom API has a significant amount of documentation to get users up and 
-running quickly. To build the docs, simply run the following from the root of 
-this repository, once cloned. 
-
-```console
-$ cargo doc --no-deps --open
-```
-
 ## Chaining API Returns
 
 Many of the data types exposed in this library can be navigated to through other
-resources, for instance a task request object holds links to the site object the
-task was scheduled at.
+resources. For instance, a task request object holds links to the site object
+the task was scheduled at.
 
 Rather than making a call to fetch the request, then parse the site ID, then
 request the site from the ID, you can instead fetch the site directly from the
-return of the request call:
+return of the task request call:
 
 ```rust, no_run
-use freedom_api::prelude::*;
+// The prelude includes extensions traits to make expose this functionality
+use freedom_api::prelude::*; 
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -123,22 +129,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Container
 
 You will note that what is returned by the `get_` methods of the API is of type
-`Self::Container<T>` rather than simply type `T`. This complexity is required
-since there are multiple API clients, most notably the default [`Client`] and
-the `CachingClient` (available via the `caching` feature flag). The caching
-client is backed by a concurrent caching system, and in order to avoid
-unnecessarily cloning all responses from the caching client to the call site,
-the cached values are stored as `Arc<T>` so they can be cheaply cloned from the
-cache. This complexity will be mostly transparent to the caller, since the
-container is required to implement [`Deref<T>`](std::ops::Deref).
+`Self::Container<T>` rather than simply type `T`. More information on why it
+exists is available with the documentation for the
+[Container](https://docs.rs/freedom-api/latest/freedom_api/trait.Container.html)
+trait.
 
-If however you need to mutate the data after receiving it, call the
-`Container::into_inner` method on the returned type to get an owned
-version of the wrapped type.
-
-```rust, ignore
-let mut request = atlas_client
-    .get_request_by_id(42)
-    .await?
-    .into_inner();
-```
+However, since `Container<T>` must implement `Deref<T>`, the return types can be
+used in most cases just like a `T`.
