@@ -1,6 +1,6 @@
 [package]
 name = "freedom-api"
-version = "2.0.0-rc1"
+version = "2.0.0-rc2"
 edition = "2021"
 authors = ["Caleb Leinz <caleb.leinz@atlasspace.com>"]
 description = "Freedom API for Rustaceans"
