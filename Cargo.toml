@@ -27,7 +27,7 @@ moka = { version = "0.12.3", features = ["future"], optional = true }
 
 # ATLAS internal dependencies
 freedom-config = { version = "1.0.0", features = ["serde"] }
-freedom-models = { version = "1.0.0", features = ["serde"] }
+freedom-models = { version = "2.0.0-rc1", features = ["serde"] }
 
 [dev-dependencies]
 futures = { version = "0.3.30" }
