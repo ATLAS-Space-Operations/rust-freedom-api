@@ -8,7 +8,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/ATLAS-Space-Operations/rust-freedom-api"
 # Support for Async fn in traits
-rust-version = "1.75"
+rust-version = "1.76"
 
 [dependencies]
 async-stream = { version = "0.3.5" }
