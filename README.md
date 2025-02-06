@@ -45,7 +45,7 @@ use futures::stream::StreamExt;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Build the client, grabbing the API keys from environment variables
     let config = Config::builder()
-        .environment(Test)
+        .environment(Test)  // Either Test or Prod
         .key_from_env()?    // Sources the key from ATLAS_KEY
         .secret_from_env()? // Sources the secret from ATLAS_SECRET
         .build()?;
@@ -111,8 +111,7 @@ use freedom_api::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = Config::from_env()?;
-    let client = Client::from_config(config);
+    let client = Client::from_env()?;
 
     let site_from_request: Site = client
         .get_request_by_id(42)
