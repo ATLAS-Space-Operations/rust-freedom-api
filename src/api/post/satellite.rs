@@ -92,14 +92,14 @@ impl<'a, C> SatelliteBuilder<'a, C, NoNorad> {
     }
 }
 
-impl<'a, C> SatelliteBuilder<'a, C, Satellite> {
+impl<C> SatelliteBuilder<'_, C, Satellite> {
     pub fn description(mut self, description: impl Into<String>) -> Self {
         self.state.description = Some(description.into());
         self
     }
 }
 
-impl<'a, C> SatelliteBuilder<'a, C, Satellite>
+impl<C> SatelliteBuilder<'_, C, Satellite>
 where
     C: Api,
 {

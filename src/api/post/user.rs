@@ -98,7 +98,7 @@ impl<'a, C> UserBuilder<'a, C, NoEmail> {
     }
 }
 
-impl<'a, C> UserBuilder<'a, C, User> {
+impl<C> UserBuilder<'_, C, User> {
     pub fn add_role(mut self, role: impl Into<String>) -> Self {
         self.state.roles.push(role.into());
 
@@ -118,7 +118,7 @@ impl<'a, C> UserBuilder<'a, C, User> {
     }
 }
 
-impl<'a, C> UserBuilder<'a, C, User>
+impl<C> UserBuilder<'_, C, User>
 where
     C: Api,
 {

@@ -349,7 +349,7 @@ where
     }
 }
 
-impl<'a, C> TaskRequestBuilder<'a, C, TaskRequest> {
+impl<C> TaskRequestBuilder<'_, C, TaskRequest> {
     pub fn task_minimum_duration(mut self, duration: u64) -> Self {
         self.state.minimum_duration = Some(duration);
         self
@@ -361,7 +361,7 @@ impl<'a, C> TaskRequestBuilder<'a, C, TaskRequest> {
     }
 }
 
-impl<'a, C> TaskRequestBuilder<'a, C, TaskRequest>
+impl<C> TaskRequestBuilder<'_, C, TaskRequest>
 where
     C: Api,
 {

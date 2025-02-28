@@ -108,14 +108,14 @@ impl<'a, C> OverrideBuilder<'a, C, NoConfig> {
     }
 }
 
-impl<'a, C> OverrideBuilder<'a, C, Override> {
+impl<C> OverrideBuilder<'_, C, Override> {
     pub fn add_property(mut self, key: impl Into<String>, value: impl ToString) -> Self {
         self.state.properties.insert(key.into(), value.to_string());
         self
     }
 }
 
-impl<'a, C> OverrideBuilder<'a, C, Override>
+impl<C> OverrideBuilder<'_, C, Override>
 where
     C: Api,
 {

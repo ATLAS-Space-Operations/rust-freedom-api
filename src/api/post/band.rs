@@ -137,7 +137,7 @@ impl<'a, C> BandDetailsBuilder<'a, C, NoIoConfig> {
     }
 }
 
-impl<'a, C> BandDetailsBuilder<'a, C, BandDetails> {
+impl<C> BandDetailsBuilder<'_, C, BandDetails> {
     pub fn polarization(mut self, polarization: Polarization) -> Self {
         self.state.polarization = Some(polarization);
         self
@@ -164,7 +164,7 @@ impl<'a, C> BandDetailsBuilder<'a, C, BandDetails> {
     }
 }
 
-impl<'a, C> BandDetailsBuilder<'a, C, BandDetails>
+impl<C> BandDetailsBuilder<'_, C, BandDetails>
 where
     C: Api,
 {

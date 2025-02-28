@@ -79,7 +79,7 @@ where
     }
 }
 
-impl<'a, C> SatelliteConfigurationBuilder<'a, C, SatelliteConfiguration> {
+impl<C> SatelliteConfigurationBuilder<'_, C, SatelliteConfiguration> {
     pub fn doppler(mut self, doppler: bool) -> Self {
         self.state.doppler = Some(doppler);
         self
@@ -91,7 +91,7 @@ impl<'a, C> SatelliteConfigurationBuilder<'a, C, SatelliteConfiguration> {
     }
 }
 
-impl<'a, C> SatelliteConfigurationBuilder<'a, C, SatelliteConfiguration>
+impl<C> SatelliteConfigurationBuilder<'_, C, SatelliteConfiguration>
 where
     C: Api,
 {
