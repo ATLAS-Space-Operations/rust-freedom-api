@@ -62,25 +62,35 @@ impl Api for Client {
     type Container<T: Value> = Inner<T>;
 
     async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), crate::error::Error> {
+        tracing::trace!("GET to {}", url);
+
         let resp = self
             .client
-            .get(url)
+            .get(url.clone())
             .basic_auth(self.config.key(), Some(&self.config.expose_secret()))
             .send()
             .await?;
 
         let status = resp.status();
-        let body = resp.bytes().await?;
+        let body = resp
+            .bytes()
+            .await
+            .inspect_err(|error| tracing::warn!(%url, %error, %status, "Failed to get response body"))
+            .inspect(|body| tracing::info!(%url, body = %String::from_utf8_lossy(body), %status, "Received response body"))?;
 
         Ok((body, status))
     }
 
     async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
+        tracing::trace!("DELETE to {}", url);
+
         self.client
-            .delete(url)
+            .delete(url.clone())
             .basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .send()
             .await
+            .inspect_err(|error| tracing::warn!(%error, %url, "Failed to DELETE"))
+            .inspect(|ok| tracing::warn!(?ok, %url, "Received response"))
             .map_err(From::from)
     }
 
@@ -88,12 +98,16 @@ impl Api for Client {
     where
         S: serde::Serialize + Sync + Send,
     {
+        tracing::trace!("POST to {}", url);
+
         self.client
-            .post(url)
+            .post(url.clone())
             .basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .json(&msg)
             .send()
             .await
+            .inspect_err(|error| tracing::warn!(%error, %url, "Failed to POST"))
+            .inspect(|ok| tracing::warn!(?ok, %url, "Received response"))
             .map_err(From::from)
     }
 
