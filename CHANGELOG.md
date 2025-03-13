@@ -2,11 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [2.1.0] - 2025-03-13
+
+### Bug Fixes
+
+- Clippy lints
+- Caching client get implementation
+
+### Documentation
+
+- *(unscoped)* Update README
+
+### Features
+
+- Add tracing around client requests
+- Add method to CachingClient to invalidate cache
 
 ### Miscellaneous Tasks
 
 - Update CHANGELOG.md
+- Fix clippy lints
+- Fix formatting
+
+### Dep
+
+- Bump MSRV to 1.80
+- Bump MSRV to 1.81
 
 ## [2.0.0] - 2025-02-05
 
