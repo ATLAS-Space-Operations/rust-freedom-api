@@ -6,9 +6,9 @@ use reqwest::{Response, StatusCode};
 use url::Url;
 
 use crate::{
+    Client,
     api::{Api, Container, Value},
     error::Error,
-    Client,
 };
 
 /// An asynchronous `Client` for interfacing with the ATLAS freedom API, which implements query
@@ -45,22 +45,29 @@ impl Api for CachingClient {
         self.inner.delete(url).await
     }
 
+    /// # Panics
+    ///
+    /// Panics if called outside of a tokio runtime
     async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), Error> {
-        let client = &self.inner;
+        let client = self.inner.clone();
         let url_clone = url.clone();
 
-        let fut = async {
+        let fut = async move {
             let (body, status) = client.get(url_clone).await?;
 
             Ok::<_, Error>((body, status))
         };
 
-        let (body, status) = match self.cache.get(&url).await {
-            Some(out) => out,
-            None => fut.await?,
-        };
+        let cache = self.cache.clone();
 
-        Ok((body, status))
+        tokio::spawn(async move {
+            cache
+                .try_get_with(url, fut)
+                .await
+                .map_err(Arc::unwrap_or_clone)
+        })
+        .await
+        .map_err(|error| Error::Response(error.to_string()))?
     }
 
     async fn post<S>(&self, url: Url, msg: S) -> Result<Response, Error>

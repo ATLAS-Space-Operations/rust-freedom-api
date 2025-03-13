@@ -19,11 +19,12 @@ serde = { version = "1.0.195", features = ["derive"] }
 serde_json = { version = "1.0.111" }
 thiserror = { version = "2.0.11" }
 time = { version = "0.3.36", features = ["macros", "parsing", "formatting"] }
+tokio = { version = "1", features = ["rt"] }
 tracing = { version = "0.1.40" }
 url = { version = "2.5.0" }
 
 # Optional dependencies
-moka = { version = "0.12.3", features = ["future"], optional = true }
+moka = { version = "0.12.10", features = ["future"], optional = true }
 
 # ATLAS internal dependencies
 freedom-config = { version = "1.0.0", features = ["serde"] }
