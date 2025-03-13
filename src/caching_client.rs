@@ -26,6 +26,14 @@ pub struct CachingClient {
     pub(crate) cache: moka::future::Cache<Url, (Bytes, StatusCode)>,
 }
 
+impl CachingClient {
+    /// Invalidates all the entries in the cache. Future requests to `get` will result in new calls
+    /// to Freedom
+    pub fn invalidate_all(&self) {
+        self.cache.invalidate_all();
+    }
+}
+
 impl PartialEq for CachingClient {
     fn eq(&self, other: &Self) -> bool {
         self.inner == other.inner
