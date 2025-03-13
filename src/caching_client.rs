@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use freedom_config::Config;
+use moka::future::Cache;
 use reqwest::{Response, StatusCode};
 use url::Url;
 
@@ -23,10 +24,18 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct CachingClient {
     pub(crate) inner: Client,
-    pub(crate) cache: moka::future::Cache<Url, (Bytes, StatusCode)>,
+    pub(crate) cache: Cache<Url, (Bytes, StatusCode)>,
 }
 
 impl CachingClient {
+    /// Create a new caching client from a normal client 
+    pub fn new(client: Client, capacity: u64) -> Self {
+        Self {
+            inner: client,
+            cache: Cache::new(capacity),
+        }
+    }
+
     /// Invalidates all the entries in the cache. Future requests to `get` will result in new calls
     /// to Freedom
     pub fn invalidate_all(&self) {
