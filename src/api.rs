@@ -24,7 +24,7 @@ use freedom_models::{
 use reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
 use serde_json::Value as JsonValue;
-use time::{OffsetDateTime, format_description::well_known::Iso8601};
+use time::{format_description::well_known::Iso8601, OffsetDateTime};
 use url::Url;
 
 use futures_core::Stream;
