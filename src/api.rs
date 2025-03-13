@@ -24,7 +24,7 @@ use freedom_models::{
 use reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
 use serde_json::Value as JsonValue;
-use time::{format_description::well_known::Iso8601, OffsetDateTime};
+use time::{OffsetDateTime, format_description::well_known::Iso8601};
 use url::Url;
 
 use futures_core::Stream;
@@ -1470,7 +1470,6 @@ pub trait Api: Send + Sync {
                 .as_str()
                 .ok_or(Error::Response(String::from("Invalid type for token")))
                 .map(|s| s.to_owned())
-                .map_err(From::from)
         }
     }
 
@@ -1512,7 +1511,6 @@ pub trait Api: Send + Sync {
                 .as_str()
                 .ok_or(Error::Response(String::from("Invalid type for token")))
                 .map(|s| s.to_owned())
-                .map_err(From::from)
         }
     }
 }
