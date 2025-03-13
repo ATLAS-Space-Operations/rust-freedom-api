@@ -28,7 +28,7 @@ pub struct CachingClient {
 }
 
 impl CachingClient {
-    /// Create a new caching client from a normal client 
+    /// Create a new caching client from a normal client
     pub fn new(client: Client, capacity: u64) -> Self {
         Self {
             inner: client,
