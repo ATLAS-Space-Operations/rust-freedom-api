@@ -24,7 +24,7 @@ use freedom_models::{
 use reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
 use serde_json::Value as JsonValue;
-use time::{format_description::well_known::Iso8601, OffsetDateTime};
+use time::{OffsetDateTime, format_description::well_known::Iso8601};
 use url::Url;
 
 use futures_core::Stream;
@@ -156,7 +156,7 @@ pub trait Api: Send + Sync {
         async move {
             let (body, status) = self.get(url).await?;
 
-            error_on_non_success(&status)?;
+            error_on_non_success(&status, &body)?;
 
             let utf8_str = String::from_utf8_lossy(&body);
             serde_json::from_str(&utf8_str).map_err(From::from)
@@ -436,7 +436,7 @@ pub trait Api: Send + Sync {
             let uri = self.path_to_url(path);
 
             let (data, status) = self.get(uri).await?;
-            error_on_non_success(&status)?;
+            error_on_non_success(&status, b"Failed to fetch file")?;
 
             Ok(data)
         }
@@ -1515,9 +1515,12 @@ pub trait Api: Send + Sync {
     }
 }
 
-fn error_on_non_success(status: &StatusCode) -> Result<(), Error> {
+fn error_on_non_success(status: &StatusCode, body: &[u8]) -> Result<(), Error> {
     if !status.is_success() {
-        return Err(Error::Response(status.to_string()));
+        return Err(Error::ResponseStatus {
+            status: *status,
+            error: String::from_utf8_lossy(body).to_string(),
+        });
     }
 
     Ok(())

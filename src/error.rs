@@ -1,14 +1,23 @@
 //! Error and Result types for Freedom API
-use serde::Serialize;
+use reqwest::StatusCode;
+use serde::{Serialize, Serializer};
 
 /// Result type for the API
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// The combined error type for the client builder and for API errors
 #[derive(Debug, Clone, thiserror::Error, PartialEq, Eq, Serialize)]
+#[non_exhaustive]
 pub enum Error {
     #[error("Failed to get valid response from server: {0}")]
     Response(String),
+
+    #[error("Server responded with {status}: {error}")]
+    ResponseStatus {
+        #[serde(serialize_with = "serialize_status")]
+        status: StatusCode,
+        error: String,
+    },
 
     #[error("Failed to deserialize the response: {0}")]
     Deserialization(String),
@@ -31,6 +40,13 @@ pub enum Error {
     InvalidId,
 }
 
+fn serialize_status<S: Serializer>(
+    status: &StatusCode,
+    serializer: S,
+) -> std::result::Result<S::Ok, S::Error> {
+    serializer.serialize_u16(status.as_u16())
+}
+
 impl Error {
     /// Shorthand for creating a runtime pagination error
     pub(crate) fn pag_item(s: String) -> Self {
@@ -40,7 +56,11 @@ impl Error {
 
 impl From<reqwest::Error> for Error {
     fn from(value: reqwest::Error) -> Self {
-        Error::Response(value.to_string())
+        let error = value.to_string();
+        match value.status() {
+            Some(status) => Self::ResponseStatus { status, error },
+            None => Error::Response(error),
+        }
     }
 }
 

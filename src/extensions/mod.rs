@@ -9,7 +9,7 @@
 
 use std::collections::HashMap;
 
-use freedom_models::{utils::Content, Hateoas};
+use freedom_models::{Hateoas, utils::Content};
 
 use crate::{api::Value, error, prelude::Api};
 mod account;
@@ -38,8 +38,8 @@ fn get_id(reference: &'static str, links: &HashMap<String, url::Url>) -> Result<
     let id_str = url
         .path_segments()
         .ok_or(error::Error::InvalidUri("Missing Path".into()))?
-        .last()
-        .unwrap();
+        .next_back()
+        .ok_or(error::Error::InvalidId)?;
 
     id_str.parse().map_err(|_| error::Error::InvalidId)
 }
