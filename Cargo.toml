@@ -1,14 +1,14 @@
 [package]
 name = "freedom-api"
 version = "2.1.1"
-edition = "2021"
+edition = "2024"
 authors = ["Caleb Leinz <caleb.leinz@atlasspace.com>"]
 description = "Freedom API for Rustaceans"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/ATLAS-Space-Operations/rust-freedom-api"
 # Support for Async fn in traits
-rust-version = "1.81"
+rust-version = "1.86"
 
 [dependencies]
 async-stream = { version = "0.3.5" }
