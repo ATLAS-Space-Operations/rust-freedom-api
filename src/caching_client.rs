@@ -7,9 +7,9 @@ use reqwest::{Response, StatusCode};
 use url::Url;
 
 use crate::{
+    Client,
     api::{Api, Container, Value},
     error::Error,
-    Client,
 };
 
 /// An asynchronous `Client` for interfacing with the ATLAS freedom API, which implements query

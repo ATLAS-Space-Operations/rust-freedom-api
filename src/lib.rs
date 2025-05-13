@@ -19,11 +19,11 @@ pub mod prelude {
     pub use crate::caching_client::CachingClient;
     pub use crate::{
         api::{
+            Api, Container, Inner, PaginatedStream, Value,
             post::{
                 BandDetailsBuilder, OverrideBuilder, SatelliteBuilder,
                 SatelliteConfigurationBuilder, UserBuilder,
             },
-            Api, Container, Inner, PaginatedStream, Value,
         },
         client::Client,
         config::*,

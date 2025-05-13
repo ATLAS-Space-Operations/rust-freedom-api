@@ -4,7 +4,7 @@ use std::{collections::HashMap, path::Path};
 
 use freedom_api::Client;
 use freedom_config::Config;
-use httpmock::{prelude::*, Mock};
+use httpmock::{Mock, prelude::*};
 use url::Url;
 
 pub type TestResult = std::result::Result<(), Box<dyn std::error::Error + 'static + Send + Sync>>;
