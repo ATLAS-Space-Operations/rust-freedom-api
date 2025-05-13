@@ -1515,7 +1515,7 @@ pub trait Api: Send + Sync {
     }
 }
 
-fn error_on_non_success(status: &StatusCode, body: &[u8]) -> Result<(), Error> {
+pub(crate) fn error_on_non_success(status: &StatusCode, body: &[u8]) -> Result<(), Error> {
     if !status.is_success() {
         return Err(Error::ResponseStatus {
             status: *status,

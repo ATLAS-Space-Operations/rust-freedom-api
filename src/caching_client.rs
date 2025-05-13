@@ -8,7 +8,7 @@ use url::Url;
 
 use crate::{
     Client,
-    api::{Api, Container, Value},
+    api::{Api, Container, Value, error_on_non_success},
     error::Error,
 };
 
@@ -71,6 +71,8 @@ impl Api for CachingClient {
 
         let fut = async move {
             let (body, status) = client.get(url_clone).await?;
+
+            error_on_non_success(&status, &body)?;
 
             Ok::<_, Error>((body, status))
         };
