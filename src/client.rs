@@ -193,7 +193,7 @@ mod tests {
 
         assert_eq!(response, RESPONSE.as_bytes());
         assert_eq!(status, StatusCode::OK);
-        mock.assert_hits(1);
+        mock.assert_calls(1);
     }
 
     #[tokio::test]
@@ -211,7 +211,7 @@ mod tests {
 
         assert_eq!(response, RESPONSE.as_bytes());
         assert_eq!(status, StatusCode::NOT_FOUND);
-        mock.assert_hits(1);
+        mock.assert_calls(1);
     }
 
     #[tokio::test]
@@ -231,6 +231,6 @@ mod tests {
         let url = Url::parse(&format!("http://{}/testing", addr)).unwrap();
         client.post(url, &json).await.unwrap();
 
-        mock.assert_hits(1);
+        mock.assert_calls(1);
     }
 }

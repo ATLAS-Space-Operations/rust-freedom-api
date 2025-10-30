@@ -41,11 +41,11 @@ impl TestingEnv {
     }
 
     pub fn get_json_from_file(
-        &self,
+        &'_ self,
         path: &str,
         query: Vec<(&str, &str)>,
         file: impl AsRef<Path>,
-    ) -> Mock {
+    ) -> Mock<'_> {
         let file = std::fs::read(file).unwrap();
         let file = String::from_utf8(file).unwrap();
         let file = file.replace("localhost:8080", &format!("localhost:{}", self.port()));
