@@ -1,6 +1,6 @@
 use bytes::Bytes;
 use freedom_config::Config;
-use reqwest::{Response, StatusCode};
+use reqwest::{RequestBuilder, Response, StatusCode};
 use url::Url;
 
 use crate::api::{Api, Inner, Value};
@@ -13,6 +13,7 @@ use crate::api::{Api, Inner, Value};
 pub struct Client {
     pub(crate) config: Config,
     pub(crate) client: reqwest::Client,
+    universal_headers: Vec<(String, String)>,
 }
 
 impl PartialEq for Client {
@@ -42,6 +43,7 @@ impl Client {
         Self {
             config,
             client: reqwest::Client::new(),
+            universal_headers: Vec::new(),
         }
     }
 
@@ -56,6 +58,23 @@ impl Client {
         let config = Config::from_env()?;
         Ok(Self::from_config(config))
     }
+
+    /// Adds a universal header key and value to all GET POST, and DELETEs made with the client
+    pub fn with_universal_header(
+        mut self,
+        key: impl Into<String>,
+        value: impl Into<String>,
+    ) -> Self {
+        self.universal_headers.push((key.into(), value.into()));
+        self
+    }
+
+    fn append_headers(&self, mut req: RequestBuilder) -> RequestBuilder {
+        for (header, value) in self.universal_headers.iter() {
+            req = req.header(header, value);
+        }
+        req
+    }
 }
 
 impl Api for Client {
@@ -64,9 +83,9 @@ impl Api for Client {
     async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), crate::error::Error> {
         tracing::trace!("GET to {}", url);
 
-        let resp = self
-            .client
-            .get(url.clone())
+        let req = self.append_headers(self.client.get(url.clone()));
+
+        let resp = req
             .basic_auth(self.config.key(), Some(&self.config.expose_secret()))
             .send()
             .await?;
@@ -84,9 +103,9 @@ impl Api for Client {
     async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
         tracing::trace!("DELETE to {}", url);
 
-        self.client
-            .delete(url.clone())
-            .basic_auth(self.config.key(), Some(self.config.expose_secret()))
+        let req = self.append_headers(self.client.delete(url.clone()));
+
+        req.basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .send()
             .await
             .inspect_err(|error| tracing::warn!(%error, %url, "Failed to DELETE"))
@@ -100,9 +119,9 @@ impl Api for Client {
     {
         tracing::trace!("POST to {}", url);
 
-        self.client
-            .post(url.clone())
-            .basic_auth(self.config.key(), Some(self.config.expose_secret()))
+        let req = self.append_headers(self.client.post(url.clone()));
+
+        req.basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .json(&msg)
             .send()
             .await
@@ -193,7 +212,7 @@ mod tests {
 
         assert_eq!(response, RESPONSE.as_bytes());
         assert_eq!(status, StatusCode::OK);
-        mock.assert_hits(1);
+        mock.assert_calls(1);
     }
 
     #[tokio::test]
@@ -211,7 +230,7 @@ mod tests {
 
         assert_eq!(response, RESPONSE.as_bytes());
         assert_eq!(status, StatusCode::NOT_FOUND);
-        mock.assert_hits(1);
+        mock.assert_calls(1);
     }
 
     #[tokio::test]
@@ -231,6 +250,6 @@ mod tests {
         let url = Url::parse(&format!("http://{}/testing", addr)).unwrap();
         client.post(url, &json).await.unwrap();
 
-        mock.assert_hits(1);
+        mock.assert_calls(1);
     }
 }

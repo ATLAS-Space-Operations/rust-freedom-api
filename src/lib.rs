@@ -8,6 +8,8 @@ pub mod error;
 pub mod extensions;
 mod utils;
 
+#[cfg(feature = "bundles")]
+pub use self::api::bundle::BundleApi;
 pub use self::{
     api::{Api, Container, Inner, PaginatedStream, Value},
     client::Client,
