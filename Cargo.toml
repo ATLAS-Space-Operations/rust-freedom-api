@@ -1,6 +1,6 @@
 [package]
 name = "freedom-api"
-version = "3.0.0-rc2"
+version = "3.0.0-rc3"
 edition = "2024"
 authors = ["Caleb Leinz <caleb.leinz@atlasspace.com>"]
 description = "Freedom API for Rustaceans"
@@ -28,7 +28,7 @@ moka = { version = "0.12.10", features = ["future"], optional = true }
 
 # ATLAS internal dependencies
 freedom-config = { version = "1.0.0", features = ["serde"] }
-freedom-models = { git = "https://github.com/ATLAS-Space-Operations/rust-freedom-models", branch = "dev", features = ["serde"] }
+freedom-models = { version = "2.2.0", features = ["serde"] }
 
 [dev-dependencies]
 futures = { version = "0.3.30" }
@@ -38,7 +38,6 @@ tokio-test = { version = "0.4.4"}
 tracing-test = { version = "0.2.4" }
 
 [features]
-bundles = ["freedom-models/bundles"]
 caching = ["dep:moka", "serde/rc"]
 
 [[example]]
