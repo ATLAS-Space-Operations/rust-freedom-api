@@ -31,8 +31,6 @@ use futures_core::Stream;
 
 use crate::error::Error;
 
-#[cfg(feature = "bundles")]
-pub(crate) mod bundle;
 pub(crate) mod post;
 
 /// A super trait containing all the requirements for Freedom API Values
