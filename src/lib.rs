@@ -6,11 +6,13 @@ mod caching_client;
 mod client;
 pub mod error;
 pub mod extensions;
+mod gateway_licenses;
 mod utils;
 
 pub use self::{
     api::{Api, Container, Inner, PaginatedStream, Value},
     client::Client,
+    gateway_licenses::GatewayApi,
 };
 
 /// Contains the client, data models, and traits necessary for queries

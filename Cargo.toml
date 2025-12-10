@@ -28,7 +28,7 @@ moka = { version = "0.12.10", features = ["future"], optional = true }
 
 # ATLAS internal dependencies
 freedom-config = { version = "1.0.0", features = ["serde"] }
-freedom-models = { version = "2.2.0", features = ["serde"] }
+freedom-models = { git = "https://github.com/ATLAS-Space-Operations/rust-freedom-models.git", branch = "gateway-licenses", features = ["serde"] }
 
 [dev-dependencies]
 futures = { version = "0.3.30" }
