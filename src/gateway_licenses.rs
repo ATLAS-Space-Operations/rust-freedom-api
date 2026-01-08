@@ -7,24 +7,30 @@ pub trait GatewayApi: Api {
     fn get_all_gateway_licenses(
         &self,
     ) -> impl Future<Output = Result<gateway_licenses::View, Error>> + Send + Sync {
-        let uri = self.path_to_url("gateway-licenses");
-        self.get_json_map(uri)
+        async move {
+            let uri = self.path_to_url("gateway-licenses")?;
+            self.get_json_map(uri).await
+        }
     }
 
     fn get_all_gateway_license(
         &self,
         id: u32,
     ) -> impl Future<Output = Result<gateway_licenses::ViewOne, Error>> + Send + Sync {
-        let uri = self.path_to_url(format!("gateway-licenses/{id}"));
-        self.get_json_map(uri)
+        async move {
+            let uri = self.path_to_url(format!("gateway-licenses/{id}"))?;
+            self.get_json_map(uri).await
+        }
     }
 
     fn verify_gateway_license(
         &self,
         request: gateway_licenses::Verify,
     ) -> impl Future<Output = Result<gateway_licenses::VerifyResponse, Error>> + Send + Sync {
-        let uri = self.path_to_url("gateway-licenses/verify");
-        self.post_deserialize(uri, request)
+        async move {
+            let uri = self.path_to_url("gateway-licenses/verify")?;
+            self.post_deserialize(uri, request).await
+        }
     }
 
     fn regenerate_gateway_license(
@@ -32,8 +38,10 @@ pub trait GatewayApi: Api {
         id: u32,
     ) -> impl Future<Output = Result<gateway_licenses::RegenerateResponse, Error>> + Send + Sync
     {
-        let uri = self.path_to_url(format!("gateway-licenses/{id}/regenerate"));
-        self.post_deserialize(uri, serde_json::json!({}))
+        async move {
+            let uri = self.path_to_url(format!("gateway-licenses/{id}/regenerate"))?;
+            self.post_deserialize(uri, serde_json::json!({})).await
+        }
     }
 }
 

@@ -125,7 +125,7 @@ where
     pub async fn send(self) -> Result<Response, Error> {
         let client = self.client;
 
-        let url = client.path_to_url(format!("accounts/{}/newuser", self.state.account_id));
+        let url = client.path_to_url(format!("accounts/{}/newuser", self.state.account_id))?;
         client.post(url, self.state).await
     }
 }

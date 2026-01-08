@@ -144,6 +144,32 @@ pub trait Api: Send + Sync {
     /// For a more detailed description, see the [`Container`] trait.
     type Container<T: Value>: Container<T>;
 
+    /// Returns the freedom configuration for the API
+    fn config(&self) -> &Config;
+
+    /// Returns a mutable reference to the freedom configuration for the API
+    fn config_mut(&mut self) -> &mut Config;
+
+    /// Creates a get request at the provided absolute URI for the client's environment, using basic
+    /// authentication.
+    ///
+    /// Returns the raw binary body, and the status code.
+    fn get(
+        &self,
+        url: Url,
+    ) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send + Sync;
+
+    fn delete(&self, url: Url) -> impl Future<Output = Result<Response, Error>> + Send;
+
+    /// Lower level method, not intended for direct use
+    fn post<S>(
+        &self,
+        url: Url,
+        msg: S,
+    ) -> impl Future<Output = Result<Response, Error>> + Send + Sync
+    where
+        S: serde::Serialize + Send + Sync;
+
     /// Creates a get request at the provided absolute URI for the client's environment, using basic
     /// authentication.
     ///
@@ -162,15 +188,6 @@ pub trait Api: Send + Sync {
             serde_json::from_str(&utf8_str).map_err(From::from)
         }
     }
-
-    /// Creates a get request at the provided absolute URI for the client's environment, using basic
-    /// authentication.
-    ///
-    /// Returns the raw binary body, and the status code.
-    fn get(
-        &self,
-        url: Url,
-    ) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send + Sync;
 
     /// Creates a stream of items from a paginated endpoint.
     ///
@@ -217,23 +234,12 @@ pub trait Api: Send + Sync {
         })
     }
 
-    /// Returns the freedom configuration for the API
-    fn config(&self) -> &Config;
-
-    /// Returns a mutable reference to the freedom configuration for the API
-    fn config_mut(&mut self) -> &mut Config;
-
     /// Fetch the URL from the given path
-    ///
-    /// # Panics
-    ///
-    /// Panics in the event the URL cannot be constructed from the provided path
-    fn path_to_url(&self, path: impl AsRef<str>) -> Url {
+    fn path_to_url(&self, path: impl AsRef<str>) -> Result<Url, Error> {
         let url = self.config().environment().freedom_entrypoint();
-        url.join(path.as_ref()).expect("Invalid URL construction")
+        url.join(path.as_ref())
+            .map_err(|error| Error::InvalidUri(error.to_string()))
     }
-
-    fn delete(&self, url: Url) -> impl Future<Output = Result<Response, Error>> + Send;
 
     /// Request to delete the band details object matching the provided id
     ///
@@ -250,7 +256,7 @@ pub trait Api: Send + Sync {
     /// ```
     fn delete_band_details(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
         async move {
-            let uri = self.path_to_url(format!("satellite_bands/{id}"));
+            let uri = self.path_to_url(format!("satellite_bands/{id}"))?;
             self.delete(uri).await
         }
     }
@@ -273,7 +279,7 @@ pub trait Api: Send + Sync {
         id: i32,
     ) -> impl Future<Output = Result<Response, Error>> + Send {
         async move {
-            let uri = self.path_to_url(format!("satellite_configurations/{id}"));
+            let uri = self.path_to_url(format!("satellite_configurations/{id}"))?;
             self.delete(uri).await
         }
     }
@@ -293,7 +299,7 @@ pub trait Api: Send + Sync {
     /// ```
     fn delete_satellite(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
         async move {
-            let uri = self.path_to_url(format!("satellites/{id}"));
+            let uri = self.path_to_url(format!("satellites/{id}"))?;
             self.delete(uri).await
         }
     }
@@ -313,7 +319,7 @@ pub trait Api: Send + Sync {
     /// ```
     fn delete_override(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
         async move {
-            let uri = self.path_to_url(format!("overrides/{id}"));
+            let uri = self.path_to_url(format!("overrides/{id}"))?;
             self.delete(uri).await
         }
     }
@@ -333,7 +339,7 @@ pub trait Api: Send + Sync {
     /// ```
     fn delete_user(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
         async move {
-            let uri = self.path_to_url(format!("users/{id}"));
+            let uri = self.path_to_url(format!("users/{id}"))?;
             self.delete(uri).await
         }
     }
@@ -353,7 +359,7 @@ pub trait Api: Send + Sync {
     /// ```
     fn delete_task_request(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
         async move {
-            let uri = self.path_to_url(format!("requests/{id}"));
+            let uri = self.path_to_url(format!("requests/{id}"))?;
             self.delete(uri).await
         }
     }
@@ -374,15 +380,6 @@ pub trait Api: Send + Sync {
             resp.json::<T>().await.map_err(From::from)
         }
     }
-
-    /// Lower level method, not intended for direct use
-    fn post<S>(
-        &self,
-        url: Url,
-        msg: S,
-    ) -> impl Future<Output = Result<Response, Error>> + Send + Sync
-    where
-        S: serde::Serialize + Send + Sync;
 
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
@@ -405,7 +402,7 @@ pub trait Api: Send + Sync {
         account_name: &str,
     ) -> impl Future<Output = Result<Self::Container<Account>, Error>> + Send + Sync {
         async move {
-            let mut uri = self.path_to_url("accounts/search/findOneByName");
+            let mut uri = self.path_to_url("accounts/search/findOneByName")?;
             uri.set_query(Some(&format!("name={account_name}")));
             self.get_json_map(uri).await
         }
@@ -433,7 +430,7 @@ pub trait Api: Send + Sync {
     ) -> impl Future<Output = Result<Bytes, Error>> + Send + Sync {
         async move {
             let path = format!("downloads/{}/{}", task_id, file_name);
-            let uri = self.path_to_url(path);
+            let uri = self.path_to_url(path)?;
 
             let (data, status) = self.get(uri).await?;
             error_on_non_success(&status, b"Failed to fetch file")?;
@@ -450,7 +447,7 @@ pub trait Api: Send + Sync {
         account_id: i32,
     ) -> impl Future<Output = Result<Self::Container<Account>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url(format!("accounts/{account_id}"));
+            let uri = self.path_to_url(format!("accounts/{account_id}"))?;
             self.get_json_map(uri).await
         }
     }
@@ -460,7 +457,10 @@ pub trait Api: Send + Sync {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_accounts(&self) -> PaginatedStream<'_, Self::Container<Account>> {
-        let uri = self.path_to_url("accounts");
+        let uri = match self.path_to_url("accounts") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
         self.get_paginated(uri)
     }
 
@@ -469,7 +469,10 @@ pub trait Api: Send + Sync {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_satellite_bands(&self) -> PaginatedStream<'_, Self::Container<Band>> {
-        let uri = self.path_to_url("satellite_bands");
+        let uri = match self.path_to_url("satellite_bands") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
         self.get_paginated(uri)
     }
 
@@ -481,7 +484,7 @@ pub trait Api: Send + Sync {
         satellite_band_id: i32,
     ) -> impl Future<Output = Result<Self::Container<Band>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url(format!("satellite_bands/{satellite_band_id}"));
+            let uri = self.path_to_url(format!("satellite_bands/{satellite_band_id}"))?;
             self.get_json_map(uri).await
         }
     }
@@ -494,7 +497,7 @@ pub trait Api: Send + Sync {
         satellite_band_name: &str,
     ) -> impl Future<Output = Result<Self::Container<Band>, Error>> + Send + Sync {
         async move {
-            let mut uri = self.path_to_url("satellite_bands/search/findOneByName");
+            let mut uri = self.path_to_url("satellite_bands/search/findOneByName")?;
             uri.set_query(Some(&format!("name={satellite_band_name}")));
             self.get_json_map(uri).await
         }
@@ -508,7 +511,10 @@ pub trait Api: Send + Sync {
         &self,
         account_name: &str,
     ) -> PaginatedStream<'_, Self::Container<Band>> {
-        let mut uri = self.path_to_url("satellite_bands/search/findAllByAccountName");
+        let mut uri = match self.path_to_url("satellite_bands/search/findAllByAccountName") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
         uri.set_query(Some(&format!("accountName={account_name}")));
 
         self.get_paginated(uri)
@@ -523,7 +529,11 @@ pub trait Api: Send + Sync {
         &self,
         account_name: &str,
     ) -> PaginatedStream<'_, Self::Container<SatelliteConfiguration>> {
-        let mut uri = self.path_to_url("satellite_configurations/search/findAllByAccountName");
+        let mut uri = match self.path_to_url("satellite_configurations/search/findAllByAccountName")
+        {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
         uri.set_query(Some(&format!("accountName={account_name}")));
 
         self.get_paginated(uri)
@@ -536,7 +546,10 @@ pub trait Api: Send + Sync {
     fn get_satellite_configurations(
         &self,
     ) -> PaginatedStream<'_, Self::Container<SatelliteConfiguration>> {
-        let uri = self.path_to_url("satellite_configurations");
+        let uri = match self.path_to_url("satellite_configurations") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         self.get_paginated(uri)
     }
@@ -550,7 +563,7 @@ pub trait Api: Send + Sync {
         async move {
             let uri = self.path_to_url(format!(
                 "satellite_configurations/{satellite_configuration_id}"
-            ));
+            ))?;
 
             self.get_json_map(uri).await
         }
@@ -563,7 +576,7 @@ pub trait Api: Send + Sync {
     ) -> impl Future<Output = Result<Self::Container<SatelliteConfiguration>, Error>> + Send + Sync
     {
         async move {
-            let mut uri = self.path_to_url("satellite_configurations/search/findOneByName");
+            let mut uri = self.path_to_url("satellite_configurations/search/findOneByName")?;
             uri.set_query(Some(&format!("name={satellite_configuration_name}")));
 
             self.get_json_map(uri).await
@@ -575,7 +588,10 @@ pub trait Api: Send + Sync {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_sites(&self) -> PaginatedStream<'_, Self::Container<Site>> {
-        let uri = self.path_to_url("sites");
+        let uri = match self.path_to_url("sites") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
         self.get_paginated(uri)
     }
 
@@ -587,7 +603,7 @@ pub trait Api: Send + Sync {
         id: i32,
     ) -> impl Future<Output = Result<Self::Container<Site>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url(format!("sites/{id}"));
+            let uri = self.path_to_url(format!("sites/{id}"))?;
             self.get_json_map(uri).await
         }
     }
@@ -600,7 +616,7 @@ pub trait Api: Send + Sync {
         name: impl AsRef<str> + Send + Sync,
     ) -> impl Future<Output = Result<Self::Container<Site>, Error>> + Send + Sync {
         async move {
-            let mut uri = self.path_to_url("sites/search/findOneByName");
+            let mut uri = self.path_to_url("sites/search/findOneByName")?;
             let query = format!("name={}", name.as_ref());
             uri.set_query(Some(&query));
 
@@ -616,7 +632,7 @@ pub trait Api: Send + Sync {
         task_request_id: i32,
     ) -> impl Future<Output = Result<Self::Container<TaskRequest>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url(format!("requests/{task_request_id}"));
+            let uri = self.path_to_url(format!("requests/{task_request_id}"))?;
 
             self.get_json_map(uri).await
         }
@@ -628,7 +644,10 @@ pub trait Api: Send + Sync {
     /// and return type
     fn get_requests(&self) -> PaginatedStream<'_, Self::Container<TaskRequest>> {
         {
-            let uri = self.path_to_url("requests/search/findAll");
+            let uri = match self.path_to_url("requests/search/findAll") {
+                Ok(uri) => uri,
+                Err(err) => return err.once_err(),
+            };
             self.get_paginated(uri)
         }
     }
@@ -641,7 +660,7 @@ pub trait Api: Send + Sync {
         end: OffsetDateTime,
     ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send + Sync {
         async move {
-            let mut uri = self.path_to_url("requests/search/findAllByTargetDateBetween");
+            let mut uri = self.path_to_url("requests/search/findAllByTargetDateBetween")?;
 
             uri.set_query(Some(&format!(
                 "start={}&end={}",
@@ -668,13 +687,27 @@ pub trait Api: Send + Sync {
     where
         T: AsRef<str> + Send + Sync,
     {
-        let mut uri = self.path_to_url("requests/search/findAllByAccountAndTargetDateBetween");
+        let start = match start.format(&Iso8601::DEFAULT).map_err(Error::from) {
+            Ok(start) => start,
+            Err(error) => return error.once_err(),
+        };
+
+        let end = match end.format(&Iso8601::DEFAULT).map_err(Error::from) {
+            Ok(end) => end,
+            Err(error) => return error.once_err(),
+        };
+
+        let mut uri = match self.path_to_url("requests/search/findAllByAccountAndTargetDateBetween")
+        {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         uri.set_query(Some(&format!(
             "account={}&start={}&end={}",
             account_uri.as_ref(),
-            start.format(&Iso8601::DEFAULT).unwrap(),
-            end.format(&Iso8601::DEFAULT).unwrap(),
+            start,
+            end
         )));
 
         self.get_paginated(uri)
@@ -688,7 +721,10 @@ pub trait Api: Send + Sync {
     fn get_requests_by_account_and_upcoming_today(
         &self,
     ) -> PaginatedStream<'_, Self::Container<TaskRequest>> {
-        let uri = self.path_to_url("requests/search/findByAccountUpcomingToday");
+        let uri = match self.path_to_url("requests/search/findByAccountUpcomingToday") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         self.get_paginated(uri)
     }
@@ -709,7 +745,11 @@ pub trait Api: Send + Sync {
     where
         T: AsRef<str> + Send + Sync,
     {
-        let mut uri = self.path_to_url("requests/search/findAllByConfigurationOrderByCreatedAsc");
+        let mut uri =
+            match self.path_to_url("requests/search/findAllByConfigurationOrderByCreatedAsc") {
+                Ok(uri) => uri,
+                Err(err) => return err.once_err(),
+            };
 
         uri.set_query(Some(&format!(
             "configuration={}",
@@ -740,7 +780,7 @@ pub trait Api: Send + Sync {
             let satellites_string = crate::utils::list_to_string(satellites);
             let mut uri = self.path_to_url(
                 "requests/search/findAllByConfigurationAndSatelliteNamesAndTargetDateBetween",
-            );
+            )?;
 
             uri.set_query(Some(&format!(
                 "configuration={}&satelliteNames={}&start={}&end={}",
@@ -774,7 +814,7 @@ pub trait Api: Send + Sync {
     {
         async move {
             let mut uri =
-                self.path_to_url("requests/search/findAllByConfigurationAndTargetDateBetween");
+                self.path_to_url("requests/search/findAllByConfigurationAndTargetDateBetween")?;
             uri.set_query(Some(&format!(
                 "configuration={}&start={}&end={}",
                 configuration_uri.as_ref(),
@@ -804,7 +844,7 @@ pub trait Api: Send + Sync {
     {
         async move {
             let ids_string = crate::utils::list_to_string(ids);
-            let mut uri = self.path_to_url("requests/search/findAllByIds");
+            let mut uri = self.path_to_url("requests/search/findAllByIds")?;
 
             uri.set_query(Some(&format!("ids={}", ids_string)));
 
@@ -825,7 +865,10 @@ pub trait Api: Send + Sync {
         start: OffsetDateTime,
         end: OffsetDateTime,
     ) -> PaginatedStream<'_, Self::Container<TaskRequest>> {
-        let mut uri = self.path_to_url("requests/search/findAllByOverlappingPublic");
+        let mut uri = match self.path_to_url("requests/search/findAllByOverlappingPublic") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         uri.set_query(Some(&format!(
             "start={}&end={}",
@@ -848,7 +891,10 @@ pub trait Api: Send + Sync {
     where
         T: AsRef<str> + Send + Sync,
     {
-        let mut uri = self.path_to_url("requests/search/findBySatelliteName");
+        let mut uri = match self.path_to_url("requests/search/findBySatelliteName") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         uri.set_query(Some(&format!("name={}", satellite_name.as_ref())));
 
@@ -871,7 +917,7 @@ pub trait Api: Send + Sync {
     {
         async move {
             let mut uri =
-                self.path_to_url("requests/search/findAllBySatelliteNameAndTargetDateBetween");
+                self.path_to_url("requests/search/findAllBySatelliteNameAndTargetDateBetween")?;
 
             uri.set_query(Some(&format!(
                 "name={}&start={}&end={}",
@@ -895,17 +941,23 @@ pub trait Api: Send + Sync {
     fn get_requests_by_status<T>(
         &self,
         status: T,
-    ) -> Result<PaginatedStream<'_, Self::Container<TaskRequest>>, Error>
+    ) -> PaginatedStream<'_, Self::Container<TaskRequest>>
     where
         T: TryInto<TaskStatusType> + Send + Sync,
         Error: From<<T as TryInto<TaskStatusType>>::Error>,
     {
-        let status: TaskStatusType = status.try_into()?;
-        let mut uri = self.path_to_url("requests/search/findByStatus");
+        let status: TaskStatusType = match status.try_into() {
+            Ok(val) => val,
+            Err(err) => return Error::from(err).once_err(),
+        };
+        let mut uri = match self.path_to_url("requests/search/findByStatus") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         uri.set_query(Some(&format!("status={}", status.as_ref())));
 
-        Ok(self.get_paginated(uri))
+        self.get_paginated(uri)
     }
 
     /// Produces a paginated stream of [`TaskRequest`], representing all the task requests which
@@ -924,8 +976,12 @@ pub trait Api: Send + Sync {
         T: AsRef<str> + Send + Sync,
         U: AsRef<str> + Send + Sync,
     {
-        let mut uri =
-            self.path_to_url("requests/search/findAllByStatusAndAccountAndTargetDateBetween");
+        let mut uri = match self
+            .path_to_url("requests/search/findAllByStatusAndAccountAndTargetDateBetween")
+        {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         uri.set_query(Some(&format!(
             "status={}&satelliteNames={}&start={}&end={}",
@@ -954,7 +1010,7 @@ pub trait Api: Send + Sync {
     {
         async move {
             let typ: TaskType = typ.try_into()?;
-            let mut uri = self.path_to_url("requests/search/findAllByTypeAndTargetDateBetween");
+            let mut uri = self.path_to_url("requests/search/findAllByTypeAndTargetDateBetween")?;
 
             uri.set_query(Some(&format!(
                 "type={}&start={}&end={}",
@@ -978,7 +1034,7 @@ pub trait Api: Send + Sync {
         &self,
     ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url("requests/search/findAllPassedToday");
+            let uri = self.path_to_url("requests/search/findAllPassedToday")?;
 
             Ok(self
                 .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
@@ -995,7 +1051,7 @@ pub trait Api: Send + Sync {
         &self,
     ) -> impl Future<Output = Result<Self::Container<Vec<TaskRequest>>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url("requests/search/findAllUpcomingToday");
+            let uri = self.path_to_url("requests/search/findAllUpcomingToday")?;
 
             Ok(self
                 .get_json_map::<Embedded<Self::Container<Vec<TaskRequest>>>>(uri)
@@ -1009,7 +1065,10 @@ pub trait Api: Send + Sync {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_satellites(&self) -> PaginatedStream<'_, Self::Container<Satellite>> {
-        let uri = self.path_to_url("satellites");
+        let uri = match self.path_to_url("satellites") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         self.get_paginated(uri)
     }
@@ -1020,7 +1079,7 @@ pub trait Api: Send + Sync {
         satellite_id: i32,
     ) -> impl Future<Output = Result<Self::Container<Satellite>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url(format!("satellites/{}", satellite_id));
+            let uri = self.path_to_url(format!("satellites/{}", satellite_id))?;
 
             self.get_json_map(uri).await
         }
@@ -1032,7 +1091,7 @@ pub trait Api: Send + Sync {
         satellite_name: &str,
     ) -> impl Future<Output = Result<Self::Container<Satellite>, Error>> + Send + Sync {
         async move {
-            let mut uri = self.path_to_url("satellites/findOneByName");
+            let mut uri = self.path_to_url("satellites/findOneByName")?;
             uri.set_query(Some(&format!("name={satellite_name}")));
 
             self.get_json_map(uri).await
@@ -1047,7 +1106,7 @@ pub trait Api: Send + Sync {
         task_id: i32,
     ) -> impl Future<Output = Result<Self::Container<Task>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url(format!("tasks/{}", task_id));
+            let uri = self.path_to_url(format!("tasks/{}", task_id))?;
 
             self.get_json_map(uri).await
         }
@@ -1067,7 +1126,7 @@ pub trait Api: Send + Sync {
         T: AsRef<str> + Send + Sync,
     {
         async move {
-            let mut uri = self.path_to_url("tasks/search/findByAccountAndPassOverlapping");
+            let mut uri = self.path_to_url("tasks/search/findByAccountAndPassOverlapping")?;
 
             uri.set_query(Some(&format!(
                 "account={}&start={}&end={}",
@@ -1103,7 +1162,7 @@ pub trait Api: Send + Sync {
         async move {
             let mut uri = self.path_to_url(
                 "tasks/search/findByAccountAndSiteConfigurationAndBandAndPassOverlapping",
-            );
+            )?;
 
             uri.set_query(Some(&format!(
                 "account={}&satellite={}&band={}&start={}&end={}",
@@ -1141,7 +1200,7 @@ pub trait Api: Send + Sync {
         async move {
             let mut uri = self.path_to_url(
                 "tasks/search/findByAccountAndSiteConfigurationAndBandAndPassOverlapping",
-            );
+            )?;
 
             uri.set_query(Some(&format!(
                 "account={}&siteConfig={}&band={}&start={}&end={}",
@@ -1174,7 +1233,7 @@ pub trait Api: Send + Sync {
         end: OffsetDateTime,
     ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send + Sync {
         async move {
-            let mut uri = self.path_to_url("tasks/search/findByStartBetweenOrderByStartAsc");
+            let mut uri = self.path_to_url("tasks/search/findByStartBetweenOrderByStartAsc")?;
 
             uri.set_query(Some(&format!(
                 "start={}&end={}",
@@ -1213,7 +1272,10 @@ pub trait Api: Send + Sync {
             Err(error) => return error.once_err(),
         };
 
-        let mut uri = self.path_to_url("tasks/search/findByOverlapping");
+        let mut uri = match self.path_to_url("tasks/search/findByOverlapping") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
 
         uri.set_query(Some(&format!("start={}&end={}", start, end)));
 
@@ -1228,7 +1290,7 @@ pub trait Api: Send + Sync {
         &self,
     ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url("tasks/search/findAllPassedToday");
+            let uri = self.path_to_url("tasks/search/findAllPassedToday")?;
 
             Ok(self
                 .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
@@ -1245,7 +1307,7 @@ pub trait Api: Send + Sync {
         &self,
     ) -> impl Future<Output = Result<Self::Container<Vec<Task>>, Error>> + Send + Sync {
         async move {
-            let uri = self.path_to_url("tasks/search/findAllUpcomingToday");
+            let uri = self.path_to_url("tasks/search/findAllUpcomingToday")?;
 
             Ok(self
                 .get_json_map::<Embedded<Self::Container<Vec<Task>>>>(uri)
@@ -1259,7 +1321,10 @@ pub trait Api: Send + Sync {
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
     /// and return type
     fn get_users(&self) -> PaginatedStream<'_, Self::Container<User>> {
-        let uri = self.path_to_url("users");
+        let uri = match self.path_to_url("users") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
         self.get_paginated(uri)
     }
 
@@ -1456,7 +1521,7 @@ pub trait Api: Send + Sync {
         site_configuration_id: u32,
     ) -> impl Future<Output = Result<String, Error>> + Send + Sync {
         async move {
-            let url = self.path_to_url("fps");
+            let url = self.path_to_url("fps")?;
             let payload = serde_json::json!({
                 "band": format!("/api/satellite_bands/{}", band_id),
                 "configuration": format!("/api/configurations/{}", site_configuration_id),
@@ -1497,7 +1562,7 @@ pub trait Api: Send + Sync {
         satellite_id: u32,
     ) -> impl Future<Output = Result<String, Error>> + Send + Sync {
         async move {
-            let url = self.path_to_url("fps");
+            let url = self.path_to_url("fps")?;
             let payload = serde_json::json!({
                 "band": format!("/api/satellite_bands/{}", band_id),
                 "satellite": format!("/api/satellites/{}", satellite_id),

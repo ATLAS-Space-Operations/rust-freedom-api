@@ -171,7 +171,7 @@ where
     pub async fn send(self) -> Result<Response, Error> {
         let client = self.client;
 
-        let url = client.path_to_url("satellite_bands");
+        let url = client.path_to_url("satellite_bands")?;
         client.post(url, self.state).await
     }
 }

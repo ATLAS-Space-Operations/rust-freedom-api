@@ -80,6 +80,14 @@ impl Client {
 impl Api for Client {
     type Container<T: Value> = Inner<T>;
 
+    fn config(&self) -> &Config {
+        &self.config
+    }
+
+    fn config_mut(&mut self) -> &mut Config {
+        &mut self.config
+    }
+
     async fn get(&self, url: Url) -> Result<(Bytes, StatusCode), crate::error::Error> {
         tracing::trace!("GET to {}", url);
 
@@ -128,14 +136,6 @@ impl Api for Client {
             .inspect_err(|error| tracing::warn!(%error, %url, "Failed to POST"))
             .inspect(|ok| tracing::warn!(?ok, %url, "Received response"))
             .map_err(From::from)
-    }
-
-    fn config(&self) -> &Config {
-        &self.config
-    }
-
-    fn config_mut(&mut self) -> &mut Config {
-        &mut self.config
     }
 }
 

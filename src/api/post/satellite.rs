@@ -3,13 +3,23 @@ use serde::Serialize;
 
 use crate::{api::Api, error::Error};
 
+use super::UrlResult;
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Satellite {
+struct SatelliteInner {
     name: String,
     description: Option<String>,
     norad_cat_id: u32,
     configuration: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Satellite {
+    name: String,
+    description: Option<String>,
+    norad_cat_id: u32,
+    configuration: UrlResult,
 }
 
 pub fn new<C>(client: &C) -> SatelliteBuilder<'_, C, NoName> {
@@ -40,17 +50,21 @@ pub struct NoConfig {
 }
 
 impl<'a, C> SatelliteBuilder<'a, C, NoConfig> {
-    pub fn satellite_configuration_url(
-        self,
-        url: impl Into<String>,
-    ) -> SatelliteBuilder<'a, C, NoNorad> {
+    fn satellite_configuration_result(self, url: UrlResult) -> SatelliteBuilder<'a, C, NoNorad> {
         SatelliteBuilder {
             client: self.client,
             state: NoNorad {
                 name: self.state.name,
-                configuration: url.into(),
+                configuration: url,
             },
         }
+    }
+
+    pub fn satellite_configuration_url(
+        self,
+        url: impl Into<String>,
+    ) -> SatelliteBuilder<'a, C, NoNorad> {
+        self.satellite_configuration_result(UrlResult::Checked(url.into()))
     }
 }
 
@@ -64,16 +78,15 @@ where
     ) -> SatelliteBuilder<'a, C, NoNorad> {
         let configuration = self
             .client
-            .path_to_url(format!("satellite_configurations/{}", id.into()))
-            .to_string();
+            .path_to_url(format!("satellite_configurations/{}", id.into()));
 
-        self.satellite_configuration_url(configuration)
+        self.satellite_configuration_result(UrlResult::Unchecked(configuration))
     }
 }
 
 pub struct NoNorad {
     name: String,
-    configuration: String,
+    configuration: UrlResult,
 }
 
 impl<'a, C> SatelliteBuilder<'a, C, NoNorad> {
@@ -106,7 +119,14 @@ where
     pub async fn send(self) -> Result<Response, Error> {
         let client = self.client;
 
-        let url = client.path_to_url("satellites");
-        client.post(url, self.state).await
+        let url = client.path_to_url("satellites")?;
+        let dto = SatelliteInner {
+            name: self.state.name,
+            description: self.state.description,
+            norad_cat_id: self.state.norad_cat_id,
+            configuration: self.state.configuration.try_convert()?,
+        };
+
+        client.post(url, dto).await
     }
 }

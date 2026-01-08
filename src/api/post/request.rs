@@ -5,9 +5,26 @@ use time::OffsetDateTime;
 
 use crate::{api::Api, error::Error};
 
+use super::UrlResult;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TaskRequest {
+    typ: TaskType,
+    site: UrlResult,
+    satellite: UrlResult,
+    configuration: UrlResult,
+    target_bands: Vec<UrlResult>,
+    target_date: String,
+    duration: u64,
+    minimum_duration: Option<u64>,
+    hours_of_flex: Option<u8>,
+    test_file: Option<String>,
+    with_override: Option<UrlResult>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TaskRequest {
+struct TaskRequestInner {
     #[serde(rename(serialize = "type"))]
     typ: TaskType,
     site: String,
@@ -186,12 +203,17 @@ where
     C: Api,
 {
     pub fn satellite_id(self, id: impl Into<i32>) -> TaskRequestBuilder<'a, C, NoSite<T>> {
-        let satellite = self
-            .client
-            .path_to_url(format!("satellites/{}", id.into()))
-            .to_string();
+        let satellite = self.client.path_to_url(format!("satellites/{}", id.into()));
 
-        self.satellite_url(satellite)
+        TaskRequestBuilder {
+            client: self.client,
+            state: NoSite {
+                kind: self.state.kind,
+                time: self.state.time,
+                duration: self.state.duration,
+                satellite: UrlResult::Unchecked(satellite),
+            },
+        }
     }
 }
 
@@ -203,7 +225,7 @@ impl<'a, C, T> TaskRequestBuilder<'a, C, NoSatellite<T>> {
                 kind: self.state.kind,
                 time: self.state.time,
                 duration: self.state.duration,
-                satellite: url.into(),
+                satellite: UrlResult::Checked(url.into()),
             },
         }
     }
@@ -213,7 +235,7 @@ pub struct NoSite<T> {
     kind: T,
     time: OffsetDateTime,
     duration: u64,
-    satellite: String,
+    satellite: UrlResult,
 }
 
 impl<'a, C, T> TaskRequestBuilder<'a, C, NoSite<T>>
@@ -221,12 +243,18 @@ where
     C: Api,
 {
     pub fn site_id(self, id: impl Into<i32>) -> TaskRequestBuilder<'a, C, NoConfig<T>> {
-        let site = self
-            .client
-            .path_to_url(format!("sites/{}", id.into()))
-            .to_string();
+        let site = self.client.path_to_url(format!("sites/{}", id.into()));
 
-        self.site_url(site)
+        TaskRequestBuilder {
+            client: self.client,
+            state: NoConfig {
+                kind: self.state.kind,
+                time: self.state.time,
+                duration: self.state.duration,
+                satellite: self.state.satellite,
+                site: UrlResult::Unchecked(site),
+            },
+        }
     }
 }
 
@@ -239,7 +267,7 @@ impl<'a, C, T> TaskRequestBuilder<'a, C, NoSite<T>> {
                 time: self.state.time,
                 duration: self.state.duration,
                 satellite: self.state.satellite,
-                site: url.into(),
+                site: UrlResult::Checked(url.into()),
             },
         }
     }
@@ -249,8 +277,8 @@ pub struct NoConfig<T> {
     kind: T,
     time: OffsetDateTime,
     duration: u64,
-    satellite: String,
-    site: String,
+    satellite: UrlResult,
+    site: UrlResult,
 }
 
 impl<'a, C, T> TaskRequestBuilder<'a, C, NoConfig<T>>
@@ -260,10 +288,19 @@ where
     pub fn site_configuration_id(self, id: impl Into<i32>) -> TaskRequestBuilder<'a, C, NoBand<T>> {
         let configuration = self
             .client
-            .path_to_url(format!("configurations/{}", id.into()))
-            .to_string();
+            .path_to_url(format!("configurations/{}", id.into()));
 
-        self.site_configuration_url(configuration)
+        TaskRequestBuilder {
+            client: self.client,
+            state: NoBand {
+                kind: self.state.kind,
+                time: self.state.time,
+                duration: self.state.duration,
+                satellite: self.state.satellite,
+                site: self.state.site,
+                configuration: UrlResult::Unchecked(configuration),
+            },
+        }
     }
 }
 
@@ -280,7 +317,7 @@ impl<'a, C, T> TaskRequestBuilder<'a, C, NoConfig<T>> {
                 duration: self.state.duration,
                 satellite: self.state.satellite,
                 site: self.state.site,
-                configuration: url.into(),
+                configuration: UrlResult::Checked(url.into()),
             },
         }
     }
@@ -290,9 +327,9 @@ pub struct NoBand<T> {
     kind: T,
     time: OffsetDateTime,
     duration: u64,
-    satellite: String,
-    site: String,
-    configuration: String,
+    satellite: UrlResult,
+    site: UrlResult,
+    configuration: UrlResult,
 }
 
 impl<'a, C, T> TaskRequestBuilder<'a, C, NoBand<T>>
@@ -307,18 +344,24 @@ where
         C: Api,
     {
         let client = self.client;
-        let bands = ids.into_iter().map(|id| {
-            client
-                .path_to_url(format!("satellite_bands/{}", id))
-                .to_string()
-        });
+        let bands = ids
+            .into_iter()
+            .map(|id| UrlResult::Unchecked(client.path_to_url(format!("satellite_bands/{}", id))));
 
-        self.band_urls(bands)
+        self.band_results(bands)
     }
 
     pub fn band_urls(
-        mut self,
+        self,
         urls: impl IntoIterator<Item = String>,
+    ) -> TaskRequestBuilder<'a, C, TaskRequest> {
+        let target_bands: Vec<_> = urls.into_iter().map(UrlResult::Checked).collect();
+        self.band_results(target_bands)
+    }
+
+    fn band_results(
+        mut self,
+        urls: impl IntoIterator<Item = UrlResult>,
     ) -> TaskRequestBuilder<'a, C, TaskRequest> {
         use time::macros::format_description;
         let item = format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]Z");
@@ -355,9 +398,13 @@ impl<C> TaskRequestBuilder<'_, C, TaskRequest> {
         self
     }
 
-    pub fn override_url(mut self, url: impl Into<String>) -> Self {
-        self.state.with_override = Some(url.into());
+    fn override_result(mut self, url: UrlResult) -> Self {
+        self.state.with_override = Some(url);
         self
+    }
+
+    pub fn override_url(self, url: impl Into<String>) -> Self {
+        self.override_result(UrlResult::Checked(url.into()))
     }
 }
 
@@ -366,18 +413,40 @@ where
     C: Api,
 {
     pub fn override_id(self, id: impl Into<i32>) -> Self {
-        let override_url = self
-            .client
-            .path_to_url(format!("overrides/{}", id.into()))
-            .to_string();
+        let override_url = self.client.path_to_url(format!("overrides/{}", id.into()));
 
-        self.override_url(override_url)
+        self.override_result(UrlResult::Unchecked(override_url))
     }
 
     pub async fn send(self) -> Result<Response, Error> {
         let client = self.client;
 
-        let url = client.path_to_url("requests");
-        client.post(url, self.state).await
+        let url = client.path_to_url("requests")?;
+
+        let mut target_bands = Vec::new();
+        for result in self.state.target_bands {
+            let url = result.try_convert()?;
+            target_bands.push(url);
+        }
+        let with_override = match self.state.with_override {
+            Some(url) => Some(url.try_convert()?),
+            None => None,
+        };
+
+        let dto = TaskRequestInner {
+            typ: self.state.typ,
+            site: self.state.site.try_convert()?,
+            satellite: self.state.satellite.try_convert()?,
+            configuration: self.state.configuration.try_convert()?,
+            target_bands,
+            target_date: self.state.target_date,
+            duration: self.state.duration,
+            minimum_duration: self.state.minimum_duration,
+            hours_of_flex: self.state.hours_of_flex,
+            test_file: self.state.test_file,
+            with_override,
+        };
+
+        client.post(url, dto).await
     }
 }
