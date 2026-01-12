@@ -16,7 +16,7 @@ use freedom_models::{
     pagination::Paginated,
     satellite::Satellite,
     satellite_configuration::SatelliteConfiguration,
-    site::Site,
+    site::{Site, SiteConfiguration},
     task::{Task, TaskRequest, TaskStatusType, TaskType},
     user::User,
     utils::Embedded,
@@ -617,6 +617,47 @@ pub trait Api: Send + Sync {
     ) -> impl Future<Output = Result<Self::Container<Site>, Error>> + Send + Sync {
         async move {
             let mut uri = self.path_to_url("sites/search/findOneByName")?;
+            let query = format!("name={}", name.as_ref());
+            uri.set_query(Some(&query));
+
+            self.get_json_map(uri).await
+        }
+    }
+
+    /// Produces a paginated stream of [`SiteConfiguration`] objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_site_configurations(&self) -> PaginatedStream<'_, Self::Container<SiteConfiguration>> {
+        let uri = match self.path_to_url("configurations") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
+        self.get_paginated(uri)
+    }
+
+    /// Produces a single [`SiteConfiguration`] object matching the provided ID.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    fn get_site_configuration_by_id(
+        &self,
+        id: i32,
+    ) -> impl Future<Output = Result<Self::Container<SiteConfiguration>, Error>> + Send + Sync {
+        async move {
+            let uri = self.path_to_url(format!("configurations/{id}"))?;
+            self.get_json_map(uri).await
+        }
+    }
+
+    /// Produces a single [`SiteConfiguration`] object matching the provided name.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    fn get_site_configuration_by_name(
+        &self,
+        name: impl AsRef<str> + Send + Sync,
+    ) -> impl Future<Output = Result<Self::Container<SiteConfiguration>, Error>> + Send + Sync {
+        async move {
+            let mut uri = self.path_to_url("configurations/search/findOneByName")?;
             let query = format!("name={}", name.as_ref());
             uri.set_query(Some(&query));
 
