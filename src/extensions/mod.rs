@@ -24,7 +24,7 @@ pub use {
     account::AccountExt,
     band::BandExt,
     request::TaskRequestExt,
-    satellite::SatelliteExt,
+    satellite::{SatelliteConfigurationExt, SatelliteExt},
     site::{SiteConfigurationExt, SiteExt},
     task::TaskExt,
     user::UserExt,
