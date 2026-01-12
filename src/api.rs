@@ -664,8 +664,8 @@ pub trait Api: Send + Sync {
 
             uri.set_query(Some(&format!(
                 "start={}&end={}",
-                start.format(&Iso8601::DEFAULT).unwrap(),
-                end.format(&Iso8601::DEFAULT).unwrap(),
+                start.format(&Iso8601::DEFAULT)?,
+                end.format(&Iso8601::DEFAULT)?,
             )));
 
             self.get_json_map(uri).await
