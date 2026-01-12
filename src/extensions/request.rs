@@ -12,10 +12,7 @@ use freedom_models::{
 pub trait TaskRequestExt {
     fn get_id(&self) -> Result<i32, Error>;
 
-    fn get_task<C>(
-        &self,
-        client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<Task>, Error>> + Send + Sync
+    fn get_task<C>(&self, client: &C) -> impl Future<Output = Result<Task, Error>> + Send + Sync
     where
         C: Api;
 
@@ -26,7 +23,7 @@ pub trait TaskRequestExt {
     fn get_target_bands<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<Band>>, Error>> + Send + Sync
+    ) -> impl Future<Output = Result<Vec<Band>, Error>> + Send + Sync
     where
         C: Api;
 
@@ -54,7 +51,7 @@ impl TaskRequestExt for TaskRequest {
         super::get_id("self", &self.links)
     }
 
-    async fn get_task<C>(&self, client: &C) -> Result<<C as Api>::Container<Task>, Error>
+    async fn get_task<C>(&self, client: &C) -> Result<Task, Error>
     where
         C: Api,
     {
@@ -68,10 +65,7 @@ impl TaskRequestExt for TaskRequest {
         super::get_content("site", &self.links, client).await
     }
 
-    async fn get_target_bands<C>(
-        &self,
-        client: &C,
-    ) -> Result<<C as Api>::Container<Vec<Band>>, Error>
+    async fn get_target_bands<C>(&self, client: &C) -> Result<Vec<Band>, Error>
     where
         C: Api,
     {

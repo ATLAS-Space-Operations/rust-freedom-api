@@ -61,22 +61,18 @@ where
     client.get_json_map(uri).await
 }
 
-// TODO: There are BOTH "_embedded" and "content" wrapping maps. However the former contains the
-// links within the map, the later contains the links on the outside of the map. We need to treat
-// these differently.
 async fn get_embedded<T, C>(
     reference: &'static str,
     links: &HashMap<String, url::Url>,
     client: &C,
-) -> Result<<C as Api>::Container<T>, error::Error>
+) -> Result<T, error::Error>
 where
     C: Api,
     T: Value,
 {
     use freedom_models::utils::Embedded;
 
-    let wrapped =
-        get_item::<Embedded<<C as Api>::Container<T>>, C>(reference, links, client).await?;
+    let wrapped = get_item::<Embedded<T>, C>(reference, links, client).await?;
 
     Ok(wrapped.items)
 }

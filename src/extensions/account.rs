@@ -9,14 +9,14 @@ pub trait AccountExt {
     fn get_users<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<User>>, Error>> + Send + Sync
+    ) -> impl Future<Output = Result<Vec<User>, Error>> + Send + Sync
     where
         C: Api;
 
     fn get_satellites<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<Vec<Satellite>>, Error>> + Send + Sync
+    ) -> impl Future<Output = Result<Vec<Satellite>, Error>> + Send + Sync
     where
         C: Api;
 }
@@ -26,17 +26,14 @@ impl AccountExt for Account {
         super::get_id("self", &self.links)
     }
 
-    async fn get_users<C>(&self, client: &C) -> Result<<C as Api>::Container<Vec<User>>, Error>
+    async fn get_users<C>(&self, client: &C) -> Result<Vec<User>, Error>
     where
         C: Api,
     {
         super::get_item("users", &self.links, client).await
     }
 
-    async fn get_satellites<C>(
-        &self,
-        client: &C,
-    ) -> Result<<C as Api>::Container<Vec<Satellite>>, Error>
+    async fn get_satellites<C>(&self, client: &C) -> Result<Vec<Satellite>, Error>
     where
         C: Api,
     {

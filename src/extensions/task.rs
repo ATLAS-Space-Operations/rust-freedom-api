@@ -13,21 +13,18 @@ pub trait TaskExt {
     fn get_task_request<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<TaskRequest>, Error>> + Send + Sync
+    ) -> impl Future<Output = Result<TaskRequest, Error>> + Send + Sync
     where
         C: Api;
 
     fn get_config<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<SiteConfiguration>, Error>> + Send + Sync
+    ) -> impl Future<Output = Result<SiteConfiguration, Error>> + Send + Sync
     where
         C: Api;
 
-    fn get_azel<C>(
-        &self,
-        client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<AzEl>, Error>> + Send + Sync
+    fn get_azel<C>(&self, client: &C) -> impl Future<Output = Result<AzEl, Error>> + Send + Sync
     where
         C: Api;
 }
@@ -37,27 +34,21 @@ impl TaskExt for Task {
         super::get_id("self", &self.links)
     }
 
-    async fn get_task_request<C>(
-        &self,
-        client: &C,
-    ) -> Result<<C as Api>::Container<TaskRequest>, Error>
+    async fn get_task_request<C>(&self, client: &C) -> Result<TaskRequest, Error>
     where
         C: Api,
     {
         super::get_item("taskRequest", &self.links, client).await
     }
 
-    async fn get_config<C>(
-        &self,
-        client: &C,
-    ) -> Result<<C as Api>::Container<SiteConfiguration>, Error>
+    async fn get_config<C>(&self, client: &C) -> Result<SiteConfiguration, Error>
     where
         C: Api,
     {
         super::get_item("config", &self.links, client).await
     }
 
-    async fn get_azel<C>(&self, client: &C) -> Result<<C as Api>::Container<AzEl>, Error>
+    async fn get_azel<C>(&self, client: &C) -> Result<AzEl, Error>
     where
         C: Api,
     {
