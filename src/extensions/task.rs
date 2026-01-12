@@ -13,23 +13,23 @@ pub trait TaskExt {
     fn get_task_request<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<TaskRequest>, Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<TaskRequest>, Error>> + Send + Sync
     where
-        C: Api + Send;
+        C: Api;
 
     fn get_config<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<SiteConfiguration>, Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<SiteConfiguration>, Error>> + Send + Sync
     where
-        C: Api + Send;
+        C: Api;
 
     fn get_azel<C>(
         &self,
         client: &C,
-    ) -> impl Future<Output = Result<<C as Api>::Container<AzEl>, Error>> + Send
+    ) -> impl Future<Output = Result<<C as Api>::Container<AzEl>, Error>> + Send + Sync
     where
-        C: Api + Send;
+        C: Api;
 }
 
 impl TaskExt for Task {
@@ -52,14 +52,14 @@ impl TaskExt for Task {
         client: &C,
     ) -> Result<<C as Api>::Container<SiteConfiguration>, Error>
     where
-        C: Api + Send + Sync,
+        C: Api,
     {
         super::get_item("config", &self.links, client).await
     }
 
     async fn get_azel<C>(&self, client: &C) -> Result<<C as Api>::Container<AzEl>, Error>
     where
-        C: Api + Send + Sync,
+        C: Api,
     {
         super::get_item("azel", &self.links, client).await
     }

@@ -6,9 +6,12 @@ use freedom_models::{account::Account, user::User};
 pub trait UserExt {
     fn get_id(&self) -> Result<i32, Error>;
 
-    fn get_account<C>(&self, client: &C) -> impl Future<Output = Result<Account, Error>> + Send
+    fn get_account<C>(
+        &self,
+        client: &C,
+    ) -> impl Future<Output = Result<Account, Error>> + Send + Sync
     where
-        C: Api + Send;
+        C: Api;
 }
 
 impl UserExt for User {
@@ -18,7 +21,7 @@ impl UserExt for User {
 
     async fn get_account<C>(&self, client: &C) -> Result<Account, Error>
     where
-        C: Api + Send,
+        C: Api,
     {
         super::get_content("account", &self.links, client).await
     }
