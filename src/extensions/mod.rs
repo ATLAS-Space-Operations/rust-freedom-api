@@ -6,6 +6,12 @@
 //! These are implemented as traits to allow the `freedom_models` crate to remain extremely thin,
 //! so that when it is ingested by other crates which do not require this functionality, it does
 //! not contribute to the dependency graph.
+//!
+//! ## Container
+//!
+//! Unlike the objects fetched directly from the API, objects fetched through a parent are not
+//! wrapped in the Container<T> type. This is deliberate as certain objects are nested deeply and
+//! muddy the API when wrapping.
 
 use std::collections::HashMap;
 
