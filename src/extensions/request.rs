@@ -27,7 +27,7 @@ pub trait TaskRequestExt {
     where
         C: Api;
 
-    fn get_config<C>(
+    fn get_site_configuration<C>(
         &self,
         client: &C,
     ) -> impl Future<Output = Result<SiteConfiguration, Error>> + Send + Sync
@@ -72,7 +72,7 @@ impl TaskRequestExt for TaskRequest {
         super::get_embedded("targetBands", &self.links, client).await
     }
 
-    async fn get_config<C>(&self, client: &C) -> Result<SiteConfiguration, Error>
+    async fn get_site_configuration<C>(&self, client: &C) -> Result<SiteConfiguration, Error>
     where
         C: Api,
     {
