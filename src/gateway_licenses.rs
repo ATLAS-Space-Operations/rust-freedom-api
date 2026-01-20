@@ -25,9 +25,12 @@ pub trait GatewayApi: Api {
 
     fn verify_gateway_license(
         &self,
-        request: gateway_licenses::Verify,
+        license_key: &str,
     ) -> impl Future<Output = Result<gateway_licenses::VerifyResponse, Error>> + Send + Sync {
         async move {
+            let request = gateway_licenses::Verify {
+                license_key: license_key.to_string(),
+            };
             let uri = self.path_to_url("gateway-licenses/verify")?;
             self.post_deserialize(uri, request).await
         }
