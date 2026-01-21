@@ -3,7 +3,7 @@ use std::sync::Arc;
 use bytes::Bytes;
 use freedom_config::Config;
 use moka::future::Cache;
-use reqwest::{Response, StatusCode};
+use reqwest::StatusCode;
 use url::Url;
 
 use crate::{
@@ -58,7 +58,7 @@ impl<T: Value> Container<T> for Arc<T> {
 impl Api for CachingClient {
     type Container<T: Value> = Arc<T>;
 
-    async fn delete(&self, url: Url) -> Result<Response, Error> {
+    async fn delete(&self, url: Url) -> Result<(Bytes, StatusCode), Error> {
         self.inner.delete(url).await
     }
 
@@ -89,7 +89,7 @@ impl Api for CachingClient {
         .map_err(|error| Error::Response(error.to_string()))?
     }
 
-    async fn post<S>(&self, url: Url, msg: S) -> Result<Response, Error>
+    async fn post<S>(&self, url: Url, msg: S) -> Result<(Bytes, StatusCode), Error>
     where
         S: serde::Serialize + Send + Sync,
     {

@@ -1,4 +1,3 @@
-use reqwest::Response;
 use serde::Serialize;
 
 use crate::{api::Api, error::Error};
@@ -109,7 +108,9 @@ impl<C> SatelliteConfigurationBuilder<'_, C, SatelliteConfiguration>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<Response, Error> {
+    pub async fn send(
+        self,
+    ) -> Result<freedom_models::satellite_configuration::SatelliteConfiguration, Error> {
         let client = self.client;
 
         let mut band_details = Vec::new();
@@ -126,6 +127,6 @@ where
         };
 
         let url = client.path_to_url("satellite_configurations")?;
-        client.post(url, dto).await
+        client.post_json_map(url, dto).await
     }
 }

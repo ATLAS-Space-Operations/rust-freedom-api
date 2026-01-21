@@ -32,7 +32,7 @@ pub trait GatewayApi: Api {
                 license_key: license_key.to_string(),
             };
             let uri = self.path_to_url("gateway-licenses/verify")?;
-            self.post_deserialize(uri, request).await
+            self.post_json_map(uri, request).await
         }
     }
 
@@ -43,7 +43,7 @@ pub trait GatewayApi: Api {
     {
         async move {
             let uri = self.path_to_url(format!("gateway-licenses/{id}/regenerate"))?;
-            self.post_deserialize(uri, serde_json::json!({})).await
+            self.post_json_map(uri, serde_json::json!({})).await
         }
     }
 }

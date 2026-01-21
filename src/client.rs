@@ -1,6 +1,6 @@
 use bytes::Bytes;
 use freedom_config::Config;
-use reqwest::{RequestBuilder, Response, StatusCode};
+use reqwest::{RequestBuilder, StatusCode};
 use url::Url;
 
 use crate::api::{Api, Inner, Value};
@@ -108,20 +108,27 @@ impl Api for Client {
         Ok((body, status))
     }
 
-    async fn delete(&self, url: Url) -> Result<Response, crate::error::Error> {
+    async fn delete(&self, url: Url) -> Result<(Bytes, StatusCode), crate::error::Error> {
         tracing::trace!("DELETE to {}", url);
 
         let req = self.append_headers(self.client.delete(url.clone()));
 
-        req.basic_auth(self.config.key(), Some(self.config.expose_secret()))
+        let resp = req
+            .basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .send()
+            .await?;
+
+        let status = resp.status();
+        let body = resp
+            .bytes()
             .await
             .inspect_err(|error| tracing::warn!(%error, %url, "Failed to DELETE"))
-            .inspect(|ok| tracing::warn!(?ok, %url, "Received response"))
-            .map_err(From::from)
+            .inspect(|ok| tracing::warn!(?ok, %url, "Received response"))?;
+
+        Ok((body, status))
     }
 
-    async fn post<S>(&self, url: Url, msg: S) -> Result<Response, crate::error::Error>
+    async fn post<S>(&self, url: Url, msg: S) -> Result<(Bytes, StatusCode), crate::error::Error>
     where
         S: serde::Serialize + Sync + Send,
     {
@@ -129,13 +136,20 @@ impl Api for Client {
 
         let req = self.append_headers(self.client.post(url.clone()));
 
-        req.basic_auth(self.config.key(), Some(self.config.expose_secret()))
+        let resp = req
+            .basic_auth(self.config.key(), Some(self.config.expose_secret()))
             .json(&msg)
             .send()
+            .await?;
+
+        let status = resp.status();
+        let body = resp
+            .bytes()
             .await
             .inspect_err(|error| tracing::warn!(%error, %url, "Failed to POST"))
-            .inspect(|ok| tracing::warn!(?ok, %url, "Received response"))
-            .map_err(From::from)
+            .inspect(|ok| tracing::warn!(?ok, %url, "Received response"))?;
+
+        Ok((body, status))
     }
 }
 

@@ -9,7 +9,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Config::from_env()?;
     let client = Client::from_config(config);
 
-    let response = client
+    let request = client
         .new_task_request()
         .test_task("idk.bin")
         .target_time_utc(OffsetDateTime::now_utc() + Duration::from_secs(60 * 15))
@@ -21,11 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .send()
         .await?;
 
-    println!("{:#?}", response);
-
-    let text = response.text().await;
-
-    println!("{:#?}", text);
+    println!("{:#?}", request);
 
     Ok(())
 }

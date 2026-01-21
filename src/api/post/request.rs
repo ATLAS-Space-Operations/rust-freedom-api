@@ -1,5 +1,4 @@
 use freedom_models::task::TaskType;
-use reqwest::Response;
 use serde::Serialize;
 use time::OffsetDateTime;
 
@@ -418,7 +417,7 @@ where
         self.override_result(UrlResult::Unchecked(override_url))
     }
 
-    pub async fn send(self) -> Result<Response, Error> {
+    pub async fn send(self) -> Result<freedom_models::task::TaskRequest, Error> {
         let client = self.client;
 
         let url = client.path_to_url("requests")?;
@@ -447,6 +446,6 @@ where
             with_override,
         };
 
-        client.post(url, dto).await
+        client.post_json_map(url, dto).await
     }
 }

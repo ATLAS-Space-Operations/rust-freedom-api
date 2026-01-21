@@ -2,7 +2,6 @@ use freedom_models::{
     band::{BandType, IoConfiguration, IoHardware},
     task::Polarization,
 };
-use reqwest::Response;
 use serde::Serialize;
 
 use crate::{api::Api, error::Error};
@@ -168,10 +167,10 @@ impl<C> BandDetailsBuilder<'_, C, BandDetails>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<Response, Error> {
+    pub async fn send(self) -> Result<freedom_models::band::Band, Error> {
         let client = self.client;
 
         let url = client.path_to_url("satellite_bands")?;
-        client.post(url, self.state).await
+        client.post_json_map(url, self.state).await
     }
 }

@@ -1,4 +1,3 @@
-use reqwest::Response;
 use serde::Serialize;
 
 use crate::{api::Api, error::Error};
@@ -122,10 +121,10 @@ impl<C> UserBuilder<'_, C, User>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<Response, Error> {
+    pub async fn send(self) -> Result<freedom_models::user::User, Error> {
         let client = self.client;
 
         let url = client.path_to_url(format!("accounts/{}/newuser", self.state.account_id))?;
-        client.post(url, self.state).await
+        client.post_json_map(url, self.state).await
     }
 }

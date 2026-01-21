@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use reqwest::Response;
 use serde::Serialize;
 
 use crate::{api::Api, error::Error};
@@ -130,7 +129,7 @@ impl<C> OverrideBuilder<'_, C, Override>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<Response, Error> {
+    pub async fn send(self) -> Result<(), Error> {
         let client = self.client;
 
         let url = client.path_to_url("overrides")?;
@@ -145,6 +144,7 @@ where
             properties: self.state.properties,
         };
 
-        client.post(url, dto).await
+        client.post(url, dto).await?;
+        Ok(())
     }
 }

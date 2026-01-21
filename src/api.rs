@@ -21,7 +21,7 @@ use freedom_models::{
     user::User,
     utils::Embedded,
 };
-use reqwest::{Response, StatusCode};
+use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use serde_json::Value as JsonValue;
 use time::{OffsetDateTime, format_description::well_known::Iso8601};
@@ -159,14 +159,14 @@ pub trait Api: Send + Sync {
         url: Url,
     ) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send + Sync;
 
-    fn delete(&self, url: Url) -> impl Future<Output = Result<Response, Error>> + Send;
+    fn delete(&self, url: Url) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send;
 
     /// Lower level method, not intended for direct use
     fn post<S>(
         &self,
         url: Url,
         msg: S,
-    ) -> impl Future<Output = Result<Response, Error>> + Send + Sync
+    ) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send + Sync
     where
         S: serde::Serialize + Send + Sync;
 
@@ -254,10 +254,12 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_band_details(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+    fn delete_band_details(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
         async move {
             let uri = self.path_to_url(format!("satellite_bands/{id}"))?;
-            self.delete(uri).await
+            let (body, status) = self.delete(uri).await?;
+            error_on_non_success(&status, &body)?;
+            Ok(())
         }
     }
 
@@ -277,10 +279,12 @@ pub trait Api: Send + Sync {
     fn delete_satellite_configuration(
         &self,
         id: i32,
-    ) -> impl Future<Output = Result<Response, Error>> + Send {
+    ) -> impl Future<Output = Result<(), Error>> + Send {
         async move {
             let uri = self.path_to_url(format!("satellite_configurations/{id}"))?;
-            self.delete(uri).await
+            let (body, status) = self.delete(uri).await?;
+            error_on_non_success(&status, &body)?;
+            Ok(())
         }
     }
 
@@ -297,10 +301,12 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_satellite(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+    fn delete_satellite(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
         async move {
             let uri = self.path_to_url(format!("satellites/{id}"))?;
-            self.delete(uri).await
+            let (body, status) = self.delete(uri).await?;
+            error_on_non_success(&status, &body)?;
+            Ok(())
         }
     }
 
@@ -317,10 +323,12 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_override(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+    fn delete_override(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
         async move {
             let uri = self.path_to_url(format!("overrides/{id}"))?;
-            self.delete(uri).await
+            let (body, status) = self.delete(uri).await?;
+            error_on_non_success(&status, &body)?;
+            Ok(())
         }
     }
 
@@ -337,10 +345,12 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_user(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+    fn delete_user(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
         async move {
             let uri = self.path_to_url(format!("users/{id}"))?;
-            self.delete(uri).await
+            let (body, status) = self.delete(uri).await?;
+            error_on_non_success(&status, &body)?;
+            Ok(())
         }
     }
 
@@ -357,15 +367,17 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_task_request(&self, id: i32) -> impl Future<Output = Result<Response, Error>> + Send {
+    fn delete_task_request(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
         async move {
             let uri = self.path_to_url(format!("requests/{id}"))?;
-            self.delete(uri).await
+            let (body, status) = self.delete(uri).await?;
+            error_on_non_success(&status, &body)?;
+            Ok(())
         }
     }
 
     /// Lower level method, not intended for direct use
-    fn post_deserialize<S, T>(
+    fn post_json_map<S, T>(
         &self,
         url: Url,
         msg: S,
@@ -375,9 +387,12 @@ pub trait Api: Send + Sync {
         T: Value,
     {
         async move {
-            let resp = self.post(url, msg).await?;
+            let (body, status) = self.post(url, msg).await?;
 
-            resp.json::<T>().await.map_err(From::from)
+            error_on_non_success(&status, &body)?;
+
+            let utf8_str = String::from_utf8_lossy(&body);
+            serde_json::from_str(&utf8_str).map_err(From::from)
         }
     }
 
@@ -1568,7 +1583,7 @@ pub trait Api: Send + Sync {
                 "configuration": format!("/api/configurations/{}", site_configuration_id),
             });
 
-            let value: JsonValue = self.post_deserialize(url, &payload).await?;
+            let value: JsonValue = self.post_json_map(url, &payload).await?;
 
             value
                 .get("token")
@@ -1609,7 +1624,7 @@ pub trait Api: Send + Sync {
                 "satellite": format!("/api/satellites/{}", satellite_id),
             });
 
-            let value: JsonValue = self.post_deserialize(url, &payload).await?;
+            let value: JsonValue = self.post_json_map(url, &payload).await?;
 
             value
                 .get("token")
