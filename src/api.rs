@@ -391,8 +391,10 @@ pub trait Api: Send + Sync {
 
             error_on_non_success(&status, &body)?;
 
-            let utf8_str = String::from_utf8_lossy(&body);
-            serde_json::from_str(&utf8_str).map_err(From::from)
+            let utf8_str = str::from_utf8(&body).map_err(|error| {
+                Error::Deserialization(format!("Failed to decode response as UTF-8: {error}"))
+            })?;
+            serde_json::from_str(utf8_str).map_err(From::from)
         }
     }
 
