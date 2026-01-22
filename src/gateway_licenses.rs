@@ -2,6 +2,12 @@ use freedom_models::gateway_licenses;
 
 use crate::{Api, error::Error};
 
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Verify {
+    license_key: String,
+}
+
 /// Extension API for interacting with the Freedom Gateway licensing architecture
 pub trait GatewayApi: Api {
     fn get_all_gateway_licenses(
@@ -28,7 +34,7 @@ pub trait GatewayApi: Api {
         license_key: &str,
     ) -> impl Future<Output = Result<gateway_licenses::VerifyResponse, Error>> + Send + Sync {
         async move {
-            let request = gateway_licenses::Verify {
+            let request = Verify {
                 license_key: license_key.to_string(),
             };
             let uri = self.path_to_url("gateway-licenses/verify")?;
