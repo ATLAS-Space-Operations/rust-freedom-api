@@ -10,7 +10,7 @@
 //! ## Container
 //!
 //! Unlike the objects fetched directly from the API, objects fetched through a parent are not
-//! wrapped in the Container<T> type. This is deliberate as certain objects are nested deeply and
+//! wrapped in the `Container<T>` type. This is deliberate as certain objects are nested deeply and
 //! muddy the API when wrapping.
 
 use std::collections::HashMap;
