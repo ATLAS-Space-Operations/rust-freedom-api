@@ -1491,8 +1491,8 @@ pub trait Api: Send + Sync {
     ///     .name("downconverter.gain override for sat 1 on config 2")
     ///     .satellite_id(1)
     ///     .satellite_configuration_id(2)
-    ///     .add_property("site.hardware.modem.ttc.rx.demodulator.bitrate", 8096_u32)
-    ///     .add_property("site.hardware.modem.ttc.tx.modulator.bitrate", 8096_u32)
+    ///     .with_property("site.hardware.modem.ttc.rx.demodulator.bitrate", 8096_u32)
+    ///     .with_property("site.hardware.modem.ttc.tx.modulator.bitrate", 8096_u32)
     ///     .send()
     ///     .await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
