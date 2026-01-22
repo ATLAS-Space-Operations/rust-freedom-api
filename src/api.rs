@@ -159,7 +159,10 @@ pub trait Api: Send + Sync {
         url: Url,
     ) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send + Sync;
 
-    fn delete(&self, url: Url) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send;
+    fn delete(
+        &self,
+        url: Url,
+    ) -> impl Future<Output = Result<(Bytes, StatusCode), Error>> + Send + Sync;
 
     /// Lower level method, not intended for direct use
     fn post<S>(
@@ -254,7 +257,10 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_band_details(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
+    fn delete_band_details(
+        &self,
+        id: i32,
+    ) -> impl Future<Output = Result<(), Error>> + Send + Sync {
         async move {
             let uri = self.path_to_url(format!("satellite_bands/{id}"))?;
             let (body, status) = self.delete(uri).await?;
@@ -279,7 +285,7 @@ pub trait Api: Send + Sync {
     fn delete_satellite_configuration(
         &self,
         id: i32,
-    ) -> impl Future<Output = Result<(), Error>> + Send {
+    ) -> impl Future<Output = Result<(), Error>> + Send + Sync {
         async move {
             let uri = self.path_to_url(format!("satellite_configurations/{id}"))?;
             let (body, status) = self.delete(uri).await?;
@@ -301,7 +307,7 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_satellite(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
+    fn delete_satellite(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send + Sync {
         async move {
             let uri = self.path_to_url(format!("satellites/{id}"))?;
             let (body, status) = self.delete(uri).await?;
@@ -323,7 +329,7 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_override(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
+    fn delete_override(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send + Sync {
         async move {
             let uri = self.path_to_url(format!("overrides/{id}"))?;
             let (body, status) = self.delete(uri).await?;
@@ -345,7 +351,7 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_user(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
+    fn delete_user(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send + Sync {
         async move {
             let uri = self.path_to_url(format!("users/{id}"))?;
             let (body, status) = self.delete(uri).await?;
@@ -367,7 +373,10 @@ pub trait Api: Send + Sync {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    fn delete_task_request(&self, id: i32) -> impl Future<Output = Result<(), Error>> + Send {
+    fn delete_task_request(
+        &self,
+        id: i32,
+    ) -> impl Future<Output = Result<(), Error>> + Send + Sync {
         async move {
             let uri = self.path_to_url(format!("requests/{id}"))?;
             let (body, status) = self.delete(uri).await?;
