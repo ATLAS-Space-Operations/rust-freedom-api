@@ -10,7 +10,7 @@ mod gateway_licenses;
 mod utils;
 
 pub use self::{
-    api::{Api, Container, Inner, PaginatedStream, Value},
+    api::{Api, Container, Inner, PaginatedStream, Value, post::Post},
     client::Client,
     gateway_licenses::GatewayApi,
 };
@@ -23,7 +23,7 @@ pub mod prelude {
         api::{
             Api, Container, Inner, PaginatedStream, Value,
             post::{
-                BandDetailsBuilder, OverrideBuilder, SatelliteBuilder,
+                BandDetailsBuilder, OverrideBuilder, Post, SatelliteBuilder,
                 SatelliteConfigurationBuilder, UserBuilder,
             },
         },

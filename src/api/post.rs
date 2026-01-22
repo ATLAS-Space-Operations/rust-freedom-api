@@ -10,6 +10,19 @@ pub use self::{
     sat_config::SatelliteConfigurationBuilder, satellite::SatelliteBuilder, user::UserBuilder,
 };
 
+use super::Value;
+
+/// A trait defining the response and send future for HTTP POSTs
+pub trait Post {
+    /// The deserialized response from the Freedom API after a successful POST
+    type Response: Value;
+
+    /// The future used to send the POST
+    fn send(
+        self,
+    ) -> impl Future<Output = Result<Self::Response, crate::error::Error>> + Send + Sync;
+}
+
 #[derive(Debug, Clone, PartialEq)]
 enum UrlResult {
     Checked(String),

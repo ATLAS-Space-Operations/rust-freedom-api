@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use freedom_api::prelude::*;
+use freedom_api::{Post, prelude::*};
 use freedom_config::Config;
 use time::OffsetDateTime;
 

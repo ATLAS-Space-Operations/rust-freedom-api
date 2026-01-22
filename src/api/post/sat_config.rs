@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::{api::Api, error::Error};
 
-use super::UrlResult;
+use super::{Post, UrlResult};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -104,13 +104,13 @@ impl<C> SatelliteConfigurationBuilder<'_, C, SatelliteConfiguration> {
     }
 }
 
-impl<C> SatelliteConfigurationBuilder<'_, C, SatelliteConfiguration>
+impl<C> Post for SatelliteConfigurationBuilder<'_, C, SatelliteConfiguration>
 where
     C: Api,
 {
-    pub async fn send(
-        self,
-    ) -> Result<freedom_models::satellite_configuration::SatelliteConfiguration, Error> {
+    type Response = freedom_models::satellite_configuration::SatelliteConfiguration;
+
+    async fn send(self) -> Result<Self::Response, Error> {
         let client = self.client;
 
         let mut band_details = Vec::new();

@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::{api::Api, error::Error};
 
-use super::UrlResult;
+use super::{Post, UrlResult};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -111,11 +111,13 @@ impl<C> SatelliteBuilder<'_, C, Satellite> {
     }
 }
 
-impl<C> SatelliteBuilder<'_, C, Satellite>
+impl<C> Post for SatelliteBuilder<'_, C, Satellite>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<freedom_models::satellite::Satellite, Error> {
+    type Response = freedom_models::satellite::Satellite;
+
+    async fn send(self) -> Result<Self::Response, Error> {
         let client = self.client;
 
         let url = client.path_to_url("satellites")?;

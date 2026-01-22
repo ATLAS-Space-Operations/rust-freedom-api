@@ -6,6 +6,8 @@ use serde::Serialize;
 
 use crate::{api::Api, error::Error};
 
+use super::Post;
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BandDetails {
@@ -163,11 +165,13 @@ impl<C> BandDetailsBuilder<'_, C, BandDetails> {
     }
 }
 
-impl<C> BandDetailsBuilder<'_, C, BandDetails>
+impl<C> Post for BandDetailsBuilder<'_, C, BandDetails>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<freedom_models::band::Band, Error> {
+    type Response = freedom_models::band::Band;
+
+    async fn send(self) -> Result<Self::Response, Error> {
         let client = self.client;
 
         let url = client.path_to_url("satellite_bands")?;

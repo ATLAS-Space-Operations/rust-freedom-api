@@ -2,6 +2,8 @@ use serde::Serialize;
 
 use crate::{api::Api, error::Error};
 
+use super::Post;
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
@@ -117,11 +119,13 @@ impl<C> UserBuilder<'_, C, User> {
     }
 }
 
-impl<C> UserBuilder<'_, C, User>
+impl<C> Post for UserBuilder<'_, C, User>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<freedom_models::user::User, Error> {
+    type Response = freedom_models::user::User;
+
+    async fn send(self) -> Result<Self::Response, Error> {
         let client = self.client;
 
         let url = client.path_to_url(format!("accounts/{}/newuser", self.state.account_id))?;

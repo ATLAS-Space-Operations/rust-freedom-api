@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use crate::{api::Api, error::Error};
 
-use super::UrlResult;
+use super::{Post, UrlResult};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -125,11 +125,13 @@ impl<C> OverrideBuilder<'_, C, Override> {
     }
 }
 
-impl<C> OverrideBuilder<'_, C, Override>
+impl<C> Post for OverrideBuilder<'_, C, Override>
 where
     C: Api,
 {
-    pub async fn send(self) -> Result<(), Error> {
+    type Response = freedom_models::task_override::Override;
+
+    async fn send(self) -> Result<Self::Response, Error> {
         let client = self.client;
 
         let url = client.path_to_url("overrides")?;
@@ -144,7 +146,6 @@ where
             properties: self.state.properties,
         };
 
-        client.post(url, dto).await?;
-        Ok(())
+        client.post_json_map(url, dto).await
     }
 }

@@ -4,7 +4,7 @@ use time::OffsetDateTime;
 
 use crate::{api::Api, error::Error};
 
-use super::UrlResult;
+use super::{Post, UrlResult};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TaskRequest {
@@ -416,8 +416,15 @@ where
 
         self.override_result(UrlResult::Unchecked(override_url))
     }
+}
 
-    pub async fn send(self) -> Result<freedom_models::task::TaskRequest, Error> {
+impl<C> Post for TaskRequestBuilder<'_, C, TaskRequest>
+where
+    C: Api,
+{
+    type Response = freedom_models::task::TaskRequest;
+
+    async fn send(self) -> Result<Self::Response, Error> {
         let client = self.client;
 
         let url = client.path_to_url("requests")?;
