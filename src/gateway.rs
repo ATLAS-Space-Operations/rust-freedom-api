@@ -19,13 +19,24 @@ pub trait GatewayApi: Api {
         }
     }
 
-    fn get_all_gateway_license(
+    fn get_gateway_license(
         &self,
         id: u32,
     ) -> impl Future<Output = Result<gateway_licenses::ViewOne, Error>> + Send + Sync {
         async move {
             let uri = self.path_to_url(format!("gateway-licenses/{id}"))?;
             self.get_json_map(uri).await
+        }
+    }
+
+    fn regenerate_gateway_license(
+        &self,
+        id: u32,
+    ) -> impl Future<Output = Result<gateway_licenses::RegenerateResponse, Error>> + Send + Sync
+    {
+        async move {
+            let uri = self.path_to_url(format!("gateway-licenses/{id}/regenerate"))?;
+            self.post_json_map(uri, serde_json::json!({})).await
         }
     }
 
@@ -39,17 +50,6 @@ pub trait GatewayApi: Api {
             };
             let uri = self.path_to_url("gateway-licenses/verify")?;
             self.post_json_map(uri, request).await
-        }
-    }
-
-    fn regenerate_gateway_license(
-        &self,
-        id: u32,
-    ) -> impl Future<Output = Result<gateway_licenses::RegenerateResponse, Error>> + Send + Sync
-    {
-        async move {
-            let uri = self.path_to_url(format!("gateway-licenses/{id}/regenerate"))?;
-            self.post_json_map(uri, serde_json::json!({})).await
         }
     }
 }
