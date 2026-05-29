@@ -10,6 +10,16 @@ struct Verify {
 
 /// Extension API for interacting with the Freedom Gateway licensing architecture
 pub trait GatewayApi: Api {
+    /// Fetch information about the latest version of Freedom Gateway
+    fn get_gateway_latest_version(
+        &self,
+    ) -> impl Future<Output = Result<gateway_licenses::LatestVersion, Error>> + Send + Sync {
+        async move {
+            let uri = self.path_to_url("gateway/latestVersion")?;
+            self.get_json_map(uri).await
+        }
+    }
+
     fn get_all_gateway_licenses(
         &self,
     ) -> impl Future<Output = Result<gateway_licenses::View, Error>> + Send + Sync {
