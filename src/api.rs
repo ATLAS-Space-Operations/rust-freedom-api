@@ -1383,6 +1383,20 @@ pub trait Api: Send + Sync {
         }
     }
 
+    /// Produces a single [`User`] matching the provided ID.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    fn get_user_by_id(
+        &self,
+        user_id: i32,
+    ) -> impl Future<Output = Result<Self::Container<User>, Error>> + Send + Sync {
+        async move {
+            let uri = self.path_to_url(format!("users/{}", user_id))?;
+
+            self.get_json_map(uri).await
+        }
+    }
+
     /// Produces a paginated stream of [`User`] objects.
     ///
     /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
