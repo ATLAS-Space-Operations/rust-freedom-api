@@ -33,7 +33,7 @@ pub use {
     satellite::{SatelliteConfigurationExt, SatelliteExt},
     site::{SiteConfigurationExt, SiteExt},
     task::TaskExt,
-    user::UserExt,
+    user::{UserExt, WhoAmIExt},
 };
 
 fn get_id(reference: &'static str, links: &HashMap<String, url::Url>) -> Result<i32, error::Error> {

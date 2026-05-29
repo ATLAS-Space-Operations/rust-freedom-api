@@ -18,7 +18,7 @@ use freedom_models::{
     satellite_configuration::SatelliteConfiguration,
     site::{Site, SiteConfiguration},
     task::{Task, TaskRequest, TaskStatusType, TaskType},
-    user::User,
+    user::{User, WhoAmI},
     utils::Embedded,
 };
 use reqwest::StatusCode;
@@ -1657,6 +1657,17 @@ pub trait Api: Send + Sync {
                 .as_str()
                 .ok_or(Error::Response(String::from("Invalid type for token")))
                 .map(|s| s.to_owned())
+        }
+    }
+
+    /// Returns details about the user associated with the client's API keys
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    fn whoami(&self) -> impl Future<Output = Result<Self::Container<WhoAmI>, Error>> + Send + Sync {
+        async move {
+            let uri = self.path_to_url("users/search/whoami")?;
+
+            self.get_json_map(uri).await
         }
     }
 }
