@@ -24,7 +24,7 @@ tracing = { version = "0.1.40" }
 url = { version = "2.5.0" }
 
 # Optional dependencies
-moka = { version = "0.12.10", features = ["future"], optional = true }
+moka = { version = "0.12.15", features = ["future"], optional = true }
 
 # ATLAS internal dependencies
 freedom-config = { version = "1.0.0", features = ["serde"] }
