@@ -418,33 +418,6 @@ pub trait Api: Send + Sync {
     /// # tokio_test::block_on(async {
     /// let client = Client::from_env()?;
     ///
-    /// let account = client.get_account_by_name("ATLAS").await?;
-    /// println!("{}", account.name);
-    /// # Ok::<_, Box<dyn std::error::Error>>(())
-    /// # });
-    /// ```
-    fn get_account_by_name(
-        &self,
-        account_name: &str,
-    ) -> impl Future<Output = Result<Self::Container<Account>, Error>> + Send + Sync {
-        async move {
-            let mut uri = self.path_to_url("accounts/search/findOneByName")?;
-            uri.set_query(Some(&format!("name={account_name}")));
-            self.get_json_map(uri).await
-        }
-    }
-
-    /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
-    ///
-    /// See [`get`](Self::get) documentation for more details about the process and return type
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use freedom_api::prelude::*;
-    /// # tokio_test::block_on(async {
-    /// let client = Client::from_env()?;
-    ///
     /// let data = client.get_file_by_task_id_and_name(42, "data.bin").await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
@@ -465,6 +438,18 @@ pub trait Api: Send + Sync {
         }
     }
 
+    /// Produces a paginated stream of [`Account`](freedom_models::account::Account) objects.
+    ///
+    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
+    /// and return type
+    fn get_accounts(&self) -> PaginatedStream<'_, Self::Container<Account>> {
+        let uri = match self.path_to_url("accounts") {
+            Ok(uri) => uri,
+            Err(err) => return err.once_err(),
+        };
+        self.get_paginated(uri)
+    }
+
     /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
     /// See [`get`](Self::get) documentation for more details about the process and return type
@@ -478,16 +463,31 @@ pub trait Api: Send + Sync {
         }
     }
 
-    /// Produces a paginated stream of [`Account`](freedom_models::account::Account) objects.
+    /// Produces a single [`Account`](freedom_models::account::Account) matching the provided ID.
     ///
-    /// See [`get_paginated`](Self::get_paginated) documentation for more details about the process
-    /// and return type
-    fn get_accounts(&self) -> PaginatedStream<'_, Self::Container<Account>> {
-        let uri = match self.path_to_url("accounts") {
-            Ok(uri) => uri,
-            Err(err) => return err.once_err(),
-        };
-        self.get_paginated(uri)
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// let account = client.get_account_by_name("ATLAS").await?;
+    /// println!("{}", account.name);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn get_account_by_name(
+        &self,
+        account_name: &str,
+    ) -> impl Future<Output = Result<Self::Container<Account>, Error>> + Send + Sync {
+        async move {
+            let mut uri = self.path_to_url("accounts/search/findOneByName")?;
+            uri.set_query(Some(&format!("name={account_name}")));
+            self.get_json_map(uri).await
+        }
     }
 
     /// Produces a paginated stream of [`Band`] objects.
