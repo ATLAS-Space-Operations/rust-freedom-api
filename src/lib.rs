@@ -39,8 +39,8 @@ pub mod prelude {
 /// Re-export of the models found in the `freedom-models` crate.
 pub mod models {
     pub use freedom_models::{
-        account::*, azel::*, band::*, satellite::*, satellite_configuration::*, site::*, task::*,
-        user::*,
+        account::*, azel::*, band::*, gateway_licenses::*, satellite::*,
+        satellite_configuration::*, site::*, task::*, user::*,
     };
 }
 
