@@ -17,7 +17,7 @@ use freedom_models::{
     satellite::Satellite,
     satellite_configuration::SatelliteConfiguration,
     site::{Site, SiteConfiguration},
-    task::{Task, TaskRequest, TaskStatusType, TaskType},
+    task::{PayloadStatus, Task, TaskRequest, TaskStatusType, TaskType},
     user::{User, WhoAmI},
     utils::Embedded,
 };
@@ -486,6 +486,49 @@ pub trait Api: Send + Sync {
         async move {
             let mut uri = self.path_to_url("accounts/search/findOneByName")?;
             uri.set_query(Some(&format!("name={account_name}")));
+            self.get_json_map(uri).await
+        }
+    }
+
+    /// Gets the [`PayloadStatus`] for a particular task ID and band name, optionally also filtering
+    /// by artifact name.
+    ///
+    /// See [`get`](Self::get) documentation for more details about the process and return type
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use freedom_api::prelude::*;
+    /// # tokio_test::block_on(async {
+    /// let client = Client::from_env()?;
+    ///
+    /// let status = client.get_payload_status(1, "My-Band", None).await?;
+    /// println!("{}", status.payload_enabled);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    fn get_payload_status(
+        &self,
+        task_id: i32,
+        band_name: &str,
+        artifact_name: Option<&str>,
+    ) -> impl Future<Output = Result<Self::Container<PayloadStatus>, Error>> + Send + Sync {
+        async move {
+            let mut uri = self.path_to_url(format!("tasks/{}/payloadStatus", task_id))?;
+
+            // rustc is getting all testy with holding pairs across awaits, so we need to prove to
+            // it that it is not
+            {
+                let mut pairs = uri.query_pairs_mut();
+                pairs.append_pair("band", band_name.as_ref());
+
+                if let Some(artifact_name) = artifact_name {
+                    pairs.append_pair("artifact", artifact_name.as_ref());
+                }
+
+                let _ = pairs.finish();
+            }
+
             self.get_json_map(uri).await
         }
     }
