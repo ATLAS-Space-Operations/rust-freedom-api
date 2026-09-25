@@ -9,7 +9,7 @@ support for a blocking client may be added sometime in the future, but for now
 an executor is required for usage. We recommend [tokio](https://tokio.rs/), as
 it is already a dependency of the asynchronous http client used.
 
-## Installation 
+## Installation
 
 To incorporate the Freedom API into an existing cargo project simply invoke the
 following from the project's root directory:
@@ -20,8 +20,8 @@ $ cargo add freedom-api
 
 ## Documentation
 
-The freedom API has a significant amount of documentation to get users up and 
-running quickly. 
+The freedom API has a significant amount of documentation to get users up and
+running quickly.
 
 The latest docs are available
 [here](https://docs.rs/freedom-api/latest/freedom_api/), via docs.rs. If you
@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client = Client::from_config(config);
 
-    // Query Freedom for a list of all Satellites, printing the names of the 
+    // Query Freedom for a list of all Satellites, printing the names of the
     // satellite which passed deserialization
     client.get_satellites()
         .collect::<Vec<_>>()
@@ -107,7 +107,7 @@ return of the task request call:
 
 ```rust, no_run
 // The prelude includes extensions traits to make expose this functionality
-use freedom_api::prelude::*; 
+use freedom_api::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
