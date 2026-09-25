@@ -9,9 +9,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     let client = Client::from_config(config);
-    let status = client
-        .get_payload_status(288818, "TEST_RX_100Mbps", None)
-        .await?;
+    let status = client.get_payload_status(1, "TEST_Band", None).await?;
 
     println!("{:#?}", status);
 
